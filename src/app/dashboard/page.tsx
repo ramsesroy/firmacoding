@@ -1,36 +1,82 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import SignaturePreview from "@/components/SignaturePreview";
+import ValidationInfoDisplay from "@/components/ValidationInfoDisplay";
+import IconPicker from "@/components/IconPicker";
 import { TemplateType, RedSocial } from "@/types/signature";
 import { copyToClipboard } from "@/lib/signatureUtils";
 import { uploadImage } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function DashboardPage() {
+  // URLs de imágenes de ejemplo (imágenes reales profesionales de Unsplash)
+  // Foto de perfil profesional - retrato empresarial de calidad
+  const EXAMPLE_PHOTO_URL = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
+  // Logo de empresa de ejemplo - diseño minimalista corporativo
+  const EXAMPLE_LOGO_URL = "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80";
+
   const [signatureData, setSignatureData] = useState({
     nombre: "Juan Pérez",
     cargo: "Desarrollador Full Stack",
     foto: "",
     telefono: "+1 (555) 123-4567",
     redes: [
-      { nombre: "LinkedIn", url: "https://linkedin.com/in/juanperez" },
-      { nombre: "Twitter", url: "https://twitter.com/juanperez" },
+      { nombre: "LinkedIn", url: "https://linkedin.com/in/juanperez", icono: "💼" },
+      { nombre: "X (Twitter)", url: "https://twitter.com/juanperez", icono: "🐦" },
+      { nombre: "GitHub", url: "https://github.com/juanperez", icono: "💻" },
     ] as RedSocial[],
+    horario: "",
+    textoAdicional: "",
+    colorPersonalizado: "",
+    qrLink: "",
+    logoEmpresa: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80", // Logo de ejemplo para template professional
+    ctaTexto: "",
+    telefonoMovil: "",
+    direccion: "",
+    iconoTelefono: "📞",
+    iconoTelefonoMovil: "📱",
+    iconoDireccion: "📍",
   });
 
-  const [template, setTemplate] = useState<TemplateType>("classic");
-  const [nuevaRed, setNuevaRed] = useState({ nombre: "", url: "" });
+  const [template, setTemplate] = useState<TemplateType>("professional");
+  const [nuevaRed, setNuevaRed] = useState({ nombre: "", url: "", icono: "" });
   const [copied, setCopied] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [editingRed, setEditingRed] = useState<number | null>(null);
-  const [editRedForm, setEditRedForm] = useState({ nombre: "", url: "" });
+  const [editRedForm, setEditRedForm] = useState({ nombre: "", url: "", icono: "" });
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Agregar imágenes de ejemplo según el template cuando cambia
+  useEffect(() => {
+    // Templates que usan foto
+    const templatesWithPhoto = ["classic", "modern", "minimal", "modernaSinBarra", "modern2", "modern3", "modern4"];
+    // Templates que usan logo
+    const templatesWithLogo = ["professional", "enterpriseVintage"];
+    
+    setSignatureData(prev => {
+      const updates: Partial<typeof signatureData> = {};
+      
+      // Agregar foto de ejemplo si el template la requiere y no hay foto
+      if (templatesWithPhoto.includes(template) && !prev.foto) {
+        updates.foto = EXAMPLE_PHOTO_URL;
+      }
+      
+      // Agregar logo de ejemplo si el template lo requiere y no hay logo
+      if (templatesWithLogo.includes(template) && !prev.logoEmpresa) {
+        updates.logoEmpresa = EXAMPLE_LOGO_URL;
+      }
+      
+      return Object.keys(updates).length > 0 ? { ...prev, ...updates } : prev;
+    });
+  }, [template]); // Se ejecuta cuando cambia el template
 
   const handleCopyToClipboard = async () => {
-    const success = await copyToClipboard(signatureData, template);
+    const success = await copyToClipboard(signatureData, template, signatureData.nombre || "Usuario");
     if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -64,25 +110,50 @@ export default function DashboardPage() {
     }
   };
 
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadingLogo(true);
+    try {
+      const imageURL = await uploadImage(file);
+      setSignatureData({ ...signatureData, logoEmpresa: imageURL });
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Error al cargar el logo");
+      if (logoFileInputRef.current) {
+        logoFileInputRef.current.value = "";
+      }
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleRemoveLogo = () => {
+    setSignatureData({ ...signatureData, logoEmpresa: "" });
+    if (logoFileInputRef.current) {
+      logoFileInputRef.current.value = "";
+    }
+  };
+
   const handleEditRed = (index: number) => {
     const red = signatureData.redes[index];
     setEditingRed(index);
-    setEditRedForm({ nombre: red.nombre, url: red.url });
+    setEditRedForm({ nombre: red.nombre, url: red.url, icono: red.icono || "" });
   };
 
   const handleSaveEditRed = () => {
     if (editingRed !== null && editRedForm.nombre && editRedForm.url) {
       const nuevasRedes = [...signatureData.redes];
-      nuevasRedes[editingRed] = editRedForm as RedSocial;
+      nuevasRedes[editingRed] = { ...editRedForm, icono: editRedForm.icono || undefined } as RedSocial;
       setSignatureData({ ...signatureData, redes: nuevasRedes });
       setEditingRed(null);
-      setEditRedForm({ nombre: "", url: "" });
+      setEditRedForm({ nombre: "", url: "", icono: "" });
     }
   };
 
   const handleCancelEditRed = () => {
     setEditingRed(null);
-    setEditRedForm({ nombre: "", url: "" });
+    setEditRedForm({ nombre: "", url: "", icono: "" });
   };
 
   const handleSave = async () => {
@@ -185,37 +256,59 @@ export default function DashboardPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Plantilla
                 </label>
-                <div className="grid grid-cols-3 gap-3">
-                  <button
-                    onClick={() => setTemplate("classic")}
-                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      template === "classic"
-                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                        : "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
-                    }`}
-                  >
-                    Clásica
-                  </button>
-                  <button
-                    onClick={() => setTemplate("modern")}
-                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      template === "modern"
-                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                        : "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
-                    }`}
-                  >
-                    Moderna
-                  </button>
-                  <button
-                    onClick={() => setTemplate("minimal")}
-                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      template === "minimal"
-                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                        : "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
-                    }`}
-                  >
-                    Minimal
-                  </button>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 max-h-64 overflow-y-auto pr-2">
+                  {[
+                    { id: "professional", name: "Professional", badge: "Most Popular" },
+                    { id: "classic", name: "Clásica" },
+                    { id: "modern", name: "Moderna" },
+                    { id: "minimal", name: "Minimal" },
+                    { id: "minimalCorporate", name: "Corp" },
+                    { id: "modernaSinBarra", name: "Modern 2" },
+                    { id: "enterpriseVintage", name: "Enterprise" },
+                    { id: "modern2", name: "Modern 3" },
+                    { id: "qrProfesional", name: "QR Pro" },
+                    { id: "modern3", name: "Modern 4" },
+                    { id: "modern4", name: "Modern 5" },
+                    { id: "qrCorporated", name: "QR Corp" },
+                  ].map((tpl) => (
+                    <button
+                      key={tpl.id}
+                      onClick={() => {
+                        const newTemplate = tpl.id as TemplateType;
+                        setTemplate(newTemplate);
+                        
+                        // Agregar foto de ejemplo si el template usa foto y no hay foto
+                        const templatesWithPhoto = ["classic", "modern", "minimal", "modernaSinBarra", "modern2", "modern3", "modern4"];
+                        if (templatesWithPhoto.includes(newTemplate) && !signatureData.foto) {
+                          setSignatureData({ ...signatureData, foto: EXAMPLE_PHOTO_URL });
+                        }
+                        
+                        // Agregar logo de ejemplo si el template usa logo y no hay logo
+                        const templatesWithLogo = ["professional", "enterpriseVintage"];
+                        if (templatesWithLogo.includes(newTemplate) && !signatureData.logoEmpresa) {
+                          setSignatureData({ ...signatureData, logoEmpresa: EXAMPLE_LOGO_URL });
+                        }
+                      }}
+                      className={`relative px-3 py-2.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                        template === tpl.id
+                          ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                          : "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
+                      }`}
+                    >
+                      <span className="flex items-center gap-1.5 relative">
+                        <span>{tpl.name}</span>
+                        {tpl.badge && (
+                          <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full whitespace-nowrap ${
+                            template === tpl.id
+                              ? "bg-yellow-400 text-gray-900"
+                              : "bg-yellow-400 text-gray-900"
+                          }`}>
+                            {tpl.badge}
+                          </span>
+                        )}
+                      </span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -311,21 +404,314 @@ export default function DashboardPage() {
               )}
             </div>
 
+            {/* Logo de Empresa (Professional) */}
+            {(template === "professional") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Logo de Empresa
+                </label>
+                {!signatureData.logoEmpresa ? (
+                  <div className="space-y-3">
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-200 cursor-pointer bg-gray-50/50">
+                      <input
+                        ref={logoFileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="hidden"
+                        id="logo-input"
+                        disabled={uploadingLogo}
+                      />
+                      <label
+                        htmlFor="logo-input"
+                        className="cursor-pointer block"
+                      >
+                        <svg
+                          className="mx-auto h-10 w-10 text-gray-400 mb-2"
+                          stroke="currentColor"
+                          fill="none"
+                          viewBox="0 0 48 48"
+                        >
+                          <path
+                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span className="text-sm font-medium text-gray-700">
+                          {uploadingLogo ? "Subiendo logo..." : "Haz clic para subir un logo"}
+                        </span>
+                        <p className="text-xs text-gray-500 mt-1">
+                          JPG, PNG o GIF (máx. 5MB)
+                        </p>
+                      </label>
+                    </div>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-300"></div>
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-white px-2 text-gray-500">O</span>
+                      </div>
+                    </div>
+                    <input
+                      type="text"
+                      value={signatureData.logoEmpresa || ""}
+                      onChange={(e) =>
+                        setSignatureData({ ...signatureData, logoEmpresa: e.target.value })
+                      }
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                      placeholder="URL del logo (https://ejemplo.com/logo.png)"
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="border border-gray-200 rounded-xl p-5 bg-gray-50/50">
+                      <img
+                        src={signatureData.logoEmpresa}
+                        alt="Vista previa del logo"
+                        className="max-w-full h-32 object-contain mx-auto rounded-lg shadow-sm"
+                      />
+                      <button
+                        onClick={handleRemoveLogo}
+                        className="mt-3 w-full px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all duration-200 text-sm font-semibold border border-red-200"
+                      >
+                        Eliminar Logo
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      value={signatureData.logoEmpresa || ""}
+                      onChange={(e) =>
+                        setSignatureData({ ...signatureData, logoEmpresa: e.target.value })
+                      }
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                      placeholder="URL del logo (https://ejemplo.com/logo.png)"
+                    />
+                    <p className="text-xs text-gray-500">
+                      ⚠️ También puedes cambiar la URL del logo manualmente
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Teléfono */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Teléfono
-              </label>
-              <input
-                type="text"
-                value={signatureData.telefono}
-                onChange={(e) =>
-                  setSignatureData({ ...signatureData, telefono: e.target.value })
-                }
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                placeholder="+1 (555) 123-4567"
-              />
+              <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Teléfono
+                  </label>
+                  <input
+                    type="text"
+                    value={signatureData.telefono}
+                    onChange={(e) =>
+                      setSignatureData({ ...signatureData, telefono: e.target.value })
+                    }
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+                <IconPicker
+                  selectedIcon={signatureData.iconoTelefono}
+                  onSelectIcon={(icon) =>
+                    setSignatureData({ ...signatureData, iconoTelefono: icon })
+                  }
+                  label="Icono"
+                />
+              </div>
             </div>
+
+            {/* Teléfono Móvil (Professional) */}
+            {(template === "professional") && (
+              <div>
+                <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Teléfono Móvil
+                    </label>
+                    <input
+                      type="text"
+                      value={signatureData.telefonoMovil || ""}
+                      onChange={(e) =>
+                        setSignatureData({ ...signatureData, telefonoMovil: e.target.value })
+                      }
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                      placeholder="+34 614 19 54 89"
+                    />
+                  </div>
+                  <IconPicker
+                    selectedIcon={signatureData.iconoTelefonoMovil}
+                    onSelectIcon={(icon) =>
+                      setSignatureData({ ...signatureData, iconoTelefonoMovil: icon })
+                    }
+                    label="Icono"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Dirección (Professional) */}
+            {(template === "professional") && (
+              <div>
+                <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Dirección
+                    </label>
+                    <input
+                      type="text"
+                      value={signatureData.direccion || ""}
+                      onChange={(e) =>
+                        setSignatureData({ ...signatureData, direccion: e.target.value })
+                      }
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                      placeholder="Ej: Rio Barbate, 5, Cádiz 11138, Spain"
+                    />
+                  </div>
+                  <IconPicker
+                    selectedIcon={signatureData.iconoDireccion}
+                    onSelectIcon={(icon) =>
+                      setSignatureData({ ...signatureData, iconoDireccion: icon })
+                    }
+                    label="Icono"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Logo de Empresa (Enterprise Vintage) */}
+            {(template === "enterpriseVintage") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Logo de Empresa
+                </label>
+                <input
+                  type="text"
+                  value={signatureData.logoEmpresa || ""}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, logoEmpresa: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="URL del logo (recomendado) o deja vacío para ocultar"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  ⚠️ Se recomienda usar una URL pública del logo. Si dejas vacío, no se mostrará ningún logo.
+                </p>
+              </div>
+            )}
+
+            {/* Horario (QR Profesional) */}
+            {(template === "qrProfesional") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Horario de atención
+                </label>
+                <input
+                  type="text"
+                  value={signatureData.horario}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, horario: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="Ej: 08:00 a 16:00 hs"
+                />
+              </div>
+            )}
+
+            {/* Texto Adicional (Enterprise Vintage) */}
+            {(template === "enterpriseVintage") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Texto adicional (debajo del teléfono)
+                </label>
+                <input
+                  type="text"
+                  value={signatureData.textoAdicional}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, textoAdicional: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="Ej: Disponible de lunes a viernes"
+                />
+              </div>
+            )}
+
+            {/* Selector de Color (Moderna sin barra, Modern 4) */}
+            {(["modernaSinBarra", "modern4"].includes(template)) && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Color personalizado
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={signatureData.colorPersonalizado || "#0066cc"}
+                    onChange={(e) =>
+                      setSignatureData({ ...signatureData, colorPersonalizado: e.target.value })
+                    }
+                    className="w-16 h-12 border border-gray-200 rounded-lg cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={signatureData.colorPersonalizado}
+                    onChange={(e) =>
+                      setSignatureData({ ...signatureData, colorPersonalizado: e.target.value })
+                    }
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                    placeholder="#0066cc"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {template === "modernaSinBarra" && "Color para borde de foto y cargo"}
+                  {template === "modern4" && "Color para borde, línea y botón"}
+                </p>
+              </div>
+            )}
+
+            {/* Texto del CTA (Modern 4) */}
+            {(template === "modern4") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Texto del botón CTA
+                </label>
+                <input
+                  type="text"
+                  value={signatureData.ctaTexto || "Book a Meeting"}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, ctaTexto: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="Ej: Book a Meeting"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Personaliza el texto del botón de llamada a la acción
+                </p>
+              </div>
+            )}
+
+            {/* QR Link (QR Profesional, QR Corporated) */}
+            {(["qrProfesional", "qrCorporated"].includes(template)) && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  URL para código QR
+                </label>
+                <input
+                  type="url"
+                  value={signatureData.qrLink}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, qrLink: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="https://ejemplo.com"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Esta URL se convertirá en un código QR en la firma
+                </p>
+              </div>
+            )}
 
             {/* Redes Sociales */}
             <div>
@@ -358,6 +744,13 @@ export default function DashboardPage() {
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
                           placeholder="URL"
                         />
+                        <IconPicker
+                          selectedIcon={editRedForm.icono}
+                          onSelectIcon={(icon) =>
+                            setEditRedForm({ ...editRedForm, icono: icon })
+                          }
+                          label="Icono de la red"
+                        />
                         <div className="flex gap-2">
                           <button
                             onClick={handleSaveEditRed}
@@ -375,13 +768,18 @@ export default function DashboardPage() {
                       </div>
                     ) : (
                       <div className="flex gap-2 items-center justify-between">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {red.nombre}
-                          </p>
-                          <p className="text-xs text-gray-500 truncate">
-                            {red.url}
-                          </p>
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          {red.icono && (
+                            <span className="text-lg flex-shrink-0">{red.icono}</span>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {red.nombre}
+                            </p>
+                            <p className="text-xs text-gray-500 truncate">
+                              {red.url}
+                            </p>
+                          </div>
                         </div>
                         <div className="flex gap-1">
                           <button
@@ -409,39 +807,52 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="text"
-                  value={nuevaRed.nombre}
-                  onChange={(e) =>
-                    setNuevaRed({ ...nuevaRed, nombre: e.target.value })
-                  }
-                  className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="Nombre (ej: LinkedIn)"
-                />
-                <input
-                  type="text"
-                  value={nuevaRed.url}
-                  onChange={(e) =>
-                    setNuevaRed({ ...nuevaRed, url: e.target.value })
-                  }
-                  className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="URL"
-                />
-                <button
-                  onClick={() => {
-                    if (nuevaRed.nombre && nuevaRed.url) {
-                      setSignatureData({
-                        ...signatureData,
-                        redes: [...signatureData.redes, nuevaRed as RedSocial],
-                      });
-                      setNuevaRed({ nombre: "", url: "" });
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <input
+                    type="text"
+                    value={nuevaRed.nombre}
+                    onChange={(e) =>
+                      setNuevaRed({ ...nuevaRed, nombre: e.target.value })
                     }
-                  }}
-                  className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-semibold shadow-md shadow-blue-500/20"
-                >
-                  + Agregar
-                </button>
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                    placeholder="Nombre (ej: LinkedIn)"
+                  />
+                  <input
+                    type="text"
+                    value={nuevaRed.url}
+                    onChange={(e) =>
+                      setNuevaRed({ ...nuevaRed, url: e.target.value })
+                    }
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                    placeholder="URL"
+                  />
+                </div>
+                <div className="flex gap-3 items-end">
+                  <div className="flex-1">
+                    <IconPicker
+                      selectedIcon={nuevaRed.icono}
+                      onSelectIcon={(icon) =>
+                        setNuevaRed({ ...nuevaRed, icono: icon })
+                      }
+                      label="Icono (opcional)"
+                    />
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (nuevaRed.nombre && nuevaRed.url) {
+                        setSignatureData({
+                          ...signatureData,
+                          redes: [...signatureData.redes, { ...nuevaRed, icono: nuevaRed.icono || undefined } as RedSocial],
+                        });
+                        setNuevaRed({ nombre: "", url: "", icono: "" });
+                      }
+                    }}
+                    className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-semibold shadow-md shadow-blue-500/20 whitespace-nowrap"
+                  >
+                    + Agregar
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -471,6 +882,17 @@ export default function DashboardPage() {
                   telefono={signatureData.telefono || undefined}
                   redes={signatureData.redes}
                   template={template}
+                  horario={signatureData.horario}
+                  textoAdicional={signatureData.textoAdicional}
+                  colorPersonalizado={signatureData.colorPersonalizado}
+                  qrLink={signatureData.qrLink}
+                  logoEmpresa={signatureData.logoEmpresa}
+                  ctaTexto={signatureData.ctaTexto}
+                  telefonoMovil={signatureData.telefonoMovil}
+                  direccion={signatureData.direccion}
+                  iconoTelefono={signatureData.iconoTelefono}
+                  iconoTelefonoMovil={signatureData.iconoTelefonoMovil}
+                  iconoDireccion={signatureData.iconoDireccion}
                 />
               </div>
             </div>
@@ -494,10 +916,27 @@ export default function DashboardPage() {
                     telefono={signatureData.telefono || undefined}
                     redes={signatureData.redes}
                     template={template}
+                    horario={signatureData.horario}
+                    textoAdicional={signatureData.textoAdicional}
+                    colorPersonalizado={signatureData.colorPersonalizado}
+                    qrLink={signatureData.qrLink}
+                    logoEmpresa={signatureData.logoEmpresa}
+                    ctaTexto={signatureData.ctaTexto}
+                    telefonoMovil={signatureData.telefonoMovil}
+                    direccion={signatureData.direccion}
+                    iconoTelefono={signatureData.iconoTelefono}
+                    iconoTelefonoMovil={signatureData.iconoTelefonoMovil}
+                    iconoDireccion={signatureData.iconoDireccion}
                   />
                 </div>
               </div>
             </div>
+
+            {/* Información de Validación/Integridad */}
+            <ValidationInfoDisplay 
+              signatureData={signatureData}
+              template={template}
+            />
 
             {/* Botones de Acción */}
             <div className="mt-auto pt-6 border-t border-gray-100">

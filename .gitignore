@@ -34,3 +34,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# temporary analysis/debug reports
+*_VALIDATION_REPORT.md
+*_ANALYSIS.md
+*_DEBUG.md
+

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "FirmaCoding - Editor de Firmas Digitales",
-  description: "Crea y gestiona tus firmas digitales de forma profesional",
+  title: "FirmaPro - Editor de Firmas Digitales Profesionales",
+  description: "Crea y gestiona tus firmas digitales profesionales en minutos. Herramienta intuitiva con múltiples plantillas y exportación HTML.",
 };
 
 export default function RootLayout({
