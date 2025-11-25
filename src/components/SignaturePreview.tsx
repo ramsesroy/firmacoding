@@ -1086,7 +1086,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
           {logoEmpresa && (
             <tr>
               <td
-                colspan="2"
+                colSpan={2}
                 style={{
                   backgroundColor: "#f5f5f5",
                   padding: "8px 12px",
@@ -1129,7 +1129,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
           )}
           <tr>
             <td
-              colspan="2"
+              colSpan={2}
               style={{
                 height: "3px",
                 backgroundColor: "#1e40af",
@@ -1319,7 +1319,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
           </tr>
           <tr>
             <td
-              colspan="2"
+              colSpan={2}
               style={{
                 borderTop: "1px solid #e0e0e0",
                 paddingTop: "12px",
@@ -2114,7 +2114,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
             {foto && (
               <td
                 valign="top"
-                rowSpan="3"
+                rowSpan={3}
                 style={{
                   paddingRight: "20px",
                   fontFamily: "Arial, sans-serif",
@@ -2421,7 +2421,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
           {(telefono || email || website) && (
             <tr>
               <td
-                colspan={qrURL ? "2" : "1"}
+                colSpan={qrURL ? 2 : 1}
                 valign="top"
                 style={{
                   paddingBottom: "12px",
@@ -2532,7 +2532,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
           {redes.length > 0 && (
             <tr>
               <td
-                colspan={qrURL ? "2" : "1"}
+                colSpan={qrURL ? 2 : 1}
                 style={{
                   borderTop: "1px solid #e0e0e0",
                   paddingTop: "10px",
@@ -2580,7 +2580,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
           )}
           <tr>
             <td
-              colspan={qrURL ? "2" : "1"}
+              colSpan={qrURL ? 2 : 1}
               style={{
                 borderTop: "1px solid #e0e0e0",
                 paddingTop: "12px",
