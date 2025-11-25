@@ -25,6 +25,8 @@ export default function DashboardPage() {
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [editingRed, setEditingRed] = useState<number | null>(null);
+  const [editRedForm, setEditRedForm] = useState({ nombre: "", url: "" });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCopyToClipboard = async () => {
@@ -60,6 +62,27 @@ export default function DashboardPage() {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  const handleEditRed = (index: number) => {
+    const red = signatureData.redes[index];
+    setEditingRed(index);
+    setEditRedForm({ nombre: red.nombre, url: red.url });
+  };
+
+  const handleSaveEditRed = () => {
+    if (editingRed !== null && editRedForm.nombre && editRedForm.url) {
+      const nuevasRedes = [...signatureData.redes];
+      nuevasRedes[editingRed] = editRedForm as RedSocial;
+      setSignatureData({ ...signatureData, redes: nuevasRedes });
+      setEditingRed(null);
+      setEditRedForm({ nombre: "", url: "" });
+    }
+  };
+
+  const handleCancelEditRed = () => {
+    setEditingRed(null);
+    setEditRedForm({ nombre: "", url: "" });
   };
 
   const handleSave = async () => {
@@ -125,24 +148,25 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        <div className="mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
             Editor de Firmas
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             Crea y personaliza tu firma digital profesional
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6 h-[calc(100vh-180px)]">
-          {/* Formulario - Columna Izquierda */}
-          <div className="bg-white rounded-lg shadow-md p-6 overflow-y-auto">
-            <h2 className="text-xl font-semibold mb-6 text-gray-900">
+        {/* Layout: Flex column en móvil, grid en desktop */}
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 sm:gap-6 lg:h-[calc(100vh-180px)]">
+          {/* Formulario - Primero en móvil, izquierda en desktop */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:overflow-y-auto order-1 lg:order-1">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-gray-900">
               Información de la Firma
             </h2>
 
-            <div className="space-y-5">
+            <div className="space-y-4 sm:space-y-5">
               {/* Template Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -299,31 +323,87 @@ export default function DashboardPage() {
                 {signatureData.redes.map((red, index) => (
                   <div
                     key={index}
-                    className="flex gap-2 items-center bg-gray-50 p-2 rounded"
+                    className="bg-gray-50 p-2 sm:p-3 rounded-lg"
                   >
-                    <span className="text-sm flex-1">{red.nombre}</span>
-                    <button
-                      onClick={() => {
-                        const nuevasRedes = signatureData.redes.filter(
-                          (_, i) => i !== index
-                        );
-                        setSignatureData({ ...signatureData, redes: nuevasRedes });
-                      }}
-                      className="text-red-600 hover:text-red-700 text-sm"
-                    >
-                      Eliminar
-                    </button>
+                    {editingRed === index ? (
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          value={editRedForm.nombre}
+                          onChange={(e) =>
+                            setEditRedForm({ ...editRedForm, nombre: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                          placeholder="Nombre"
+                        />
+                        <input
+                          type="text"
+                          value={editRedForm.url}
+                          onChange={(e) =>
+                            setEditRedForm({ ...editRedForm, url: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                          placeholder="URL"
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleSaveEditRed}
+                            className="flex-1 px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
+                          >
+                            Guardar
+                          </button>
+                          <button
+                            onClick={handleCancelEditRed}
+                            className="flex-1 px-3 py-1.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm font-medium"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2 items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {red.nombre}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate">
+                            {red.url}
+                          </p>
+                        </div>
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => handleEditRed(index)}
+                            className="px-2 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition text-sm font-medium"
+                            title="Editar"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => {
+                              const nuevasRedes = signatureData.redes.filter(
+                                (_, i) => i !== index
+                              );
+                              setSignatureData({ ...signatureData, redes: nuevasRedes });
+                            }}
+                            className="px-2 py-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition text-sm font-medium"
+                            title="Eliminar"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={nuevaRed.nombre}
                   onChange={(e) =>
                     setNuevaRed({ ...nuevaRed, nombre: e.target.value })
                   }
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm sm:text-base"
                   placeholder="Nombre (ej: LinkedIn)"
                 />
                 <input
@@ -332,7 +412,7 @@ export default function DashboardPage() {
                   onChange={(e) =>
                     setNuevaRed({ ...nuevaRed, url: e.target.value })
                   }
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm sm:text-base"
                   placeholder="URL"
                 />
                 <button
@@ -345,19 +425,19 @@ export default function DashboardPage() {
                       setNuevaRed({ nombre: "", url: "" });
                     }
                   }}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium text-sm sm:text-base"
                 >
-                  +
+                  + Agregar
                 </button>
               </div>
             </div>
           </div>
           </div>
 
-          {/* Vista Previa - Columna Derecha */}
-          <div className="bg-white rounded-lg shadow-md p-6 overflow-y-auto">
+          {/* Vista Previa - Segunda en móvil, derecha en desktop */}
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:overflow-y-auto order-2 lg:order-2">
             <div className="mb-4 pb-4 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                 Vista Previa en Vivo
               </h2>
               <p className="text-xs text-gray-500 mt-1">
@@ -366,8 +446,8 @@ export default function DashboardPage() {
             </div>
 
             {/* Vista Previa Principal */}
-            <div className="bg-gray-50 rounded-lg p-8 border-2 border-dashed border-gray-300 mb-6">
-              <div className="flex items-center justify-center min-h-[200px]">
+            <div className="bg-gray-50 rounded-lg p-4 sm:p-8 border-2 border-dashed border-gray-300 mb-4 sm:mb-6">
+              <div className="flex items-center justify-center min-h-[150px] sm:min-h-[200px]">
                 <SignaturePreview
                   nombre={signatureData.nombre}
                   cargo={signatureData.cargo}
@@ -404,8 +484,8 @@ export default function DashboardPage() {
             </div>
 
             {/* Botones de Acción */}
-            <div className="mt-6 pt-4 border-t border-gray-200">
-              <div className="flex gap-3">
+            <div className="mt-4 sm:mt-6 pt-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
                   onClick={handleSave}
                   disabled={saving}

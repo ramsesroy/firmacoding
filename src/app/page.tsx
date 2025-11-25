@@ -9,16 +9,16 @@ export default function LandingPage() {
           <div className="text-2xl font-bold text-indigo-600">
             FirmaCoding
           </div>
-          <div className="space-x-4">
+          <div className="flex gap-2 sm:gap-4 items-center">
             <Link
               href="/login"
-              className="text-gray-700 hover:text-indigo-600 transition"
+              className="text-sm sm:text-base text-gray-700 hover:text-indigo-600 transition"
             >
               Iniciar Sesión
             </Link>
             <Link
               href="/dashboard"
-              className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+              className="bg-indigo-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm sm:text-base"
             >
               Ir al Dashboard
             </Link>
@@ -39,16 +39,16 @@ export default function LandingPage() {
             Diseña, personaliza y gestiona tus firmas digitales con nuestra
             herramienta intuitiva. Perfecto para empresas y profesionales.
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <Link
               href="/dashboard"
-              className="bg-indigo-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-indigo-700 transition shadow-lg"
+              className="bg-indigo-600 text-white px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg font-semibold hover:bg-indigo-700 transition shadow-lg text-center"
             >
               Comenzar Gratis
             </Link>
             <Link
               href="#features"
-              className="bg-white text-indigo-600 px-8 py-3 rounded-lg text-lg font-semibold hover:bg-gray-50 transition shadow-lg border-2 border-indigo-600"
+              className="bg-white text-indigo-600 px-6 sm:px-8 py-3 rounded-lg text-base sm:text-lg font-semibold hover:bg-gray-50 transition shadow-lg border-2 border-indigo-600 text-center"
             >
               Ver Características
             </Link>
