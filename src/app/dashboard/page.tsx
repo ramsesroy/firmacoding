@@ -148,57 +148,70 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
-        <div className="mb-4 sm:mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+      {/* Navbar Superior */}
+      <nav className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="text-2xl font-bold text-gray-900">
+              Firma<span className="text-blue-600">Pro</span>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Contenido Principal */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Header */}
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
             Editor de Firmas
           </h1>
-          <p className="text-sm sm:text-base text-gray-600">
+          <p className="text-base sm:text-lg text-gray-600">
             Crea y personaliza tu firma digital profesional
           </p>
         </div>
 
         {/* Layout: Flex column en móvil, grid en desktop */}
-        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 sm:gap-6 lg:h-[calc(100vh-180px)]">
-          {/* Formulario - Primero en móvil, izquierda en desktop */}
-          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:overflow-y-auto order-1 lg:order-1">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6 text-gray-900">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 sm:gap-8 lg:h-[calc(100vh-220px)]">
+          {/* Formulario - Card */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-6 sm:p-8 lg:overflow-y-auto order-1 lg:order-1">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-6 text-gray-900">
               Información de la Firma
             </h2>
 
-            <div className="space-y-4 sm:space-y-5">
+            <div className="space-y-6">
               {/* Template Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   Plantilla
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-3">
                   <button
                     onClick={() => setTemplate("classic")}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                       template === "classic"
-                        ? "bg-indigo-600 text-white shadow-md"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                        : "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
                     }`}
                   >
                     Clásica
                   </button>
                   <button
                     onClick={() => setTemplate("modern")}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                       template === "modern"
-                        ? "bg-indigo-600 text-white shadow-md"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                        : "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
                     }`}
                   >
                     Moderna
                   </button>
                   <button
                     onClick={() => setTemplate("minimal")}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
                       template === "minimal"
-                        ? "bg-indigo-600 text-white shadow-md"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
+                        : "bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200"
                     }`}
                   >
                     Minimal
@@ -217,7 +230,7 @@ export default function DashboardPage() {
                 onChange={(e) =>
                   setSignatureData({ ...signatureData, nombre: e.target.value })
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
                 placeholder="Tu nombre completo"
               />
             </div>
@@ -233,7 +246,7 @@ export default function DashboardPage() {
                 onChange={(e) =>
                   setSignatureData({ ...signatureData, cargo: e.target.value })
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
                 placeholder="Tu cargo o título profesional"
               />
             </div>
@@ -244,7 +257,7 @@ export default function DashboardPage() {
                 Foto de Perfil
               </label>
               {!signatureData.foto ? (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-indigo-400 transition cursor-pointer">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-200 cursor-pointer bg-gray-50/50">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -271,25 +284,25 @@ export default function DashboardPage() {
                         strokeLinejoin="round"
                       />
                     </svg>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm font-medium text-gray-700">
                       {uploading ? "Subiendo..." : "Haz clic para subir una imagen"}
                     </span>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 mt-2">
                       JPG, PNG o GIF (máx. 5MB)
                     </p>
                   </label>
                 </div>
               ) : (
                 <div className="relative">
-                  <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+                  <div className="border border-gray-200 rounded-xl p-5 bg-gray-50/50">
                     <img
                       src={signatureData.foto}
                       alt="Vista previa"
-                      className="max-w-full h-32 object-contain mx-auto rounded"
+                      className="max-w-full h-40 object-contain mx-auto rounded-lg shadow-sm"
                     />
                     <button
                       onClick={handleRemoveImage}
-                      className="mt-3 w-full px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-sm font-medium"
+                      className="mt-3 w-full px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all duration-200 text-sm font-semibold border border-red-200"
                     >
                       Eliminar Imagen
                     </button>
@@ -309,7 +322,7 @@ export default function DashboardPage() {
                 onChange={(e) =>
                   setSignatureData({ ...signatureData, telefono: e.target.value })
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
                 placeholder="+1 (555) 123-4567"
               />
             </div>
@@ -333,7 +346,7 @@ export default function DashboardPage() {
                           onChange={(e) =>
                             setEditRedForm({ ...editRedForm, nombre: e.target.value })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
                           placeholder="Nombre"
                         />
                         <input
@@ -342,19 +355,19 @@ export default function DashboardPage() {
                           onChange={(e) =>
                             setEditRedForm({ ...editRedForm, url: e.target.value })
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
                           placeholder="URL"
                         />
                         <div className="flex gap-2">
                           <button
                             onClick={handleSaveEditRed}
-                            className="flex-1 px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
+                            className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 text-sm font-semibold shadow-sm"
                           >
                             Guardar
                           </button>
                           <button
                             onClick={handleCancelEditRed}
-                            className="flex-1 px-3 py-1.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm font-medium"
+                            className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 text-sm font-semibold border border-gray-200"
                           >
                             Cancelar
                           </button>
@@ -396,14 +409,14 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
-              <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="text"
                   value={nuevaRed.nombre}
                   onChange={(e) =>
                     setNuevaRed({ ...nuevaRed, nombre: e.target.value })
                   }
-                  className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm sm:text-base"
+                  className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
                   placeholder="Nombre (ej: LinkedIn)"
                 />
                 <input
@@ -412,7 +425,7 @@ export default function DashboardPage() {
                   onChange={(e) =>
                     setNuevaRed({ ...nuevaRed, url: e.target.value })
                   }
-                  className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm sm:text-base"
+                  className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
                   placeholder="URL"
                 />
                 <button
@@ -425,7 +438,7 @@ export default function DashboardPage() {
                       setNuevaRed({ nombre: "", url: "" });
                     }
                   }}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium text-sm sm:text-base"
+                  className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-semibold shadow-md shadow-blue-500/20"
                 >
                   + Agregar
                 </button>
@@ -434,20 +447,23 @@ export default function DashboardPage() {
           </div>
           </div>
 
-          {/* Vista Previa - Segunda en móvil, derecha en desktop */}
-          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:overflow-y-auto order-2 lg:order-2">
-            <div className="mb-4 pb-4 border-b border-gray-200">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+          {/* Vista Previa - Card */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-6 sm:p-8 lg:overflow-y-auto order-2 lg:order-2 flex flex-col">
+            <div className="mb-6 pb-4 border-b border-gray-100">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">
                 Vista Previa en Vivo
               </h2>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-sm text-gray-500">
                 Los cambios se actualizan automáticamente
               </p>
             </div>
 
             {/* Vista Previa Principal */}
-            <div className="bg-gray-50 rounded-lg p-4 sm:p-8 border-2 border-dashed border-gray-300 mb-4 sm:mb-6">
-              <div className="flex items-center justify-center min-h-[150px] sm:min-h-[200px]">
+            <div className="bg-gradient-to-br from-gray-50 via-gray-50/50 to-gray-100 rounded-xl p-6 sm:p-10 border border-gray-200 mb-6" style={{
+              backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0)',
+              backgroundSize: '20px 20px'
+            }}>
+              <div className="flex items-center justify-center min-h-[180px] sm:min-h-[220px]">
                 <SignaturePreview
                   nombre={signatureData.nombre}
                   cargo={signatureData.cargo}
@@ -460,12 +476,12 @@ export default function DashboardPage() {
             </div>
 
             {/* Vista Simulada en Email */}
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              <p className="text-xs text-gray-600 mb-3 font-medium">
-                Vista simulada en correo electrónico:
+            <div className="bg-gray-50 rounded-xl p-4 sm:p-5 border border-gray-200 mb-6">
+              <p className="text-xs text-gray-600 mb-3 font-semibold uppercase tracking-wide">
+                Vista simulada en correo electrónico
               </p>
-              <div className="bg-white p-4 rounded border border-gray-200 shadow-sm">
-                <p className="text-gray-700 mb-4 text-sm leading-relaxed">
+              <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-sm">
+                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
                   Este es un ejemplo de cómo se verá tu firma en un correo
                   electrónico. La firma se actualiza automáticamente mientras
                   escribes.
@@ -484,38 +500,38 @@ export default function DashboardPage() {
             </div>
 
             {/* Botones de Acción */}
-            <div className="mt-4 sm:mt-6 pt-4 border-t border-gray-200">
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <div className="mt-auto pt-6 border-t border-gray-100">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className={`flex-1 px-4 py-2 rounded-lg transition font-medium text-sm ${
+                  className={`flex-1 px-6 py-3.5 rounded-lg transition-all duration-200 font-semibold text-base ${
                     saving
                       ? "bg-gray-400 text-white cursor-not-allowed"
-                      : "bg-indigo-600 text-white hover:bg-indigo-700"
+                      : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40"
                   }`}
                 >
                   {saving ? "Guardando..." : "Guardar Firma"}
                 </button>
                 <button
                   onClick={handleCopyToClipboard}
-                  className={`flex-1 px-4 py-2 rounded-lg transition font-medium text-sm ${
+                  className={`flex-1 px-6 py-3.5 rounded-lg transition-all duration-200 font-semibold text-base ${
                     copied
-                      ? "bg-green-600 text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30"
+                      : "bg-gray-900 text-white hover:bg-gray-800 shadow-lg shadow-gray-900/20"
                   }`}
                 >
                   {copied ? "✓ Copiado!" : "Copiar HTML"}
                 </button>
               </div>
               {copied && (
-                <p className="text-xs text-green-600 mt-2 text-center">
+                <p className="text-sm text-green-600 mt-3 text-center font-medium">
                   ¡Firma copiada! Ya puedes pegarla en Gmail o tu cliente de correo.
                 </p>
               )}
               {saveMessage && (
                 <p
-                  className={`text-xs mt-2 text-center ${
+                  className={`text-sm mt-3 text-center font-medium ${
                     saveMessage.type === "success"
                       ? "text-green-600"
                       : "text-red-600"
