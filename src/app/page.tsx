@@ -12,9 +12,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
           <div className="max-w-4xl mx-auto text-center">
             {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-50 border border-blue-100 mb-8">
-              <span className="text-sm font-semibold text-blue-600">
-                ✨ Nueva función: Exportación HTML mejorada
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-100 mb-8">
+              <span className="text-sm font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                🤖 Potenciado por IA • Generación inteligente de firmas
               </span>
             </div>
 
@@ -27,9 +27,13 @@ export default function LandingPage() {
             </h1>
 
             {/* Description */}
-            <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 mb-6 max-w-3xl mx-auto leading-relaxed">
               Diseña, personaliza y gestiona tus firmas digitales con nuestra
-              herramienta intuitiva. Perfecto para empresas y profesionales que buscan una identidad profesional impecable.
+              herramienta intuitiva potenciada por inteligencia artificial. Perfecto para empresas y profesionales que buscan una identidad profesional impecable.
+            </p>
+            <p className="text-base sm:text-lg text-gray-500 mb-10 max-w-2xl mx-auto">
+              Nuestra IA sugiere diseños optimizados, valida automáticamente tus datos y genera firmas profesionales en segundos. 
+              <span className="font-semibold text-gray-700"> Sin complicaciones, sin código, solo resultados.</span>
             </p>
 
             {/* CTA Buttons */}

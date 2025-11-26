@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { TemplateType, RedSocial } from "@/types/signature";
 import SignaturePreview from "@/components/SignaturePreview";
@@ -8,9 +8,11 @@ import { copyToClipboard, generateSignatureHTML } from "@/lib/signatureUtils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { exportAsPNG, exportAsPDF } from "@/lib/exportUtils";
 
 interface SignatureRecord {
   id: string;
+  signature_name?: string | null; // Nombre personalizado
   name: string;
   role: string;
   phone: string | null;
@@ -42,6 +44,8 @@ export default function FirmasPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [exportingId, setExportingId] = useState<string | null>(null);
+  const previewRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     if (!user) {
@@ -165,10 +169,115 @@ export default function FirmasPage() {
       data: signatureData,
       template: signature.template_id,
       id: signature.id,
+      signatureName: signature.signature_name || "",
     }));
 
     // Redirigir al editor
     window.location.href = "/dashboard?edit=" + signature.id;
+  };
+
+  const handleDuplicate = async (signature: SignatureRecord) => {
+    if (!user) return;
+
+    try {
+      // Crear una copia de la firma sin el ID
+      const signatureRecord = {
+        user_id: user.id,
+        signature_name: (signature.signature_name || signature.name) + " (Copia)",
+        name: signature.name,
+        role: signature.role,
+        phone: signature.phone || null,
+        image_url: signature.image_url || null,
+        social_links: signature.social_links,
+        template_id: signature.template_id,
+        logo_empresa: signature.logo_empresa || null,
+        logo_posicion: signature.logo_posicion || null,
+        telefono_movil: signature.telefono_movil || null,
+        direccion: signature.direccion || null,
+        horario: signature.horario || null,
+        texto_adicional: signature.texto_adicional || null,
+        color_personalizado: signature.color_personalizado || null,
+        qr_link: signature.qr_link || null,
+        cta_texto: signature.cta_texto || null,
+        icono_telefono: signature.icono_telefono || null,
+        icono_telefono_movil: signature.icono_telefono_movil || null,
+        icono_direccion: signature.icono_direccion || null,
+      };
+
+      const { error } = await supabase
+        .from("signatures")
+        .insert([signatureRecord]);
+
+      if (error) throw error;
+
+      // Recargar la lista
+      await loadSignatures();
+    } catch (err) {
+      console.error("Error al duplicar firma:", err);
+      alert(err instanceof Error ? err.message : "Error al duplicar la firma");
+    }
+  };
+
+  const handleExportPNG = async (signature: SignatureRecord) => {
+    const previewElement = previewRefs.current[signature.id];
+    if (!previewElement) {
+      // Expandir primero si no está expandido
+      setExpandedId(signature.id);
+      setTimeout(async () => {
+        const element = previewRefs.current[signature.id];
+        if (element) {
+          setExportingId(signature.id);
+          try {
+            await exportAsPNG(element, signature.signature_name || signature.name);
+          } catch (error) {
+            alert("Error al exportar como PNG");
+          } finally {
+            setExportingId(null);
+          }
+        }
+      }, 500);
+      return;
+    }
+
+    setExportingId(signature.id);
+    try {
+      await exportAsPNG(previewElement, signature.signature_name || signature.name);
+    } catch (error) {
+      alert("Error al exportar como PNG");
+    } finally {
+      setExportingId(null);
+    }
+  };
+
+  const handleExportPDF = async (signature: SignatureRecord) => {
+    const previewElement = previewRefs.current[signature.id];
+    if (!previewElement) {
+      // Expandir primero si no está expandido
+      setExpandedId(signature.id);
+      setTimeout(async () => {
+        const element = previewRefs.current[signature.id];
+        if (element) {
+          setExportingId(signature.id);
+          try {
+            await exportAsPDF(element, signature.signature_name || signature.name);
+          } catch (error) {
+            alert("Error al exportar como PDF");
+          } finally {
+            setExportingId(null);
+          }
+        }
+      }, 500);
+      return;
+    }
+
+    setExportingId(signature.id);
+    try {
+      await exportAsPDF(previewElement, signature.signature_name || signature.name);
+    } catch (error) {
+      alert("Error al exportar como PDF");
+    } finally {
+      setExportingId(null);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -315,7 +424,7 @@ export default function FirmasPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1 truncate">
-                        {signature.name}
+                        {signature.signature_name || signature.name}
                       </h3>
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-sm text-gray-600">
                         <span className="truncate">{signature.role}</span>
@@ -347,11 +456,46 @@ export default function FirmasPage() {
                       >
                         {isCopied ? "✓ Copiado" : "Copiar HTML"}
                       </button>
+                      <div className="relative group">
+                        <button
+                          onClick={() => handleExportPNG(signature)}
+                          disabled={exportingId === signature.id}
+                          className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-lg transition border ${
+                            exportingId === signature.id
+                              ? "bg-gray-400 text-white cursor-not-allowed border-gray-400"
+                              : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border-indigo-200"
+                          }`}
+                          title="Exportar como PNG"
+                        >
+                          📷 PNG
+                        </button>
+                      </div>
+                      <div className="relative group">
+                        <button
+                          onClick={() => handleExportPDF(signature)}
+                          disabled={exportingId === signature.id}
+                          className={`px-3 sm:px-4 py-2 text-sm font-medium rounded-lg transition border ${
+                            exportingId === signature.id
+                              ? "bg-gray-400 text-white cursor-not-allowed border-gray-400"
+                              : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border-indigo-200"
+                          }`}
+                          title="Exportar como PDF"
+                        >
+                          📄 PDF
+                        </button>
+                      </div>
                       <button
                         onClick={() => handleEdit(signature)}
                         className="px-3 sm:px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition border border-blue-200"
                       >
                         Editar
+                      </button>
+                      <button
+                        onClick={() => handleDuplicate(signature)}
+                        className="px-3 sm:px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-lg transition border border-purple-200"
+                        title="Duplicar firma"
+                      >
+                        📋 Duplicar
                       </button>
                       <button
                         onClick={() => handleDelete(signature.id)}
@@ -375,7 +519,12 @@ export default function FirmasPage() {
                       <p className="text-xs text-gray-500 mb-4 font-semibold uppercase tracking-wide">
                         Vista Previa
                       </p>
-                      <div className="flex items-center justify-center">
+                      <div 
+                        ref={(el) => {
+                          previewRefs.current[signature.id] = el;
+                        }}
+                        className="flex items-center justify-center"
+                      >
                         <SignaturePreview
                           nombre={signatureData.nombre}
                           cargo={signatureData.cargo}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AuthProviderWrapper from "@/components/AuthProvider";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 export const metadata: Metadata = {
   title: "FirmaPro - Editor de Firmas Digitales Profesionales",
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body>
-        <AuthProviderWrapper>{children}</AuthProviderWrapper>
+        <ThemeProvider>
+          <AuthProviderWrapper>{children}</AuthProviderWrapper>
+        </ThemeProvider>
       </body>
     </html>
   );

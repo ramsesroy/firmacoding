@@ -3,15 +3,20 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import SignaturePreview from "@/components/SignaturePreview";
+import EmailClientPreview from "@/components/EmailClientPreview";
 import IconPicker from "@/components/IconPicker";
 import { TemplateType, RedSocial } from "@/types/signature";
 import { copyToClipboard, generateSignatureHTML } from "@/lib/signatureUtils";
 import { uploadImage } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/contexts/AuthContext";
+import { validateUrl, validateEmail, validatePhone } from "@/lib/validationUtils";
+import { useToast } from "@/hooks/useToast";
+import ToastContainer from "@/components/ToastContainer";
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { toasts, success, error, removeToast } = useToast();
   
   // URLs de imágenes de ejemplo (imágenes reales profesionales de Unsplash)
   // Foto de perfil profesional - retrato empresarial de calidad
@@ -45,12 +50,12 @@ export default function DashboardPage() {
 
   const [template, setTemplate] = useState<TemplateType>("professional");
   const [editingSignatureId, setEditingSignatureId] = useState<string | null>(null);
+  const [signatureCustomName, setSignatureCustomName] = useState("");
   const [nuevaRed, setNuevaRed] = useState({ nombre: "", url: "", icono: "" });
   const [copied, setCopied] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [editingRed, setEditingRed] = useState<number | null>(null);
   const [editRedForm, setEditRedForm] = useState({ nombre: "", url: "", icono: "" });
   const [showHtmlModal, setShowHtmlModal] = useState(false);
@@ -72,6 +77,9 @@ export default function DashboardPage() {
           if (parsed.id) {
             setEditingSignatureId(parsed.id);
           }
+          if (parsed.signatureName) {
+            setSignatureCustomName(parsed.signatureName);
+          }
           localStorage.removeItem("editSignature");
         }
       } catch (err) {
@@ -79,6 +87,64 @@ export default function DashboardPage() {
       }
     }
   }, []);
+
+  // Guardado automático de borrador cada 30 segundos
+  useEffect(() => {
+    if (!user || editingSignatureId) return; // Solo guardar borradores si hay usuario y no está editando
+    
+    const autoSaveInterval = setInterval(() => {
+      const draft = {
+        data: signatureData,
+        template,
+        signatureName: signatureCustomName,
+      };
+      localStorage.setItem("signatureDraft", JSON.stringify(draft));
+    }, 30000); // Guardar cada 30 segundos
+
+    return () => clearInterval(autoSaveInterval);
+  }, [signatureData, template, signatureCustomName, user, editingSignatureId]);
+
+  // Cargar borrador al iniciar (solo si no hay edición activa)
+  useEffect(() => {
+    if (editingSignatureId) return; // No cargar borrador si estamos editando
+    
+    const draft = localStorage.getItem("signatureDraft");
+    const editData = localStorage.getItem("editSignature");
+    
+    if (draft && !editData) {
+      try {
+        const parsed = JSON.parse(draft);
+        if (parsed.data && parsed.template) {
+          setSignatureData(parsed.data);
+          setTemplate(parsed.template);
+          if (parsed.signatureName) {
+            setSignatureCustomName(parsed.signatureName);
+          }
+        }
+      } catch (err) {
+        console.error("Error al cargar borrador:", err);
+      }
+    }
+  }, []);
+
+  // Atajos de teclado
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+S o Cmd+S para guardar
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        if (user && signatureData.nombre && signatureData.cargo) {
+          handleSave();
+        } else if (!user) {
+          setShowRegisterModal(true);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, signatureData.nombre, signatureData.cargo]);
 
   // Agregar imágenes de ejemplo según el template cuando cambia
   useEffect(() => {
@@ -208,11 +274,7 @@ export default function DashboardPage() {
   const handleSave = async () => {
     // Validar que los campos requeridos estén completos
     if (!signatureData.nombre || !signatureData.cargo) {
-      setSaveMessage({
-        type: "error",
-        text: "Por favor completa al menos el nombre y el cargo",
-      });
-      setTimeout(() => setSaveMessage(null), 3000);
+      error("Por favor completa al menos el nombre y el cargo");
       return;
     }
 
@@ -223,7 +285,6 @@ export default function DashboardPage() {
     }
 
     setSaving(true);
-    setSaveMessage(null);
 
     try {
 
@@ -231,6 +292,7 @@ export default function DashboardPage() {
       // Asegurar que las propiedades coincidan exactamente con la estructura de la base de datos
       const signatureRecord = {
         user_id: user.id,
+        signature_name: signatureCustomName || null, // Nombre personalizado
         name: signatureData.nombre,
         role: signatureData.cargo,
         phone: signatureData.telefono || null,
@@ -282,10 +344,13 @@ export default function DashboardPage() {
         type: "success",
         text: editingSignatureId ? "¡Firma actualizada exitosamente!" : "¡Firma guardada exitosamente!",
       });
-      // Limpiar el ID de edición después de guardar
+      // Limpiar el ID de edición y el nombre personalizado después de guardar
       if (editingSignatureId) {
         setEditingSignatureId(null);
       }
+      setSignatureCustomName("");
+      // Limpiar borrador después de guardar exitosamente
+      localStorage.removeItem("signatureDraft");
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (error) {
       // Depuración: Imprimir el objeto error completo para ver detalles
@@ -307,7 +372,8 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
       {/* Contenido Principal */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header */}
@@ -329,6 +395,25 @@ export default function DashboardPage() {
             </h2>
 
             <div className="space-y-6">
+              {/* Nombre personalizado de la firma (solo al guardar) */}
+              {user && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nombre de la Firma <span className="text-gray-400">(opcional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={signatureCustomName}
+                    onChange={(e) => setSignatureCustomName(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                    placeholder="Ej: Firma Personal, Firma Empresa, etc."
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Este nombre te ayudará a identificar la firma más fácilmente
+                  </p>
+                </div>
+              )}
+
               {/* Template Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -621,12 +706,45 @@ export default function DashboardPage() {
                   <input
                     type="text"
                     value={signatureData.telefono}
-                    onChange={(e) =>
-                      setSignatureData({ ...signatureData, telefono: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setSignatureData({ ...signatureData, telefono: value });
+                      if (value.trim()) {
+                        const validation = validatePhone(value);
+                        if (!validation.valid) {
+                          setValidationErrors(prev => ({ ...prev, telefono: validation.error || "" }));
+                        } else {
+                          setValidationErrors(prev => {
+                            const newErrors = { ...prev };
+                            delete newErrors.telefono;
+                            return newErrors;
+                          });
+                        }
+                      } else {
+                        setValidationErrors(prev => {
+                          const newErrors = { ...prev };
+                          delete newErrors.telefono;
+                          return newErrors;
+                        });
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const value = e.target.value;
+                      if (value.trim()) {
+                        const validation = validatePhone(value);
+                        if (!validation.valid) {
+                          setValidationErrors(prev => ({ ...prev, telefono: validation.error || "" }));
+                        }
+                      }
+                    }}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400 ${
+                      validationErrors.telefono ? "border-red-300" : "border-gray-200"
+                    }`}
                     placeholder="+1 (555) 123-4567"
                   />
+                  {validationErrors.telefono && (
+                    <p className="text-xs text-red-600 mt-1">{validationErrors.telefono}</p>
+                  )}
                 </div>
                 <div className="w-full sm:w-auto">
                   <IconPicker
@@ -821,12 +939,45 @@ export default function DashboardPage() {
                 <input
                   type="url"
                   value={signatureData.qrLink}
-                  onChange={(e) =>
-                    setSignatureData({ ...signatureData, qrLink: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSignatureData({ ...signatureData, qrLink: value });
+                    if (value.trim()) {
+                      const validation = validateUrl(value);
+                      if (!validation.valid) {
+                        setValidationErrors(prev => ({ ...prev, qrLink: validation.error || "" }));
+                      } else {
+                        setValidationErrors(prev => {
+                          const newErrors = { ...prev };
+                          delete newErrors.qrLink;
+                          return newErrors;
+                        });
+                      }
+                    } else {
+                      setValidationErrors(prev => {
+                        const newErrors = { ...prev };
+                        delete newErrors.qrLink;
+                        return newErrors;
+                      });
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const value = e.target.value;
+                    if (value.trim()) {
+                      const validation = validateUrl(value);
+                      if (!validation.valid) {
+                        setValidationErrors(prev => ({ ...prev, qrLink: validation.error || "" }));
+                      }
+                    }
+                  }}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400 ${
+                    validationErrors.qrLink ? "border-red-300" : "border-gray-200"
+                  }`}
                   placeholder="https://ejemplo.com"
                 />
+                {validationErrors.qrLink && (
+                  <p className="text-xs text-red-600 mt-1">{validationErrors.qrLink}</p>
+                )}
                 <p className="text-xs text-gray-500 mt-1">
                   Esta URL se convertirá en un código QR en la firma
                 </p>
@@ -941,12 +1092,48 @@ export default function DashboardPage() {
                   <input
                     type="text"
                     value={nuevaRed.url}
-                    onChange={(e) =>
-                      setNuevaRed({ ...nuevaRed, url: e.target.value })
-                    }
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                    placeholder="URL"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setNuevaRed({ ...nuevaRed, url: value });
+                      // Validar si parece email o URL
+                      if (value.trim()) {
+                        const isEmail = value.includes("@");
+                        const validation = isEmail ? validateEmail(value) : validateUrl(value);
+                        if (!validation.valid) {
+                          setValidationErrors(prev => ({ ...prev, nuevaRedUrl: validation.error || "" }));
+                        } else {
+                          setValidationErrors(prev => {
+                            const newErrors = { ...prev };
+                            delete newErrors.nuevaRedUrl;
+                            return newErrors;
+                          });
+                        }
+                      } else {
+                        setValidationErrors(prev => {
+                          const newErrors = { ...prev };
+                          delete newErrors.nuevaRedUrl;
+                          return newErrors;
+                        });
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const value = e.target.value;
+                      if (value.trim()) {
+                        const isEmail = value.includes("@");
+                        const validation = isEmail ? validateEmail(value) : validateUrl(value);
+                        if (!validation.valid) {
+                          setValidationErrors(prev => ({ ...prev, nuevaRedUrl: validation.error || "" }));
+                        }
+                      }
+                    }}
+                    className={`flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400 ${
+                      validationErrors.nuevaRedUrl ? "border-red-300" : "border-gray-200"
+                    }`}
+                    placeholder="URL o Email"
                   />
+                  {validationErrors.nuevaRedUrl && (
+                    <p className="text-xs text-red-600 mt-1">{validationErrors.nuevaRedUrl}</p>
+                  )}
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 items-end">
                   <div className="w-full sm:flex-1">
@@ -961,11 +1148,23 @@ export default function DashboardPage() {
                   <button
                     onClick={() => {
                       if (nuevaRed.nombre && nuevaRed.url) {
+                        // Validar antes de agregar
+                        const isEmail = nuevaRed.url.includes("@");
+                        const validation = isEmail ? validateEmail(nuevaRed.url) : validateUrl(nuevaRed.url);
+                        if (!validation.valid) {
+                          setValidationErrors(prev => ({ ...prev, nuevaRedUrl: validation.error || "" }));
+                          return;
+                        }
                         setSignatureData({
                           ...signatureData,
                           redes: [...signatureData.redes, { ...nuevaRed, icono: nuevaRed.icono || undefined } as RedSocial],
                         });
                         setNuevaRed({ nombre: "", url: "", icono: "" });
+                        setValidationErrors(prev => {
+                          const newErrors = { ...prev };
+                          delete newErrors.nuevaRedUrl;
+                          return newErrors;
+                        });
                       }
                     }}
                     className="w-full sm:w-auto px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-semibold shadow-md shadow-blue-500/20 whitespace-nowrap"
@@ -1018,39 +1217,32 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Vista Simulada en Email */}
+            {/* Vista Previa en Diferentes Clientes */}
             <div className="bg-gray-50 rounded-xl p-3 sm:p-4 lg:p-5 border border-gray-200 mb-4 sm:mb-6">
               <p className="text-xs text-gray-600 mb-2 sm:mb-3 font-semibold uppercase tracking-wide">
-                Vista simulada en correo electrónico
+                Vista previa en diferentes clientes de email
               </p>
               <div className="bg-white p-3 sm:p-4 lg:p-5 rounded-lg border border-gray-200 shadow-sm">
-                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
-                  Este es un ejemplo de cómo se verá tu firma en un correo
-                  electrónico. La firma se actualiza automáticamente mientras
-                  escribes.
-                </p>
-                <div className="border-t border-gray-200 pt-4">
-                  <SignaturePreview
-                    nombre={signatureData.nombre}
-                    cargo={signatureData.cargo}
-                    foto={signatureData.foto || undefined}
-                    telefono={signatureData.telefono || undefined}
-                    redes={signatureData.redes}
-                    template={template}
-                    horario={signatureData.horario}
-                    textoAdicional={signatureData.textoAdicional}
-                    colorPersonalizado={signatureData.colorPersonalizado}
-                    qrLink={signatureData.qrLink}
-                    logoEmpresa={signatureData.logoEmpresa}
-                    logoPosicion={signatureData.logoPosicion}
-                    ctaTexto={signatureData.ctaTexto}
-                    telefonoMovil={signatureData.telefonoMovil}
-                    direccion={signatureData.direccion}
-                    iconoTelefono={signatureData.iconoTelefono}
-                    iconoTelefonoMovil={signatureData.iconoTelefonoMovil}
-                    iconoDireccion={signatureData.iconoDireccion}
-                  />
-                </div>
+                <EmailClientPreview
+                  nombre={signatureData.nombre}
+                  cargo={signatureData.cargo}
+                  foto={signatureData.foto || undefined}
+                  telefono={signatureData.telefono || undefined}
+                  redes={signatureData.redes}
+                  template={template}
+                  horario={signatureData.horario}
+                  textoAdicional={signatureData.textoAdicional}
+                  colorPersonalizado={signatureData.colorPersonalizado}
+                  qrLink={signatureData.qrLink}
+                  logoEmpresa={signatureData.logoEmpresa}
+                  logoPosicion={signatureData.logoPosicion}
+                  ctaTexto={signatureData.ctaTexto}
+                  telefonoMovil={signatureData.telefonoMovil}
+                  direccion={signatureData.direccion}
+                  iconoTelefono={signatureData.iconoTelefono}
+                  iconoTelefonoMovil={signatureData.iconoTelefonoMovil}
+                  iconoDireccion={signatureData.iconoDireccion}
+                />
               </div>
             </div>
 
@@ -1084,17 +1276,6 @@ export default function DashboardPage() {
               {copied && (
                 <p className="text-sm text-green-600 mt-3 text-center font-medium">
                   ¡Firma copiada! Ya puedes pegarla en Gmail o tu cliente de correo.
-                </p>
-              )}
-              {saveMessage && (
-                <p
-                  className={`text-sm mt-3 text-center font-medium ${
-                    saveMessage.type === "success"
-                      ? "text-green-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {saveMessage.text}
                 </p>
               )}
             </div>
