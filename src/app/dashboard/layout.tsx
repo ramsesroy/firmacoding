@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { useTheme } from "@/contexts/ThemeContext";
 
 export default function DashboardLayout({
   children,
