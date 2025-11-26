@@ -25,14 +25,14 @@ export default function DashboardLayout({
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-md z-50">
         <div className="flex items-center justify-between p-4">
-          <Link href="/dashboard" className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+          <Link href="/dashboard" className="text-xl font-bold text-indigo-600">
             FirmaCoding
           </Link>
           <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-              aria-label="Toggle menu"
-            >
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 rounded-lg hover:bg-gray-100 transition"
+            aria-label="Toggle menu"
+          >
             <svg
               className="w-6 h-6 text-gray-700"
               fill="none"
@@ -56,7 +56,6 @@ export default function DashboardLayout({
               )}
             </svg>
           </button>
-          </div>
         </div>
       </div>
 
