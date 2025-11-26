@@ -344,16 +344,22 @@ export default function DashboardPage() {
       }
 
       if (error) {
-        console.error("Error de Supabase:", error);
+        console.error("Error de Supabase al guardar:", error);
+        console.error("Usuario:", user?.id);
+        console.error("Sesión activa:", !!session);
+        console.error("Datos intentados:", signatureRecord);
+        
         // Proporcionar mensaje de error más descriptivo
         if (error.code === "PGRST116") {
           throw new Error("No se encontró la firma para actualizar");
         } else if (error.code === "23505") {
           throw new Error("Ya existe una firma con estos datos");
+        } else if (error.code === "42501" || error.message?.includes("permission") || error.message?.includes("row-level security")) {
+          throw new Error("No tienes permisos para realizar esta acción. Por favor, verifica tu sesión.");
         } else if (error.message) {
           throw new Error(error.message);
         } else {
-          throw error;
+          throw new Error(`Error al guardar: ${JSON.stringify(error)}`);
         }
       }
 
