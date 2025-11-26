@@ -40,8 +40,9 @@ export async function exportAsPNG(
       throw new Error("No se encontró el contenido de la firma");
     }
 
-    // Calcular padding para evitar que se corten las letras (20px en cada lado)
-    const padding = 20;
+    // Calcular padding para evitar que se corten las letras (30px en cada lado, más en la parte inferior)
+    const padding = 30;
+    const paddingBottom = 40; // Más padding en la parte inferior
     const rect = contentElement.getBoundingClientRect();
     
     // Capturar el elemento de contenido con padding
@@ -51,21 +52,26 @@ export async function exportAsPNG(
       backgroundColor: backgroundColor === 'transparent' ? null : backgroundColor,
       useCORS: true,
       allowTaint: false,
+      scrollX: 0,
+      scrollY: 0,
       // Agregar padding al canvas
       onclone: (clonedDoc: Document) => {
         const clonedElement = clonedDoc.querySelector('table') || clonedDoc.body;
         if (clonedElement) {
           const style = (clonedElement as HTMLElement).style;
-          style.padding = `${padding}px`;
+          style.padding = `${padding}px ${padding}px ${paddingBottom}px ${padding}px`;
           style.boxSizing = 'border-box';
+          style.display = 'block';
         }
       },
     } as any);
 
-    // Crear un nuevo canvas con padding adicional
+    // Crear un nuevo canvas con padding adicional (más espacio en la parte inferior)
+    const paddingScaled = padding * 2; // Escala 2
+    const paddingBottomScaled = paddingBottom * 2; // Escala 2
     const paddedCanvas = document.createElement('canvas');
-    paddedCanvas.width = canvas.width + (padding * 2 * 2); // padding * 2 (escala) * 2 (lados)
-    paddedCanvas.height = canvas.height + (padding * 2 * 2);
+    paddedCanvas.width = canvas.width + (paddingScaled * 2); // padding izquierdo y derecho
+    paddedCanvas.height = canvas.height + paddingScaled + paddingBottomScaled; // padding superior e inferior (más abajo)
     const ctx = paddedCanvas.getContext('2d');
     
     if (!ctx) {
@@ -82,8 +88,7 @@ export async function exportAsPNG(
     }
     // Si es transparente, no rellenamos
 
-    // Dibujar el canvas original centrado con padding
-    const paddingScaled = padding * 2; // Escala 2
+    // Dibujar el canvas original centrado con padding (más espacio abajo)
     ctx.drawImage(canvas, paddingScaled, paddingScaled);
 
     // Convertir canvas a blob
@@ -145,8 +150,9 @@ export async function exportAsPDF(element: HTMLElement, filename: string = "firm
       throw new Error("No se encontró el contenido de la firma");
     }
 
-    // Calcular padding para evitar que se corten las letras (20px en cada lado)
-    const padding = 20;
+    // Calcular padding para evitar que se corten las letras (30px en cada lado, más en la parte inferior)
+    const padding = 30;
+    const paddingBottom = 40; // Más padding en la parte inferior
     
     // Capturar el elemento de contenido con fondo blanco y padding
     const canvas = await html2canvas(contentElement, {
@@ -155,21 +161,26 @@ export async function exportAsPDF(element: HTMLElement, filename: string = "firm
       backgroundColor: '#ffffff', // Fondo blanco para PDF
       useCORS: true,
       allowTaint: false,
+      scrollX: 0,
+      scrollY: 0,
       // Agregar padding al canvas
       onclone: (clonedDoc: Document) => {
         const clonedElement = clonedDoc.querySelector('table') || clonedDoc.body;
         if (clonedElement) {
           const style = (clonedElement as HTMLElement).style;
-          style.padding = `${padding}px`;
+          style.padding = `${padding}px ${padding}px ${paddingBottom}px ${padding}px`;
           style.boxSizing = 'border-box';
+          style.display = 'block';
         }
       },
     } as any);
 
-    // Crear un nuevo canvas con padding adicional
+    // Crear un nuevo canvas con padding adicional (más espacio en la parte inferior)
+    const paddingScaled = padding * 2; // Escala 2
+    const paddingBottomScaled = paddingBottom * 2; // Escala 2
     const paddedCanvas = document.createElement('canvas');
-    paddedCanvas.width = canvas.width + (padding * 2 * 2); // padding * 2 (escala) * 2 (lados)
-    paddedCanvas.height = canvas.height + (padding * 2 * 2);
+    paddedCanvas.width = canvas.width + (paddingScaled * 2); // padding izquierdo y derecho
+    paddedCanvas.height = canvas.height + paddingScaled + paddingBottomScaled; // padding superior e inferior (más abajo)
     const ctx = paddedCanvas.getContext('2d');
     
     if (!ctx) {
@@ -180,8 +191,7 @@ export async function exportAsPDF(element: HTMLElement, filename: string = "firm
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, paddedCanvas.width, paddedCanvas.height);
 
-    // Dibujar el canvas original centrado con padding
-    const paddingScaled = padding * 2; // Escala 2
+    // Dibujar el canvas original centrado con padding (más espacio abajo)
     ctx.drawImage(canvas, paddingScaled, paddingScaled);
 
     const imgData = paddedCanvas.toDataURL("image/png");
