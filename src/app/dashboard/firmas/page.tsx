@@ -298,12 +298,9 @@ export default function FirmasPage() {
       modern: "Moderna",
       minimal: "Minimal",
       minimalCorporate: "Corp",
-      modernaSinBarra: "Modern 2",
       enterpriseVintage: "Enterprise",
-      modern2: "Modern 3",
       qrProfesional: "QR Pro",
-      modern3: "Modern 4",
-      modern4: "Modern 5",
+      modern4: "Modern CTA",
       qrCorporated: "QR Corp",
     };
     return names[templateId] || templateId;

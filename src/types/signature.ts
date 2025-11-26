@@ -13,7 +13,7 @@ export interface SignatureProps {
   // Campos adicionales para templates específicos
   horario?: string; // Para QR Profesional
   textoAdicional?: string; // Para Enterprise Vintage
-  colorPersonalizado?: string; // Para Moderna sin barra, Modern 4
+  colorPersonalizado?: string; // Para Modern (mejorado), Modern 4
   qrLink?: string; // Para QR Profesional y QR Corporated
   logoEmpresa?: string; // Para Enterprise Vintage y Professional
   logoPosicion?: "top" | "center" | "bottom"; // Para Professional - posición del logo
@@ -28,14 +28,11 @@ export interface SignatureProps {
 export type TemplateType = 
   | "professional"            // Most Popular - Professional Clean Design
   | "classic" 
-  | "modern" 
+  | "modern"                  // Modern (mejorado con color personalizable)
   | "minimal"
   | "minimalCorporate"        // Minimal Corporate (template_01)
-  | "modernaSinBarra"         // Moderna sin barra (template_02)
   | "enterpriseVintage"         // Enterprise Vintage (template_03)
-  | "modern2"                  // Modern 2 (template_05)
   | "qrProfesional"            // QR Profesional (template_06)
-  | "modern3"                  // Modern 3 (template_08)
-  | "modern4"                  // Modern 4 (template_09)
+  | "modern4"                  // Modern 4 (template_09) - Con CTA personalizable
   | "qrCorporated";            // QR Corporated (template_10)
 

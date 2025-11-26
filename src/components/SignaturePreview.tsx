@@ -50,16 +50,10 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
         return renderMinimalTemplate();
       case "minimalCorporate":
         return renderTemplate01();
-      case "modernaSinBarra":
-        return renderTemplate02();
       case "enterpriseVintage":
         return renderTemplate03();
-      case "modern2":
-        return renderTemplate05();
       case "qrProfesional":
         return renderTemplate06();
-      case "modern3":
-        return renderTemplate08();
       case "modern4":
         return renderTemplate09();
       case "qrCorporated":
@@ -124,6 +118,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                         fontWeight: "bold",
                         color: "#1a1a1a",
                         paddingBottom: "5px",
+                        lineHeight: "1.4",
                       }}
                     >
                       {nombre}
@@ -135,6 +130,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                         fontSize: "13px",
                         color: "#666666",
                         paddingBottom: "8px",
+                        lineHeight: "1.4",
                       }}
                     >
                       {cargo}
@@ -147,6 +143,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                           fontSize: "12px",
                           color: "#555555",
                           paddingBottom: "5px",
+                          lineHeight: "1.5",
                         }}
                       >
                         Tel: {telefono}
@@ -155,7 +152,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                   )}
                   {redes.length > 0 && (
                     <tr>
-                      <td style={{ paddingTop: "8px" }}>
+                      <td style={{ paddingTop: "8px", paddingBottom: "5px" }}>
                         <table
                           cellPadding="0"
                           cellSpacing="0"
@@ -201,6 +198,9 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
   };
 
   const renderModernTemplate = () => {
+    // Color personalizable (por defecto azul #0066cc)
+    const accentColor = colorPersonalizado || "#0066cc";
+    
     return (
       <table
         cellPadding="0"
@@ -218,7 +218,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
           <tr>
             <td
               style={{
-                borderLeft: "4px solid #0066cc",
+                borderLeft: `4px solid ${accentColor}`,
                 paddingLeft: "15px",
               }}
             >
@@ -251,7 +251,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                             borderRadius: "50%",
                             objectFit: "cover",
                             display: "block",
-                            border: "3px solid #0066cc",
+                            border: `3px solid ${accentColor}`,
                           }}
                         />
                       </td>
@@ -260,7 +260,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                       style={{
                         fontSize: "18px",
                         fontWeight: "bold",
-                        color: "#0066cc",
+                        color: accentColor,
                         paddingBottom: "5px",
                       }}
                     >
@@ -321,10 +321,10 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                                   <a
                                     href={red.url}
                                     style={{
-                                      color: "#0066cc",
+                                      color: accentColor,
                                       textDecoration: "none",
                                       fontSize: "12px",
-                                      borderBottom: "1px solid #0066cc",
+                                      borderBottom: `1px solid ${accentColor}`,
                                     }}
                                   >
                                     {red.nombre}
@@ -367,6 +367,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                 borderTop: "1px solid #dddddd",
                 borderBottom: "1px solid #dddddd",
                 padding: "12px 0",
+                paddingBottom: "15px",
               }}
             >
               <table
@@ -449,7 +450,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                           )}
                           {redes.length > 0 && (
                             <tr>
-                              <td style={{ paddingTop: "5px" }}>
+                              <td style={{ paddingTop: "5px", paddingBottom: "5px" }}>
                                 <table
                                   cellPadding="0"
                                   cellSpacing="0"
@@ -891,182 +892,6 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
     );
   };
 
-  // Moderna sin barra: Foto circular con borde color personalizable, info a la derecha
-  const renderTemplate02 = () => {
-    const accentColor = colorPersonalizado || "#0066cc";
-    return (
-      <table
-        cellPadding="0"
-        cellSpacing="0"
-        border={0}
-        style={{
-          borderCollapse: "collapse",
-          fontFamily: "Arial, sans-serif",
-          fontSize: "14px",
-          color: "#333333",
-        }}
-      >
-        <tbody>
-          <tr>
-            {foto && (
-              <td
-                valign="top"
-                style={{
-                  paddingRight: "20px",
-                  fontFamily: "Arial, sans-serif",
-                }}
-              >
-                <img
-                  src={foto}
-                  alt={nombre}
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                    display: "block",
-                    border: `3px solid ${accentColor}`,
-                  }}
-                />
-              </td>
-            )}
-            <td valign="top" style={{ fontFamily: "Arial, sans-serif" }}>
-              <table
-                cellPadding="0"
-                cellSpacing="0"
-                border={0}
-                style={{
-                  borderCollapse: "collapse",
-                  fontFamily: "Arial, sans-serif",
-                }}
-              >
-                <tbody>
-                  <tr>
-                    <td
-                      style={{
-                        fontFamily: "Arial, sans-serif",
-                        fontSize: "18px",
-                        fontWeight: "bold",
-                        color: "#000000",
-                        paddingBottom: "5px",
-                        lineHeight: "1.4",
-                      }}
-                    >
-                      {nombre}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td
-                      style={{
-                        fontFamily: "Arial, sans-serif",
-                        fontSize: "14px",
-                        color: accentColor,
-                        paddingBottom: "8px",
-                        borderBottom: `1px solid ${accentColor}`,
-                        lineHeight: "1.4",
-                      }}
-                    >
-                      {(cargo || "").split("|")[0]?.trim() || cargo || "Tu Cargo"}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td
-                      style={{
-                        fontFamily: "Arial, sans-serif",
-                        fontSize: "13px",
-                        color: "#999999",
-                        paddingBottom: "12px",
-                        lineHeight: "1.4",
-                      }}
-                    >
-                      {(cargo || "").split("|")[1]?.trim() || ""}
-                    </td>
-                  </tr>
-                  {(telefono || redes.length > 0) && (
-                    <tr>
-                      <td style={{ paddingTop: "8px", fontFamily: "Arial, sans-serif" }}>
-                        <table
-                          cellPadding="0"
-                          cellSpacing="0"
-                          border={0}
-                          style={{
-                            borderCollapse: "collapse",
-                            fontFamily: "Arial, sans-serif",
-                          }}
-                        >
-                          <tbody>
-                            {telefono && (
-                              <tr>
-                                <td
-                                  style={{
-                                    fontFamily: "Arial, sans-serif",
-                                    fontSize: "12px",
-                                    color: "#666666",
-                                    paddingBottom: "4px",
-                                  }}
-                                >
-                                  <span style={{ fontFamily: "Arial, sans-serif", color: "#666666" }}>
-                                    📞
-                                  </span>{" "}
-                                  {telefono}
-                                </td>
-                              </tr>
-                            )}
-                            {redes.length > 0 && (
-                              <tr>
-                                <td style={{ paddingTop: "8px", fontFamily: "Arial, sans-serif" }}>
-                                  <table
-                                    cellPadding="0"
-                                    cellSpacing="0"
-                                    border={0}
-                                    style={{
-                                      borderCollapse: "collapse",
-                                      fontFamily: "Arial, sans-serif",
-                                    }}
-                                  >
-                                    <tbody>
-                                      <tr>
-                                        {redes.slice(0, 3).map((red, index) => (
-                                          <td
-                                            key={index}
-                                            style={{
-                                              paddingRight: "12px",
-                                              fontFamily: "Arial, sans-serif",
-                                            }}
-                                          >
-                                            <a
-                                              href={red.url}
-                                              style={{
-                                                fontFamily: "Arial, sans-serif",
-                                                color: accentColor,
-                                                textDecoration: "none",
-                                                fontSize: "12px",
-                                                borderBottom: `1px solid ${accentColor}`,
-                                              }}
-                                            >
-                                              {red.nombre}
-                                            </a>
-                                          </td>
-                                        ))}
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    );
-  };
 
   // Enterprise Vintage: Logo de empresa, línea azul, dos columnas, aviso confidencial
   const renderTemplate03 = () => {
@@ -1366,190 +1191,6 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
     );
   };
 
-  // Modern 2: Foto cuadrada redondeada, línea vertical azul, labels azules
-  const renderTemplate05 = () => {
-    const cargoParts = (cargo || "").split("|").map((p) => p.trim());
-    const cargoTitle = cargoParts[0] || cargo || "Tu Cargo";
-    const company = cargoParts[1] || "";
-
-    return (
-      <table
-        cellPadding="0"
-        cellSpacing="0"
-        border={0}
-        style={{
-          borderCollapse: "collapse",
-          fontFamily: "Arial, sans-serif",
-          fontSize: "14px",
-          color: "#333333",
-        }}
-      >
-        <tbody>
-          <tr>
-            {foto && (
-              <td
-                valign="top"
-                style={{
-                  paddingRight: "20px",
-                  fontFamily: "Arial, sans-serif",
-                }}
-              >
-                <img
-                  src={foto}
-                  alt={nombre}
-                  style={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "8px",
-                    objectFit: "cover",
-                    display: "block",
-                    border: "0",
-                  }}
-                />
-              </td>
-            )}
-            <td
-              valign="top"
-              style={{
-                borderLeft: "2px solid #0066cc",
-                paddingLeft: "20px",
-                fontFamily: "Arial, sans-serif",
-              }}
-            >
-              <table
-                cellPadding="0"
-                cellSpacing="0"
-                border={0}
-                style={{
-                  borderCollapse: "collapse",
-                  fontFamily: "Arial, sans-serif",
-                }}
-              >
-                <tbody>
-                  <tr>
-                    <td
-                      style={{
-                        fontFamily: "Arial, sans-serif",
-                        fontSize: "18px",
-                        fontWeight: "bold",
-                        color: "#0066cc",
-                        paddingBottom: "6px",
-                        lineHeight: "1.3",
-                      }}
-                    >
-                      {nombre}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td
-                      style={{
-                        fontFamily: "Arial, sans-serif",
-                        fontSize: "13px",
-                        color: "#666666",
-                        paddingBottom: "10px",
-                        lineHeight: "1.4",
-                      }}
-                    >
-                      {cargoTitle}
-                      {company && (
-                        <>
-                          {" | "}
-                          <span style={{ fontFamily: "Arial, sans-serif", color: "#666666" }}>
-                            {company}
-                          </span>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                  {(telefono || redes.length > 0) && (
-                    <>
-                      {telefono && (
-                        <tr>
-                          <td
-                            style={{
-                              fontFamily: "Arial, sans-serif",
-                              fontSize: "12px",
-                              color: "#333333",
-                              paddingBottom: "4px",
-                              lineHeight: "1.5",
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontFamily: "Arial, sans-serif",
-                                fontWeight: "600",
-                                color: "#0066cc",
-                              }}
-                            >
-                              P:
-                            </span>{" "}
-                            <span style={{ fontFamily: "Arial, sans-serif", color: "#333333" }}>
-                              {telefono}
-                            </span>
-                          </td>
-                        </tr>
-                      )}
-                      {redes.find((r) => r.url.includes("@")) && (
-                        <tr>
-                          <td
-                            style={{
-                              fontFamily: "Arial, sans-serif",
-                              fontSize: "12px",
-                              color: "#333333",
-                              paddingBottom: "4px",
-                              lineHeight: "1.5",
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontFamily: "Arial, sans-serif",
-                                fontWeight: "600",
-                                color: "#0066cc",
-                              }}
-                            >
-                              E:
-                            </span>{" "}
-                            <span style={{ fontFamily: "Arial, sans-serif", color: "#333333" }}>
-                              {redes.find((r) => r.url.includes("@"))?.url}
-                            </span>
-                          </td>
-                        </tr>
-                      )}
-                      {redes.find((r) => r.url.includes("www")) && (
-                        <tr>
-                          <td
-                            style={{
-                              fontFamily: "Arial, sans-serif",
-                              fontSize: "12px",
-                              color: "#333333",
-                              lineHeight: "1.5",
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontFamily: "Arial, sans-serif",
-                                fontWeight: "600",
-                                color: "#0066cc",
-                              }}
-                            >
-                              W:
-                            </span>{" "}
-                            <span style={{ fontFamily: "Arial, sans-serif", color: "#333333" }}>
-                              {redes.find((r) => r.url.includes("www"))?.url}
-                            </span>
-                          </td>
-                        </tr>
-                      )}
-                    </>
-                  )}
-                </tbody>
-              </table>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    );
-  };
 
   // QR Profesional: Con QR code, líneas punteadas, redes sociales, horario
   const renderTemplate06 = () => {
@@ -1805,289 +1446,6 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
     );
   };
 
-  // Modern 3: Foto cuadrada redondeada, línea vertical, iconos de redes mejorados
-  const renderTemplate08 = () => {
-    const cargoParts = (cargo || "").split("|").map((p) => p.trim());
-    const cargoTitle = cargoParts[0] || cargo || "Tu Cargo";
-    const company = cargoParts[1] || "";
-    const email = redes.find((r) => r.url.includes("@"));
-    const website = redes.find((r) => r.url.includes("www"));
-
-    // Función para obtener icono según el nombre de la red
-    const getSocialIcon = (nombre: string): string => {
-      if (!nombre) return "🔗";
-      const nameLower = nombre.toLowerCase();
-      if (nameLower.includes("linkedin")) return "💼";
-      if (nameLower.includes("twitter") || nameLower.includes("x.com")) return "🐦";
-      if (nameLower.includes("github")) return "💻";
-      if (nameLower.includes("instagram")) return "📷";
-      if (nameLower.includes("facebook")) return "👤";
-      if (nameLower.includes("youtube")) return "▶️";
-      return "🔗";
-    };
-
-    return (
-      <table
-        cellPadding="0"
-        cellSpacing="0"
-        border={0}
-        style={{
-          borderCollapse: "collapse",
-          fontFamily: "Arial, sans-serif",
-          fontSize: "14px",
-          color: "#333333",
-        }}
-      >
-        <tbody>
-          <tr>
-            {foto && (
-              <td
-                valign="top"
-                style={{
-                  paddingRight: "20px",
-                  fontFamily: "Arial, sans-serif",
-                }}
-              >
-                <img
-                  src={foto}
-                  alt={nombre}
-                  style={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                    display: "block",
-                    border: "0",
-                  }}
-                />
-              </td>
-            )}
-            <td
-              valign="top"
-              style={{
-                fontFamily: "Arial, sans-serif",
-              }}
-            >
-              <table
-                cellPadding="0"
-                cellSpacing="0"
-                border={0}
-                style={{
-                  borderCollapse: "collapse",
-                  fontFamily: "Arial, sans-serif",
-                }}
-              >
-                <tbody>
-                  <tr>
-                    <td
-                      style={{
-                        fontFamily: "Arial, sans-serif",
-                        fontSize: "18px",
-                        fontWeight: "bold",
-                        color: "#0066cc",
-                        paddingBottom: "6px",
-                        lineHeight: "1.4",
-                      }}
-                    >
-                      {nombre}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td
-                      style={{
-                        fontFamily: "Arial, sans-serif",
-                        fontSize: "13px",
-                        color: "#666666",
-                        paddingBottom: "5px",
-                        lineHeight: "1.4",
-                      }}
-                    >
-                      {cargoTitle}
-                    </td>
-                  </tr>
-                  {company && (
-                    <tr>
-                      <td
-                        style={{
-                          fontFamily: "Arial, sans-serif",
-                          fontSize: "13px",
-                          color: "#666666",
-                          paddingBottom: "12px",
-                          lineHeight: "1.4",
-                        }}
-                      >
-                        {company}
-                      </td>
-                    </tr>
-                  )}
-                  {(telefono || email || website) && (
-                    <>
-                      <tr>
-                        <td
-                          style={{
-                            borderTop: "1px solid #e0e0e0",
-                            paddingTop: "10px",
-                            fontFamily: "Arial, sans-serif",
-                          }}
-                        >
-                          <table
-                            cellPadding="0"
-                            cellSpacing="0"
-                            border={0}
-                            style={{
-                              borderCollapse: "collapse",
-                              fontFamily: "Arial, sans-serif",
-                            }}
-                          >
-                            <tbody>
-                              {telefono && (
-                                <tr>
-                                  <td
-                                    style={{
-                                      fontFamily: "Arial, sans-serif",
-                                      fontSize: "12px",
-                                      color: "#666666",
-                                      paddingBottom: "5px",
-                                      lineHeight: "1.5",
-                                    }}
-                                  >
-                                    <span
-                                      style={{
-                                        fontFamily: "Arial, sans-serif",
-                                        color: "#0066cc",
-                                      }}
-                                    >
-                                      📞
-                                    </span>{" "}
-                                    {telefono}
-                                  </td>
-                                </tr>
-                              )}
-                              {email && (
-                                <tr>
-                                  <td
-                                    style={{
-                                      fontFamily: "Arial, sans-serif",
-                                      fontSize: "12px",
-                                      color: "#666666",
-                                      paddingBottom: "5px",
-                                      lineHeight: "1.5",
-                                    }}
-                                  >
-                                    <span
-                                      style={{
-                                        fontFamily: "Arial, sans-serif",
-                                        color: "#0066cc",
-                                      }}
-                                    >
-                                      ✉️
-                                    </span>{" "}
-                                    <a
-                                      href={email.url}
-                                      style={{
-                                        fontFamily: "Arial, sans-serif",
-                                        color: "#666666",
-                                        textDecoration: "none",
-                                      }}
-                                    >
-                                      {email.url}
-                                    </a>
-                                  </td>
-                                </tr>
-                              )}
-                              {website && (
-                                <tr>
-                                  <td
-                                    style={{
-                                      fontFamily: "Arial, sans-serif",
-                                      fontSize: "12px",
-                                      color: "#666666",
-                                      paddingBottom: "10px",
-                                      lineHeight: "1.5",
-                                    }}
-                                  >
-                                    <span
-                                      style={{
-                                        fontFamily: "Arial, sans-serif",
-                                        color: "#0066cc",
-                                      }}
-                                    >
-                                      🌐
-                                    </span>{" "}
-                                    <a
-                                      href={website.url}
-                                      style={{
-                                        fontFamily: "Arial, sans-serif",
-                                        color: "#666666",
-                                        textDecoration: "none",
-                                      }}
-                                    >
-                                      {website.url}
-                                    </a>
-                                  </td>
-                                </tr>
-                              )}
-                            </tbody>
-                          </table>
-                        </td>
-                      </tr>
-                      {redes.length > 0 && (
-                        <tr>
-                          <td
-                            style={{
-                              paddingTop: "8px",
-                              fontFamily: "Arial, sans-serif",
-                            }}
-                          >
-                            <table
-                              cellPadding="0"
-                              cellSpacing="0"
-                              border={0}
-                              style={{
-                                borderCollapse: "collapse",
-                                fontFamily: "Arial, sans-serif",
-                              }}
-                            >
-                              <tbody>
-                                <tr>
-                                  {redes.slice(0, 4).map((red, index) => (
-                                    <td
-                                      key={index}
-                                      style={{
-                                        paddingRight: "10px",
-                                        fontFamily: "Arial, sans-serif",
-                                      }}
-                                    >
-                                      <a
-                                        href={red.url}
-                                        title={red.nombre}
-                                        style={{
-                                          fontFamily: "Arial, sans-serif",
-                                          color: "#0066cc",
-                                          textDecoration: "none",
-                                          fontSize: "14px",
-                                        }}
-                                      >
-                                        {getSocialIcon(red.nombre)}
-                                      </a>
-                                    </td>
-                                  ))}
-                                </tr>
-                              </tbody>
-                            </table>
-                          </td>
-                        </tr>
-                      )}
-                    </>
-                  )}
-                </tbody>
-              </table>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    );
-  };
 
   // Modern 4: Foto circular, línea vertical con color personalizable, botón CTA personalizable
   const renderTemplate09 = () => {

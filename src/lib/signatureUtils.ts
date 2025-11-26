@@ -18,7 +18,7 @@ export async function generateSignatureHTML(
       baseHTML = generateClassicHTML(nombre, cargo, foto, telefono, redes);
       break;
     case "modern":
-      baseHTML = generateModernHTML(nombre, cargo, foto, telefono, redes);
+      baseHTML = generateModernHTML(nombre, cargo, foto, telefono, redes, colorPersonalizado);
       break;
     case "minimal":
       baseHTML = generateMinimalHTML(nombre, cargo, foto, telefono, redes);
@@ -26,20 +26,11 @@ export async function generateSignatureHTML(
     case "minimalCorporate":
       baseHTML = generateTemplate01HTML(nombre, cargo, foto, telefono, redes);
       break;
-    case "modernaSinBarra":
-      baseHTML = generateTemplate02HTML(nombre, cargo, foto, telefono, redes, colorPersonalizado);
-      break;
     case "enterpriseVintage":
       baseHTML = generateTemplate03HTML(nombre, cargo, foto, telefono, redes, textoAdicional, logoEmpresa);
       break;
-    case "modern2":
-      baseHTML = generateTemplate05HTML(nombre, cargo, foto, telefono, redes);
-      break;
     case "qrProfesional":
       baseHTML = generateTemplate06HTML(nombre, cargo, foto, telefono, redes, horario, qrLink);
-      break;
-    case "modern3":
-      baseHTML = generateTemplate08HTML(nombre, cargo, foto, telefono, redes);
       break;
     case "modern4":
       baseHTML = generateTemplate09HTML(nombre, cargo, foto, telefono, redes, colorPersonalizado, ctaTexto);
@@ -134,18 +125,22 @@ function generateModernHTML(
   cargo: string,
   foto?: string,
   telefono?: string,
-  redes: RedSocial[] = []
+  redes: RedSocial[] = [],
+  colorPersonalizado?: string
 ): string {
+  // Color personalizable (por defecto azul #0066cc)
+  const accentColor = colorPersonalizado || "#0066cc";
+  
   const fotoHTML = foto
     ? `<td valign="top" rowspan="3" style="padding-right: 20px; padding-bottom: 10px; font-family: Arial, sans-serif;">
-        <img src="${escapeHtml(foto)}" alt="${escapeHtml(nombre)}" width="100" height="100" style="width: 100px; height: 100px; display: block; border: 3px solid #0066cc;" />
+        <img src="${escapeHtml(foto)}" alt="${escapeHtml(nombre)}" width="100" height="100" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; display: block; border: 3px solid ${accentColor};" />
       </td>`
     : "";
 
   const telefonoHTML = telefono
     ? `<tr>
-        <td style="font-family: Arial, sans-serif; font-size: 12px; color: #666666; padding-bottom: 8px; line-height: 1.6;">
-          <span style="font-family: Arial, sans-serif; color: #666666;">📞</span> <span style="font-family: Arial, sans-serif; color: #666666;">${escapeHtml(telefono)}</span>
+        <td style="font-family: Arial, sans-serif; font-size: 12px; color: #555555; padding-bottom: 8px; line-height: 1.6;">
+          <span style="font-family: Arial, sans-serif; color: #888888;">📞</span> <span style="font-family: Arial, sans-serif; color: #555555;">${escapeHtml(telefono)}</span>
         </td>
       </tr>`
     : "";
@@ -163,7 +158,7 @@ function generateModernHTML(
                         `<td style="padding-right: ${
                           index < redes.length - 1 ? "12px" : "0"
                         }; font-family: Arial, sans-serif;">
-                          <a href="${escapeHtml(red.url)}" style="font-family: Arial, sans-serif; color: #007bff; text-decoration: none; font-size: 12px; border-bottom: 1px solid #007bff;">
+                          <a href="${escapeHtml(red.url)}" style="font-family: Arial, sans-serif; color: ${accentColor}; text-decoration: none; font-size: 12px; border-bottom: 1px solid ${accentColor};">
                             ${escapeHtml(red.nombre)}
                           </a>
                         </td>`
@@ -179,12 +174,12 @@ function generateModernHTML(
   return `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; color: #333333; line-height: 1.6;">
   <tbody>
     <tr>
-      <td style="border-left: 4px solid #0066cc; padding-left: 15px; font-family: Arial, sans-serif;">
+      <td style="border-left: 4px solid ${accentColor}; padding-left: 15px; font-family: Arial, sans-serif;">
         <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
           <tbody>
             <tr>
               ${fotoHTML}
-              <td style="font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; color: #333333; padding-bottom: 5px; line-height: 1.6;">
+              <td style="font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; color: ${accentColor}; padding-bottom: 5px; line-height: 1.6;">
                 ${escapeHtml(nombre)}
               </td>
             </tr>
@@ -227,7 +222,7 @@ function generateMinimalHTML(
   const redesHTML =
     redes.length > 0
       ? `<tr>
-          <td style="padding-top: 5px; font-family: Arial, sans-serif;">
+          <td style="padding-top: 5px; padding-bottom: 5px; font-family: Arial, sans-serif;">
             <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
               <tbody>
                 <tr>
@@ -258,7 +253,7 @@ function generateMinimalHTML(
   return `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 13px; color: #333333; line-height: 1.8;">
   <tbody>
     <tr>
-      <td style="border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; padding: 12px 0; font-family: Arial, sans-serif;">
+      <td style="border-top: 1px solid #dddddd; border-bottom: 1px solid #dddddd; padding: 12px 0 15px 0; font-family: Arial, sans-serif;">
         <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif;">
           <tbody>
             <tr>
@@ -460,92 +455,6 @@ function generateTemplate01HTML(
 </table>`;
 }
 
-// Moderna sin barra: Foto circular con borde color personalizable
-function generateTemplate02HTML(
-  nombre: string,
-  cargo: string,
-  foto?: string,
-  telefono?: string,
-  redes: RedSocial[] = [],
-  colorPersonalizado?: string
-): string {
-  const cargoParts = cargo.split("|").map((p) => p.trim());
-  const cargoTitle = cargoParts[0] || cargo;
-  const company = cargoParts[1] || "";
-
-  // Color por defecto: #0066cc (azul), o color personalizado
-  const accentColor = colorPersonalizado || "#0066cc";
-
-  const fotoHTML = foto
-    ? `<td valign="top" style="padding-right: 20px; font-family: Arial, sans-serif;">
-        <img src="${escapeHtml(foto)}" alt="${escapeHtml(nombre)}" width="100" height="100" style="width: 100px; height: 100px; display: block; border: 3px solid ${accentColor};" />
-      </td>`
-    : "";
-
-  const redesLinks = redes.slice(0, 3)
-    .map(
-      (red) =>
-        `<td style="padding-right: 12px; font-family: Arial, sans-serif;">
-          <a href="${escapeHtml(red.url)}" style="font-family: Arial, sans-serif; color: ${accentColor}; text-decoration: none; font-size: 12px; border-bottom: 1px solid ${accentColor};">
-            ${escapeHtml(red.nombre)}
-          </a>
-        </td>`
-    )
-    .join("");
-
-  return `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; color: #333333;">
-  <tbody>
-    <tr>
-      ${fotoHTML}
-      <td valign="top" style="font-family: Arial, sans-serif;">
-        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
-          <tbody>
-            <tr>
-              <td style="font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; color: #000000; padding-bottom: 5px; line-height: 1.4;">
-                ${escapeHtml(nombre)}
-              </td>
-            </tr>
-            <tr>
-              <td style="font-family: Arial, sans-serif; font-size: 14px; color: ${accentColor}; padding-bottom: 8px; border-bottom: 1px solid ${accentColor}; line-height: 1.4;">
-                ${escapeHtml(cargoTitle)}
-              </td>
-            </tr>
-            ${company ? `<tr>
-              <td style="font-family: Arial, sans-serif; font-size: 13px; color: #999999; padding-bottom: 12px; line-height: 1.4;">
-                ${escapeHtml(company)}
-              </td>
-            </tr>` : ""}
-            ${telefono || redesLinks ? `<tr>
-              <td style="padding-top: 8px; font-family: Arial, sans-serif;">
-                <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
-                  <tbody>
-                    ${telefono ? `<tr>
-                      <td style="font-family: Arial, sans-serif; font-size: 12px; color: #666666; padding-bottom: 4px;">
-                        <span style="font-family: Arial, sans-serif; color: #666666;">📞</span> ${escapeHtml(telefono)}
-                      </td>
-                    </tr>` : ""}
-                    ${redesLinks ? `<tr>
-                      <td style="padding-top: 8px; font-family: Arial, sans-serif;">
-                        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
-                          <tbody>
-                            <tr>
-                              ${redesLinks}
-                            </tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>` : ""}
-                  </tbody>
-                </table>
-              </td>
-            </tr>` : ""}
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  </tbody>
-</table>`;
-}
 
 // Enterprise Vintage: Logo de empresa, línea azul, dos columnas, aviso confidencial, texto adicional
 function generateTemplate03HTML(
@@ -653,65 +562,6 @@ function generateTemplate03HTML(
 </table>`;
 }
 
-// Modern 2: Foto cuadrada redondeada, línea vertical azul
-function generateTemplate05HTML(
-  nombre: string,
-  cargo: string,
-  foto?: string,
-  telefono?: string,
-  redes: RedSocial[] = []
-): string {
-  const cargoParts = cargo.split("|").map((p) => p.trim());
-  const cargoTitle = cargoParts[0] || cargo;
-  const company = cargoParts[1] || "";
-  const email = redes.find((r) => r.url.includes("@"));
-  const website = redes.find((r) => r.url.includes("www"));
-
-  const fotoHTML = foto
-    ? `<td valign="top" style="padding-right: 20px; font-family: Arial, sans-serif;">
-        <img src="${escapeHtml(foto)}" alt="${escapeHtml(nombre)}" width="80" height="80" style="width: 80px; height: 80px; display: block; border: 0;" />
-      </td>`
-    : "";
-
-  return `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; color: #333333;">
-  <tbody>
-    <tr>
-      ${fotoHTML}
-      <td valign="top" style="border-left: 2px solid #0066cc; padding-left: 20px; font-family: Arial, sans-serif;">
-        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
-          <tbody>
-            <tr>
-              <td style="font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; color: #0066cc; padding-bottom: 6px; line-height: 1.3;">
-                ${escapeHtml(nombre)}
-              </td>
-            </tr>
-            <tr>
-              <td style="font-family: Arial, sans-serif; font-size: 13px; color: #666666; padding-bottom: 10px; line-height: 1.4;">
-                ${escapeHtml(cargoTitle)}${company ? ` | <span style="font-family: Arial, sans-serif; color: #666666;">${escapeHtml(company)}</span>` : ""}
-              </td>
-            </tr>
-            ${telefono ? `<tr>
-              <td style="font-family: Arial, sans-serif; font-size: 12px; color: #333333; padding-bottom: 4px; line-height: 1.5;">
-                <span style="font-family: Arial, sans-serif; font-weight: 600; color: #0066cc;">P:</span> <span style="font-family: Arial, sans-serif; color: #333333;">${escapeHtml(telefono)}</span>
-              </td>
-            </tr>` : ""}
-            ${email ? `<tr>
-              <td style="font-family: Arial, sans-serif; font-size: 12px; color: #333333; padding-bottom: 4px; line-height: 1.5;">
-                <span style="font-family: Arial, sans-serif; font-weight: 600; color: #0066cc;">E:</span> <span style="font-family: Arial, sans-serif; color: #333333;">${escapeHtml(email.url)}</span>
-              </td>
-            </tr>` : ""}
-            ${website ? `<tr>
-              <td style="font-family: Arial, sans-serif; font-size: 12px; color: #333333; line-height: 1.5;">
-                <span style="font-family: Arial, sans-serif; font-weight: 600; color: #0066cc;">W:</span> <span style="font-family: Arial, sans-serif; color: #333333;">${escapeHtml(website.url)}</span>
-              </td>
-            </tr>` : ""}
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  </tbody>
-</table>`;
-}
 
 // QR Profesional: Con QR code, líneas punteadas, redes sociales, horario
 function generateTemplate06HTML(
@@ -810,104 +660,6 @@ function generateTemplate06HTML(
 </table>`;
 }
 
-// Modern 3: Foto cuadrada redondeada, línea vertical, iconos de redes
-function generateTemplate08HTML(
-  nombre: string,
-  cargo: string,
-  foto?: string,
-  telefono?: string,
-  redes: RedSocial[] = []
-): string {
-  const cargoParts = cargo.split("|").map((p) => p.trim());
-  const cargoTitle = cargoParts[0] || cargo;
-  const company = cargoParts[1] || "";
-  const email = redes.find((r) => r.url.includes("@"));
-  const website = redes.find((r) => r.url.includes("www"));
-  // Iconos mejorados para redes sociales
-  const getSocialIcon = (nombre: string): string => {
-    const nameLower = nombre.toLowerCase();
-    if (nameLower.includes("linkedin")) return "💼";
-    if (nameLower.includes("twitter") || nameLower.includes("x.com")) return "🐦";
-    if (nameLower.includes("github")) return "💻";
-    if (nameLower.includes("instagram")) return "📷";
-    if (nameLower.includes("facebook")) return "👤";
-    if (nameLower.includes("youtube")) return "▶️";
-    return "🔗";
-  };
-
-  const redesLinks = redes.slice(0, 4)
-    .map((red) => `<td style="padding-right: 10px; font-family: Arial, sans-serif;"><a href="${escapeHtml(red.url)}" style="font-family: Arial, sans-serif; color: #0066cc; text-decoration: none; font-size: 14px;" title="${escapeHtml(red.nombre)}">${getSocialIcon(red.nombre)}</a></td>`)
-    .join("");
-
-  const fotoHTML = foto
-    ? `<td valign="top" style="padding-right: 20px; font-family: Arial, sans-serif;">
-        <img src="${escapeHtml(foto)}" alt="${escapeHtml(nombre)}" width="80" height="80" style="width: 80px; height: 80px; display: block; border: 0;" />
-      </td>`
-    : "";
-
-  return `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; color: #333333;">
-  <tbody>
-    <tr>
-      ${fotoHTML}
-      <td valign="top" style="font-family: Arial, sans-serif;">
-        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
-          <tbody>
-            <tr>
-              <td style="font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; color: #0066cc; padding-bottom: 6px; line-height: 1.4;">
-                ${escapeHtml(nombre)}
-              </td>
-            </tr>
-            <tr>
-              <td style="font-family: Arial, sans-serif; font-size: 13px; color: #666666; padding-bottom: 5px; line-height: 1.4;">
-                ${escapeHtml(cargoTitle)}
-              </td>
-            </tr>
-            ${company ? `<tr>
-              <td style="font-family: Arial, sans-serif; font-size: 13px; color: #666666; padding-bottom: 12px; line-height: 1.4;">
-                ${escapeHtml(company)}
-              </td>
-            </tr>` : ""}
-            ${telefono || email || website ? `<tr>
-              <td style="border-top: 1px solid #e0e0e0; padding-top: 10px; font-family: Arial, sans-serif;">
-                <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
-                  <tbody>
-                    ${telefono ? `<tr>
-                      <td style="font-family: Arial, sans-serif; font-size: 12px; color: #666666; padding-bottom: 5px; line-height: 1.5;">
-                        <span style="font-family: Arial, sans-serif; color: #0066cc;">📞</span> ${escapeHtml(telefono)}
-                      </td>
-                    </tr>` : ""}
-                    ${email ? `<tr>
-                      <td style="font-family: Arial, sans-serif; font-size: 12px; color: #666666; padding-bottom: 5px; line-height: 1.5;">
-                        <span style="font-family: Arial, sans-serif; color: #0066cc;">✉️</span> <a href="${escapeHtml(email.url)}" style="font-family: Arial, sans-serif; color: #666666; text-decoration: none;">${escapeHtml(email.url)}</a>
-                      </td>
-                    </tr>` : ""}
-                    ${website ? `<tr>
-                      <td style="font-family: Arial, sans-serif; font-size: 12px; color: #666666; padding-bottom: 10px; line-height: 1.5;">
-                        <span style="font-family: Arial, sans-serif; color: #0066cc;">🌐</span> <a href="${escapeHtml(website.url)}" style="font-family: Arial, sans-serif; color: #666666; text-decoration: none;">${escapeHtml(website.url)}</a>
-                      </td>
-                    </tr>` : ""}
-                  </tbody>
-                </table>
-              </td>
-            </tr>
-            ${redesLinks ? `<tr>
-              <td style="padding-top: 8px; font-family: Arial, sans-serif;">
-                <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
-                  <tbody>
-                    <tr>
-                      ${redesLinks}
-                    </tr>
-                  </tbody>
-                </table>
-              </td>
-            </tr>` : ""}` : ""}
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  </tbody>
-</table>`;
-}
 
 // Modern 4: Foto circular, línea vertical con color personalizado, botón CTA personalizable
 function generateTemplate09HTML(

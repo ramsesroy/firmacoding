@@ -150,7 +150,7 @@ export default function DashboardPage() {
   // Agregar imágenes de ejemplo según el template cuando cambia
   useEffect(() => {
     // Templates que usan foto
-    const templatesWithPhoto = ["classic", "modern", "minimal", "modernaSinBarra", "modern2", "modern3", "modern4"];
+    const templatesWithPhoto = ["classic", "modern", "minimal", "modern4"];
     // Templates que usan logo
     const templatesWithLogo = ["professional", "enterpriseVintage"];
     
@@ -441,12 +441,9 @@ export default function DashboardPage() {
                     { id: "modern", name: "Moderna" },
                     { id: "minimal", name: "Minimal" },
                     { id: "minimalCorporate", name: "Corp" },
-                    { id: "modernaSinBarra", name: "Modern 2" },
                     { id: "enterpriseVintage", name: "Enterprise" },
-                    { id: "modern2", name: "Modern 3" },
                     { id: "qrProfesional", name: "QR Pro" },
-                    { id: "modern3", name: "Modern 4" },
-                    { id: "modern4", name: "Modern 5" },
+                    { id: "modern4", name: "Modern CTA" },
                     { id: "qrCorporated", name: "QR Corp" },
                   ].map((tpl) => (
                     <button
@@ -456,7 +453,7 @@ export default function DashboardPage() {
                         setTemplate(newTemplate);
                         
                         // Agregar foto de ejemplo si el template usa foto y no hay foto
-                        const templatesWithPhoto = ["classic", "modern", "minimal", "modernaSinBarra", "modern2", "modern3", "modern4"];
+                        const templatesWithPhoto = ["classic", "modern", "minimal", "modern4"];
                         if (templatesWithPhoto.includes(newTemplate) && !signatureData.foto) {
                           setSignatureData({ ...signatureData, foto: EXAMPLE_PHOTO_URL });
                         }
@@ -904,8 +901,8 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Selector de Color (Moderna sin barra, Modern 4) */}
-            {(["modernaSinBarra", "modern4"].includes(template)) && (
+            {/* Selector de Color (Modern, Modern 4) */}
+            {(["modern", "modern4"].includes(template)) && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Color personalizado
@@ -930,7 +927,7 @@ export default function DashboardPage() {
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  {template === "modernaSinBarra" && "Color para borde de foto y cargo"}
+                  {template === "modern" && "Color para borde, foto y enlaces"}
                   {template === "modern4" && "Color para borde, línea y botón"}
                 </p>
               </div>
