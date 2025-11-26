@@ -23,8 +23,15 @@ function findContentElement(element: HTMLElement): HTMLElement | null {
 
 /**
  * Exporta una firma como imagen PNG
+ * @param element - Elemento HTML que contiene la firma
+ * @param filename - Nombre del archivo (sin extensión)
+ * @param backgroundColor - Color de fondo ('white' | 'black' | 'transparent'). Default: 'white'
  */
-export async function exportAsPNG(element: HTMLElement, filename: string = "firma"): Promise<void> {
+export async function exportAsPNG(
+  element: HTMLElement, 
+  filename: string = "firma",
+  backgroundColor: 'white' | 'black' | 'transparent' = 'white'
+): Promise<void> {
   try {
     // Encontrar el elemento de contenido real (la tabla)
     const contentElement = findContentElement(element);
@@ -33,17 +40,54 @@ export async function exportAsPNG(element: HTMLElement, filename: string = "firm
       throw new Error("No se encontró el contenido de la firma");
     }
 
-    // Capturar el elemento de contenido
+    // Calcular padding para evitar que se corten las letras (20px en cada lado)
+    const padding = 20;
+    const rect = contentElement.getBoundingClientRect();
+    
+    // Capturar el elemento de contenido con padding
     const canvas = await html2canvas(contentElement, {
       scale: 2, // Mayor calidad
       logging: false,
-      backgroundColor: null, // Fondo transparente
+      backgroundColor: backgroundColor === 'transparent' ? null : backgroundColor,
       useCORS: true,
       allowTaint: false,
+      // Agregar padding al canvas
+      onclone: (clonedDoc: Document) => {
+        const clonedElement = clonedDoc.querySelector('table') || clonedDoc.body;
+        if (clonedElement) {
+          const style = (clonedElement as HTMLElement).style;
+          style.padding = `${padding}px`;
+          style.boxSizing = 'border-box';
+        }
+      },
     } as any);
 
+    // Crear un nuevo canvas con padding adicional
+    const paddedCanvas = document.createElement('canvas');
+    paddedCanvas.width = canvas.width + (padding * 2 * 2); // padding * 2 (escala) * 2 (lados)
+    paddedCanvas.height = canvas.height + (padding * 2 * 2);
+    const ctx = paddedCanvas.getContext('2d');
+    
+    if (!ctx) {
+      throw new Error("Error al crear contexto del canvas");
+    }
+
+    // Rellenar el fondo
+    if (backgroundColor === 'white') {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, paddedCanvas.width, paddedCanvas.height);
+    } else if (backgroundColor === 'black') {
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, paddedCanvas.width, paddedCanvas.height);
+    }
+    // Si es transparente, no rellenamos
+
+    // Dibujar el canvas original centrado con padding
+    const paddingScaled = padding * 2; // Escala 2
+    ctx.drawImage(canvas, paddingScaled, paddingScaled);
+
     // Convertir canvas a blob
-    canvas.toBlob((blob) => {
+    paddedCanvas.toBlob((blob) => {
       if (!blob) {
         throw new Error("Error al generar la imagen");
       }
@@ -65,7 +109,7 @@ export async function exportAsPNG(element: HTMLElement, filename: string = "firm
       const canvas = await html2canvas(element, {
         scale: 2,
         logging: false,
-        backgroundColor: null,
+        backgroundColor: backgroundColor === 'transparent' ? null : backgroundColor,
         useCORS: true,
       } as any);
       
@@ -101,23 +145,53 @@ export async function exportAsPDF(element: HTMLElement, filename: string = "firm
       throw new Error("No se encontró el contenido de la firma");
     }
 
-    // Capturar el elemento de contenido
+    // Calcular padding para evitar que se corten las letras (20px en cada lado)
+    const padding = 20;
+    
+    // Capturar el elemento de contenido con fondo blanco y padding
     const canvas = await html2canvas(contentElement, {
       scale: 2,
       logging: false,
-      backgroundColor: null,
+      backgroundColor: '#ffffff', // Fondo blanco para PDF
       useCORS: true,
       allowTaint: false,
+      // Agregar padding al canvas
+      onclone: (clonedDoc: Document) => {
+        const clonedElement = clonedDoc.querySelector('table') || clonedDoc.body;
+        if (clonedElement) {
+          const style = (clonedElement as HTMLElement).style;
+          style.padding = `${padding}px`;
+          style.boxSizing = 'border-box';
+        }
+      },
     } as any);
 
-    const imgData = canvas.toDataURL("image/png");
+    // Crear un nuevo canvas con padding adicional
+    const paddedCanvas = document.createElement('canvas');
+    paddedCanvas.width = canvas.width + (padding * 2 * 2); // padding * 2 (escala) * 2 (lados)
+    paddedCanvas.height = canvas.height + (padding * 2 * 2);
+    const ctx = paddedCanvas.getContext('2d');
+    
+    if (!ctx) {
+      throw new Error("Error al crear contexto del canvas");
+    }
+
+    // Rellenar el fondo blanco
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, paddedCanvas.width, paddedCanvas.height);
+
+    // Dibujar el canvas original centrado con padding
+    const paddingScaled = padding * 2; // Escala 2
+    ctx.drawImage(canvas, paddingScaled, paddingScaled);
+
+    const imgData = paddedCanvas.toDataURL("image/png");
     
     // Calcular dimensiones en mm (1px = 0.264583mm a 96 DPI)
     const pxToMm = 0.264583;
-    const imgWidthMm = canvas.width * pxToMm;
-    const imgHeightMm = canvas.height * pxToMm;
+    const imgWidthMm = paddedCanvas.width * pxToMm;
+    const imgHeightMm = paddedCanvas.height * pxToMm;
     
-    // Crear PDF con el tamaño exacto de la imagen (con un pequeño margen)
+    // Crear PDF con el tamaño exacto de la imagen (con un pequeño margen adicional)
     const margin = 5; // 5mm de margen
     const pdfWidth = imgWidthMm + (margin * 2);
     const pdfHeight = imgHeightMm + (margin * 2);
@@ -139,7 +213,7 @@ export async function exportAsPDF(element: HTMLElement, filename: string = "firm
       const canvas = await html2canvas(element, {
         scale: 2,
         logging: false,
-        backgroundColor: null,
+        backgroundColor: '#ffffff',
         useCORS: true,
       } as any);
       
