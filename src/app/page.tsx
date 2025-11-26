@@ -35,7 +35,7 @@ export default function LandingPage() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
               <Link
-                href="/dashboard"
+                href="/register"
                 className="group w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-lg text-base sm:text-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transform hover:-translate-y-0.5"
               >
                 Comenzar Gratis
@@ -243,7 +243,7 @@ export default function LandingPage() {
             Únete a miles de profesionales que ya están usando FirmaPro para crear firmas impresionantes
           </p>
           <Link
-            href="/dashboard"
+            href="/register"
             className="inline-flex items-center bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-50 transition-all duration-200 shadow-xl transform hover:-translate-y-0.5"
           >
             Comenzar Gratis Ahora

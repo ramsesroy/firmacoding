@@ -5,7 +5,10 @@ import { supabase } from "@/lib/supabaseClient";
 import { TemplateType, RedSocial } from "@/types/signature";
 import SignaturePreview from "@/components/SignaturePreview";
 import { copyToClipboard, generateSignatureHTML } from "@/lib/signatureUtils";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useEffect } from "react";
 
 interface SignatureRecord {
   id: string;
@@ -32,6 +35,8 @@ interface SignatureRecord {
 }
 
 export default function FirmasPage() {
+  const { user } = useAuth();
+  const router = useRouter();
   const [signatures, setSignatures] = useState<SignatureRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,16 +45,23 @@ export default function FirmasPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!user) {
+      router.push("/register");
+      return;
+    }
     loadSignatures();
-  }, []);
+  }, [user, router]);
 
   const loadSignatures = async () => {
+    if (!user) return;
+    
     setLoading(true);
     setError(null);
     try {
       const { data, error: fetchError } = await supabase
         .from("signatures")
         .select("*")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (fetchError) {

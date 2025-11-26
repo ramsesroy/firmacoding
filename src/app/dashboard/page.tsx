@@ -7,8 +7,11 @@ import { TemplateType, RedSocial } from "@/types/signature";
 import { copyToClipboard, generateSignatureHTML } from "@/lib/signatureUtils";
 import { uploadImage } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+  
   // URLs de imágenes de ejemplo (imágenes reales profesionales de Unsplash)
   // Foto de perfil profesional - retrato empresarial de calidad
   const EXAMPLE_PHOTO_URL = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
@@ -51,6 +54,7 @@ export default function DashboardPage() {
   const [editRedForm, setEditRedForm] = useState({ nombre: "", url: "", icono: "" });
   const [showHtmlModal, setShowHtmlModal] = useState(false);
   const [htmlContent, setHtmlContent] = useState("");
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
   const htmlTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -211,13 +215,21 @@ export default function DashboardPage() {
       return;
     }
 
+    // Si no hay usuario, mostrar modal de sugerencia
+    if (!user) {
+      setShowRegisterModal(true);
+      return;
+    }
+
     setSaving(true);
     setSaveMessage(null);
 
     try {
+
       // Preparar los datos para insertar
       // Asegurar que las propiedades coincidan exactamente con la estructura de la base de datos
       const signatureRecord = {
+        user_id: user.id,
         name: signatureData.nombre,
         role: signatureData.cargo,
         phone: signatureData.telefono || null,
@@ -1088,6 +1100,56 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal de sugerencia de registro */}
+      {showRegisterModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-md w-full">
+            <div className="p-4 sm:p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900">
+                  💡 Registro Recomendado
+                </h3>
+                <button
+                  onClick={() => setShowRegisterModal(false)}
+                  className="text-gray-400 hover:text-gray-600 transition flex-shrink-0"
+                  aria-label="Cerrar"
+                >
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="space-y-3 text-sm sm:text-base text-gray-700">
+                <p>
+                  Para <strong>guardar tus firmas</strong> y acceder a ellas desde cualquier lugar, necesitas crear una cuenta gratuita.
+                </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+                  <p className="font-semibold text-blue-900 mb-2">✨ ¡Pero no te preocupes!</p>
+                  <p className="text-blue-800">
+                    Puedes <strong>copiar el HTML de tu firma</strong> completamente gratis y usarla las veces que quieras, sin necesidad de registrarte.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="p-4 sm:p-6 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
+              <Link
+                href="/register"
+                onClick={() => setShowRegisterModal(false)}
+                className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm sm:text-base text-center"
+              >
+                Crear Cuenta Gratis
+              </Link>
+              <button
+                onClick={() => setShowRegisterModal(false)}
+                className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold text-sm sm:text-base"
+              >
+                Continuar sin Registro
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal para copiar HTML manualmente (especialmente para iOS) */}
       {showHtmlModal && (

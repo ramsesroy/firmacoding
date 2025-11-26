@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function DashboardLayout({
   children,
@@ -9,6 +11,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/login");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -80,22 +89,49 @@ export default function DashboardLayout({
           >
             Editor de Firmas
           </Link>
-          <Link
-            href="/dashboard/firmas"
-            className="block px-6 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition"
-            onClick={() => setSidebarOpen(false)}
-          >
-            Mis Firmas
-          </Link>
-          <Link
-            href="/dashboard/configuracion"
-            className="block px-6 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition"
-            onClick={() => setSidebarOpen(false)}
-          >
-            Configuración
-          </Link>
+          {user && (
+            <>
+              <Link
+                href="/dashboard/firmas"
+                className="block px-6 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition"
+                onClick={() => setSidebarOpen(false)}
+              >
+                Mis Firmas
+              </Link>
+              <Link
+                href="/dashboard/configuracion"
+                className="block px-6 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 transition"
+                onClick={() => setSidebarOpen(false)}
+              >
+                Configuración
+              </Link>
+            </>
+          )}
+          {!user && (
+            <Link
+              href="/register"
+              className="block px-6 py-3 text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition font-semibold"
+              onClick={() => setSidebarOpen(false)}
+            >
+              Crear Cuenta
+            </Link>
+          )}
         </nav>
-        <div className="absolute bottom-0 w-full p-4 sm:p-6 border-t">
+        <div className="absolute bottom-0 w-full p-4 sm:p-6 border-t space-y-2">
+          {user && (
+            <div className="mb-3 px-4 py-2 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-500 mb-1">Sesión iniciada como</p>
+              <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
+            </div>
+          )}
+          {user && (
+            <button
+              onClick={handleSignOut}
+              className="w-full text-center text-red-600 hover:text-red-700 hover:bg-red-50 transition text-sm sm:text-base font-medium py-2 px-4 rounded-lg"
+            >
+              Cerrar Sesión
+            </button>
+          )}
           <Link
             href="/"
             className="block text-center text-gray-600 hover:text-indigo-600 transition text-sm sm:text-base"
