@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/useToast";
 import ToastContainer from "@/components/ToastContainer";
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const { toasts, success, error: showError, removeToast } = useToast();
   
   // URLs de imágenes de ejemplo (imágenes reales profesionales de Unsplash)
@@ -285,10 +285,15 @@ export default function DashboardPage() {
       return;
     }
 
+    // Verificar que hay sesión activa
+    if (!session) {
+      showError("No hay sesión activa. Por favor, recarga la página o inicia sesión nuevamente.");
+      return;
+    }
+
     setSaving(true);
 
     try {
-
       // Preparar los datos para insertar
       // Asegurar que las propiedades coincidan exactamente con la estructura de la base de datos
       const signatureRecord = {
@@ -322,6 +327,7 @@ export default function DashboardPage() {
           .from("signatures")
           .update(signatureRecord)
           .eq("id", editingSignatureId)
+          .eq("user_id", user.id) // Asegurar que solo actualiza sus propias firmas
           .select()
           .single();
         data = updateData;
@@ -338,7 +344,17 @@ export default function DashboardPage() {
       }
 
       if (error) {
-        throw error;
+        console.error("Error de Supabase:", error);
+        // Proporcionar mensaje de error más descriptivo
+        if (error.code === "PGRST116") {
+          throw new Error("No se encontró la firma para actualizar");
+        } else if (error.code === "23505") {
+          throw new Error("Ya existe una firma con estos datos");
+        } else if (error.message) {
+          throw new Error(error.message);
+        } else {
+          throw error;
+        }
       }
 
       success(editingSignatureId ? "¡Firma actualizada exitosamente!" : "¡Firma guardada exitosamente!");
