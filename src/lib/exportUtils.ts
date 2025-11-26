@@ -2,13 +2,53 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 /**
+ * Obtiene el tamaño real del contenido de la firma
+ */
+function getContentBounds(element: HTMLElement): { width: number; height: number; x: number; y: number } {
+  // Buscar el elemento table que contiene la firma real
+  const tableElement = element.querySelector('table');
+  if (tableElement) {
+    const rect = tableElement.getBoundingClientRect();
+    const parentRect = element.getBoundingClientRect();
+    return {
+      width: rect.width,
+      height: rect.height,
+      x: rect.left - parentRect.left,
+      y: rect.top - parentRect.top,
+    };
+  }
+  
+  // Si no hay tabla, usar el elemento completo
+  const rect = element.getBoundingClientRect();
+  return {
+    width: rect.width,
+    height: rect.height,
+    x: 0,
+    y: 0,
+  };
+}
+
+/**
  * Exporta una firma como imagen PNG
  */
 export async function exportAsPNG(element: HTMLElement, filename: string = "firma"): Promise<void> {
   try {
+    // Obtener el tamaño real del contenido
+    const bounds = getContentBounds(element);
+    
+    // Capturar el elemento con el tamaño exacto del contenido
     const canvas = await html2canvas(element, {
+      x: bounds.x,
+      y: bounds.y,
+      width: bounds.width,
+      height: bounds.height,
       scale: 2, // Mayor calidad
       logging: false,
+      backgroundColor: null, // Fondo transparente
+      useCORS: true,
+      allowTaint: false,
+      windowWidth: bounds.width,
+      windowHeight: bounds.height,
     } as any);
 
     // Convertir canvas a blob
@@ -29,7 +69,31 @@ export async function exportAsPNG(element: HTMLElement, filename: string = "firm
     }, "image/png");
   } catch (error) {
     console.error("Error al exportar como PNG:", error);
-    throw error;
+    // Fallback: intentar con el elemento original sin recortar
+    try {
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        logging: false,
+        backgroundColor: null,
+        useCORS: true,
+      } as any);
+      
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          throw new Error("Error al generar la imagen");
+        }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${filename}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }, "image/png");
+    } catch (fallbackError) {
+      throw error;
+    }
   }
 }
 
@@ -38,39 +102,92 @@ export async function exportAsPNG(element: HTMLElement, filename: string = "firm
  */
 export async function exportAsPDF(element: HTMLElement, filename: string = "firma"): Promise<void> {
   try {
-    const canvas = await html2canvas(element, {
+    // Obtener el tamaño real del contenido
+    const bounds = getContentBounds(element);
+    
+    // Crear un contenedor temporal para capturar solo el contenido
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '0';
+    tempContainer.style.width = `${bounds.width}px`;
+    tempContainer.style.height = `${bounds.height}px`;
+    tempContainer.style.overflow = 'visible';
+    tempContainer.style.backgroundColor = 'transparent';
+    
+    // Clonar el contenido
+    const contentClone = element.cloneNode(true) as HTMLElement;
+    contentClone.style.margin = '0';
+    contentClone.style.padding = '0';
+    tempContainer.appendChild(contentClone);
+    document.body.appendChild(tempContainer);
+    
+    // Capturar solo el contenido con el tamaño exacto
+    const canvas = await html2canvas(tempContainer, {
+      width: bounds.width,
+      height: bounds.height,
       scale: 2,
       logging: false,
+      backgroundColor: null,
+      useCORS: true,
+      allowTaint: false,
     } as any);
 
+    // Limpiar el contenedor temporal
+    document.body.removeChild(tempContainer);
+
     const imgData = canvas.toDataURL("image/png");
+    
+    // Calcular dimensiones en mm (1px = 0.264583mm a 96 DPI)
+    const pxToMm = 0.264583;
+    const imgWidthMm = canvas.width * pxToMm;
+    const imgHeightMm = canvas.height * pxToMm;
+    
+    // Crear PDF con el tamaño exacto de la imagen (con un pequeño margen)
+    const margin = 5; // 5mm de margen
+    const pdfWidth = imgWidthMm + (margin * 2);
+    const pdfHeight = imgHeightMm + (margin * 2);
+    
     const pdf = new jsPDF({
-      orientation: "portrait",
+      orientation: pdfWidth > pdfHeight ? "landscape" : "portrait",
       unit: "mm",
-      format: "a4",
+      format: [pdfWidth, pdfHeight],
     });
 
-    const imgWidth = 190; // Ancho máximo en mm para A4
-    const pageHeight = 295; // Altura de página A4 en mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    let heightLeft = imgHeight;
-
-    let position = 0;
-
-    pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
-
-    while (heightLeft >= 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-    }
+    // Agregar la imagen centrada con margen
+    pdf.addImage(imgData, "PNG", margin, margin, imgWidthMm, imgHeightMm);
 
     pdf.save(`${filename}.pdf`);
   } catch (error) {
     console.error("Error al exportar como PDF:", error);
-    throw error;
+    // Fallback: intentar con el elemento original
+    try {
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        logging: false,
+        backgroundColor: null,
+        useCORS: true,
+      } as any);
+      
+      const imgData = canvas.toDataURL("image/png");
+      const pxToMm = 0.264583;
+      const imgWidthMm = canvas.width * pxToMm;
+      const imgHeightMm = canvas.height * pxToMm;
+      const margin = 5;
+      const pdfWidth = imgWidthMm + (margin * 2);
+      const pdfHeight = imgHeightMm + (margin * 2);
+      
+      const pdf = new jsPDF({
+        orientation: pdfWidth > pdfHeight ? "landscape" : "portrait",
+        unit: "mm",
+        format: [pdfWidth, pdfHeight],
+      });
+      
+      pdf.addImage(imgData, "PNG", margin, margin, imgWidthMm, imgHeightMm);
+      pdf.save(`${filename}.pdf`);
+    } catch (fallbackError) {
+      throw error;
+    }
   }
 }
 
