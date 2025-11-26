@@ -13,26 +13,51 @@ export interface SignatureProps {
   // Campos adicionales para templates específicos
   horario?: string; // Para QR Profesional
   textoAdicional?: string; // Para Enterprise Vintage
-  colorPersonalizado?: string; // Para Modern (mejorado), Modern 4
+  colorPersonalizado?: string; // Para Moderna sin barra, Modern 4
   qrLink?: string; // Para QR Profesional y QR Corporated
   logoEmpresa?: string; // Para Enterprise Vintage y Professional
-  logoPosicion?: "top" | "center" | "bottom"; // Para Professional - posición del logo
   ctaTexto?: string; // Para Modern 4 (texto del botón CTA)
   telefonoMovil?: string; // Para Professional (teléfono móvil adicional)
   direccion?: string; // Para Professional (dirección)
   iconoTelefono?: string; // Icono personalizable para teléfono
   iconoDireccion?: string; // Icono personalizable para dirección
   iconoTelefonoMovil?: string; // Icono personalizable para teléfono móvil
+  stackTecnologico?: string; // Para Tech Developer (ej: "React, Node.js, TypeScript")
+  testimonio?: string; // Para Sales Professional (testimonio/calificación)
+  certificaciones?: string; // Para Medical Professional (certificaciones/especialidades)
+  horarioConsulta?: string; // Para Medical Professional (horario de consulta)
+  portfolio?: string; // Para Consultant (link a portfolio/proyectos)
+  tarifas?: string; // Para Consultant (tarifas, opcional)
+  listings?: string; // Para Real Estate Agent (listings destacados)
+  calendarioCitas?: string; // Para Real Estate Agent (link a calendario)
+  publicaciones?: string; // Para Academic/Researcher (publicaciones destacadas)
+  afiliacionInstitucional?: string; // Para Academic/Researcher (universidad/institución)
+  orcid?: string; // Para Academic/Researcher (ORCID ID)
+  mision?: string; // Para Non-Profit (misión/causa)
+  donaciones?: string; // Para Non-Profit (link a donaciones)
+  idiomas?: string; // Para Bilingual/Multilingual (idiomas hablados, ej: "Español, Inglés, Francés")
 }
 
 export type TemplateType = 
   | "professional"            // Most Popular - Professional Clean Design
   | "classic" 
-  | "modern"                  // Modern (mejorado con color personalizable)
+  | "modern" 
   | "minimal"
   | "minimalCorporate"        // Minimal Corporate (template_01)
+  | "modernaSinBarra"         // Moderna sin barra (template_02)
   | "enterpriseVintage"         // Enterprise Vintage (template_03)
+  | "modern2"                  // Modern 2 (template_05)
   | "qrProfesional"            // QR Profesional (template_06)
-  | "modern4"                  // Modern 4 (template_09) - Con CTA personalizable
-  | "qrCorporated";            // QR Corporated (template_10)
+  | "modern3"                  // Modern 3 (template_08)
+  | "modern4"                  // Modern 4 (template_09)
+  | "qrCorporated"             // QR Corporated (template_10)
+  | "techDeveloper"            // Tech Developer - Para desarrolladores
+  | "salesProfessional"        // Sales Professional - Para comerciales
+  | "boldExecutive"            // Bold Executive - Para ejecutivos
+  | "medicalProfessional"     // Medical Professional - Para profesionales de salud
+  | "consultant"               // Consultant - Para consultores independientes
+  | "realEstateAgent"          // Real Estate Agent - Para agentes inmobiliarios
+  | "academicResearcher"       // Academic/Researcher - Para académicos/investigadores
+  | "nonProfit"                // Non-Profit/Social Impact - Para ONGs/fundaciones
+  | "bilingual";               // Bilingual/Multilingual - Para profesionales multilingües
 

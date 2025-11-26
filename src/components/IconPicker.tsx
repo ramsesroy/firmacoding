@@ -64,15 +64,15 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
           />
           
           {/* Panel de selección de iconos */}
-          <div className="absolute z-50 mt-2 left-0 right-0 sm:left-auto sm:right-0 bg-white border border-gray-200 rounded-xl shadow-xl p-3 sm:p-4 w-full sm:w-auto sm:max-w-sm max-h-[80vh] sm:max-h-96 overflow-hidden flex flex-col">
+          <div className="absolute z-50 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl p-4 w-full max-w-sm max-h-96 overflow-hidden flex flex-col">
             {/* Categorías */}
-            <div className="flex gap-2 mb-3 overflow-x-auto pb-2 border-b border-gray-200 scrollbar-hide">
+            <div className="flex gap-2 mb-3 overflow-x-auto pb-2 border-b border-gray-200">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-2 sm:px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap transition-colors flex-shrink-0 ${
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap transition-colors ${
                     selectedCategory === cat
                       ? "bg-blue-600 text-white"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -85,7 +85,7 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
 
             {/* Grid de iconos */}
             <div className="overflow-y-auto flex-1">
-              <div className="grid grid-cols-6 sm:grid-cols-8 gap-1.5 sm:gap-2">
+              <div className="grid grid-cols-8 gap-2">
                 {displayIcons.map((icon, index) => (
                   <button
                     key={index}
@@ -94,7 +94,7 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
                       onSelectIcon(icon);
                       setIsOpen(false);
                     }}
-                    className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-lg sm:text-xl rounded-lg hover:bg-blue-50 transition-colors ${
+                    className={`w-10 h-10 flex items-center justify-center text-xl rounded-lg hover:bg-blue-50 transition-colors ${
                       selectedIcon === icon
                         ? "bg-blue-100 ring-2 ring-blue-500"
                         : "bg-gray-50 hover:bg-gray-100"

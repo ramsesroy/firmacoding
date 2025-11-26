@@ -1,23 +1,14 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Link from "next/link";
 import SignaturePreview from "@/components/SignaturePreview";
-import EmailClientPreview from "@/components/EmailClientPreview";
 import IconPicker from "@/components/IconPicker";
 import { TemplateType, RedSocial } from "@/types/signature";
-import { copyToClipboard, generateSignatureHTML } from "@/lib/signatureUtils";
+import { copyToClipboard } from "@/lib/signatureUtils";
 import { uploadImage } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
-import { useAuth } from "@/contexts/AuthContext";
-import { validateUrl, validateEmail, validatePhone } from "@/lib/validationUtils";
-import { useToast } from "@/hooks/useToast";
-import ToastContainer from "@/components/ToastContainer";
 
 export default function DashboardPage() {
-  const { user, session } = useAuth();
-  const { toasts, success, error: showError, removeToast } = useToast();
-  
   // URLs de imágenes de ejemplo (imágenes reales profesionales de Unsplash)
   // Foto de perfil profesional - retrato empresarial de calidad
   const EXAMPLE_PHOTO_URL = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
@@ -39,118 +30,44 @@ export default function DashboardPage() {
     colorPersonalizado: "",
     qrLink: "",
     logoEmpresa: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80", // Logo de ejemplo para template professional
-    logoPosicion: "center" as "top" | "center" | "bottom",
     ctaTexto: "",
     telefonoMovil: "",
     direccion: "",
     iconoTelefono: "📞",
     iconoTelefonoMovil: "📱",
     iconoDireccion: "📍",
+    stackTecnologico: "",
+    testimonio: "",
+    certificaciones: "",
+    horarioConsulta: "",
+    portfolio: "",
+    tarifas: "",
+    listings: "",
+    calendarioCitas: "",
+    publicaciones: "",
+    afiliacionInstitucional: "",
+    orcid: "",
+    mision: "",
+    donaciones: "",
+    idiomas: "",
   });
 
   const [template, setTemplate] = useState<TemplateType>("professional");
-  const [editingSignatureId, setEditingSignatureId] = useState<string | null>(null);
-  const [signatureCustomName, setSignatureCustomName] = useState("");
   const [nuevaRed, setNuevaRed] = useState({ nombre: "", url: "", icono: "" });
   const [copied, setCopied] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [editingRed, setEditingRed] = useState<number | null>(null);
   const [editRedForm, setEditRedForm] = useState({ nombre: "", url: "", icono: "" });
-  const [showHtmlModal, setShowHtmlModal] = useState(false);
-  const [htmlContent, setHtmlContent] = useState("");
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
-  const htmlTextareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Cargar firma para editar si viene de localStorage
-  useEffect(() => {
-    const editData = localStorage.getItem("editSignature");
-    if (editData) {
-      try {
-        const parsed = JSON.parse(editData);
-        if (parsed.data && parsed.template) {
-          setSignatureData(parsed.data);
-          setTemplate(parsed.template);
-          if (parsed.id) {
-            setEditingSignatureId(parsed.id);
-          }
-          if (parsed.signatureName) {
-            setSignatureCustomName(parsed.signatureName);
-          }
-          localStorage.removeItem("editSignature");
-        }
-      } catch (err) {
-        console.error("Error al cargar firma para editar:", err);
-      }
-    }
-  }, []);
-
-  // Guardado automático de borrador cada 30 segundos
-  useEffect(() => {
-    if (!user || editingSignatureId) return; // Solo guardar borradores si hay usuario y no está editando
-    
-    const autoSaveInterval = setInterval(() => {
-      const draft = {
-        data: signatureData,
-        template,
-        signatureName: signatureCustomName,
-      };
-      localStorage.setItem("signatureDraft", JSON.stringify(draft));
-    }, 30000); // Guardar cada 30 segundos
-
-    return () => clearInterval(autoSaveInterval);
-  }, [signatureData, template, signatureCustomName, user, editingSignatureId]);
-
-  // Cargar borrador al iniciar (solo si no hay edición activa)
-  useEffect(() => {
-    if (editingSignatureId) return; // No cargar borrador si estamos editando
-    
-    const draft = localStorage.getItem("signatureDraft");
-    const editData = localStorage.getItem("editSignature");
-    
-    if (draft && !editData) {
-      try {
-        const parsed = JSON.parse(draft);
-        if (parsed.data && parsed.template) {
-          setSignatureData(parsed.data);
-          setTemplate(parsed.template);
-          if (parsed.signatureName) {
-            setSignatureCustomName(parsed.signatureName);
-          }
-        }
-      } catch (err) {
-        console.error("Error al cargar borrador:", err);
-      }
-    }
-  }, []);
-
-  // Atajos de teclado
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+S o Cmd+S para guardar
-      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-        e.preventDefault();
-        if (user && signatureData.nombre && signatureData.cargo) {
-          handleSave();
-        } else if (!user) {
-          setShowRegisterModal(true);
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, signatureData.nombre, signatureData.cargo]);
 
   // Agregar imágenes de ejemplo según el template cuando cambia
   useEffect(() => {
     // Templates que usan foto
-    const templatesWithPhoto = ["classic", "modern", "minimal", "modern4"];
+    const templatesWithPhoto = ["classic", "modern", "minimal", "modernaSinBarra", "modern2", "modern3", "modern4"];
     // Templates que usan logo
     const templatesWithLogo = ["professional", "enterpriseVintage"];
     
@@ -172,32 +89,12 @@ export default function DashboardPage() {
   }, [template]); // Se ejecuta cuando cambia el template
 
   const handleCopyToClipboard = async () => {
-    // Generar el HTML primero
-    const html = await generateSignatureHTML(signatureData, template, signatureData.nombre || "Usuario");
-    
     const success = await copyToClipboard(signatureData, template, signatureData.nombre || "Usuario");
     if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } else {
-      // Si falla, mostrar modal con el HTML para copia manual
-      setHtmlContent(html);
-      setShowHtmlModal(true);
-    }
-  };
-
-  const handleCopyFromModal = () => {
-    if (htmlTextareaRef.current) {
-      htmlTextareaRef.current.select();
-      htmlTextareaRef.current.setSelectionRange(0, htmlContent.length);
-      const success = document.execCommand("copy");
-      if (success) {
-        setCopied(true);
-        setShowHtmlModal(false);
-        setTimeout(() => setCopied(false), 2000);
-      } else {
-        alert("Por favor, selecciona y copia el texto manualmente (Cmd+C o Ctrl+C)");
-      }
+      alert("Error al copiar al portapapeles. Por favor, inténtalo de nuevo.");
     }
   };
 
@@ -275,102 +172,45 @@ export default function DashboardPage() {
   const handleSave = async () => {
     // Validar que los campos requeridos estén completos
     if (!signatureData.nombre || !signatureData.cargo) {
-      showError("Por favor completa al menos el nombre y el cargo");
-      return;
-    }
-
-    // Si no hay usuario, mostrar modal de sugerencia
-    if (!user) {
-      setShowRegisterModal(true);
-      return;
-    }
-
-    // Verificar que hay sesión activa
-    if (!session) {
-      showError("No hay sesión activa. Por favor, recarga la página o inicia sesión nuevamente.");
+      setSaveMessage({
+        type: "error",
+        text: "Por favor completa al menos el nombre y el cargo",
+      });
+      setTimeout(() => setSaveMessage(null), 3000);
       return;
     }
 
     setSaving(true);
+    setSaveMessage(null);
 
     try {
       // Preparar los datos para insertar
       // Asegurar que las propiedades coincidan exactamente con la estructura de la base de datos
       const signatureRecord = {
-        user_id: user.id,
-        signature_name: signatureCustomName || null, // Nombre personalizado
         name: signatureData.nombre,
         role: signatureData.cargo,
         phone: signatureData.telefono || null,
         image_url: signatureData.foto || null,
         social_links: signatureData.redes.length > 0 ? signatureData.redes : null,
         template_id: template,
-        logo_empresa: signatureData.logoEmpresa || null,
-        logo_posicion: signatureData.logoPosicion || null,
-        telefono_movil: signatureData.telefonoMovil || null,
-        direccion: signatureData.direccion || null,
-        horario: signatureData.horario || null,
-        texto_adicional: signatureData.textoAdicional || null,
-        color_personalizado: signatureData.colorPersonalizado || null,
-        qr_link: signatureData.qrLink || null,
-        cta_texto: signatureData.ctaTexto || null,
-        icono_telefono: signatureData.iconoTelefono || null,
-        icono_telefono_movil: signatureData.iconoTelefonoMovil || null,
-        icono_direccion: signatureData.iconoDireccion || null,
       };
 
-      // Insertar o actualizar en la tabla signatures
-      let data, error;
-      if (editingSignatureId) {
-        // Actualizar firma existente
-        const { data: updateData, error: updateError } = await supabase
-          .from("signatures")
-          .update(signatureRecord)
-          .eq("id", editingSignatureId)
-          .eq("user_id", user.id) // Asegurar que solo actualiza sus propias firmas
-          .select()
-          .single();
-        data = updateData;
-        error = updateError;
-      } else {
-        // Insertar nueva firma
-        const { data: insertData, error: insertError } = await supabase
-          .from("signatures")
-          .insert([signatureRecord])
-          .select()
-          .single();
-        data = insertData;
-        error = insertError;
-      }
+      // Insertar en la tabla signatures
+      const { data, error } = await supabase
+        .from("signatures")
+        .insert([signatureRecord])
+        .select()
+        .single();
 
       if (error) {
-        console.error("Error de Supabase al guardar:", error);
-        console.error("Usuario:", user?.id);
-        console.error("Sesión activa:", !!session);
-        console.error("Datos intentados:", signatureRecord);
-        
-        // Proporcionar mensaje de error más descriptivo
-        if (error.code === "PGRST116") {
-          throw new Error("No se encontró la firma para actualizar");
-        } else if (error.code === "23505") {
-          throw new Error("Ya existe una firma con estos datos");
-        } else if (error.code === "42501" || error.message?.includes("permission") || error.message?.includes("row-level security")) {
-          throw new Error("No tienes permisos para realizar esta acción. Por favor, verifica tu sesión.");
-        } else if (error.message) {
-          throw new Error(error.message);
-        } else {
-          throw new Error(`Error al guardar: ${JSON.stringify(error)}`);
-        }
+        throw error;
       }
 
-      success(editingSignatureId ? "¡Firma actualizada exitosamente!" : "¡Firma guardada exitosamente!");
-      // Limpiar el ID de edición y el nombre personalizado después de guardar
-      if (editingSignatureId) {
-        setEditingSignatureId(null);
-      }
-      setSignatureCustomName("");
-      // Limpiar borrador después de guardar exitosamente
-      localStorage.removeItem("signatureDraft");
+      setSaveMessage({
+        type: "success",
+        text: "¡Firma guardada exitosamente!",
+      });
+      setTimeout(() => setSaveMessage(null), 3000);
     } catch (error) {
       // Depuración: Imprimir el objeto error completo para ver detalles
       console.error("Error al guardar la firma - Objeto completo:", error);
@@ -380,7 +220,11 @@ export default function DashboardPage() {
         stack: error instanceof Error ? error.stack : undefined,
       });
       
-      showError(error instanceof Error ? error.message : "Error al guardar la firma");
+      setSaveMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Error al guardar la firma",
+      });
+      setTimeout(() => setSaveMessage(null), 3000);
     } finally {
       setSaving(false);
     }
@@ -388,47 +232,38 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
+      {/* Navbar Superior */}
+      <nav className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="text-2xl font-bold text-gray-900">
+              Firma<span className="text-blue-600">Pro</span>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       {/* Contenido Principal */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Header */}
-        <div className="mb-4 sm:mb-6 lg:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
             Editor de Firmas
           </h1>
-          <p className="text-sm sm:text-base lg:text-lg text-gray-600">
+          <p className="text-base sm:text-lg text-gray-600">
             Crea y personaliza tu firma digital profesional
           </p>
         </div>
 
         {/* Layout: Flex column en móvil, grid en desktop */}
-        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 lg:h-[calc(100vh-220px)]">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 sm:gap-8 lg:h-[calc(100vh-220px)]">
           {/* Formulario - Card */}
-          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-lg p-4 sm:p-6 lg:p-8 lg:overflow-y-auto order-1 lg:order-1">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-6 sm:p-8 lg:overflow-y-auto order-1 lg:order-1">
             <h2 className="text-xl sm:text-2xl font-semibold mb-6 text-gray-900">
               Información de la Firma
             </h2>
 
             <div className="space-y-6">
-              {/* Nombre personalizado de la firma (solo al guardar) */}
-              {user && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nombre de la Firma <span className="text-gray-400">(opcional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={signatureCustomName}
-                    onChange={(e) => setSignatureCustomName(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                    placeholder="Ej: Firma Personal, Firma Empresa, etc."
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Este nombre te ayudará a identificar la firma más fácilmente
-                  </p>
-                </div>
-              )}
-
               {/* Template Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -441,10 +276,22 @@ export default function DashboardPage() {
                     { id: "modern", name: "Moderna" },
                     { id: "minimal", name: "Minimal" },
                     { id: "minimalCorporate", name: "Corp" },
+                    { id: "modernaSinBarra", name: "Modern 2" },
                     { id: "enterpriseVintage", name: "Enterprise" },
+                    { id: "modern2", name: "Modern 3" },
                     { id: "qrProfesional", name: "QR Pro" },
-                    { id: "modern4", name: "Modern CTA" },
+                    { id: "modern3", name: "Modern 4" },
+                    { id: "modern4", name: "Modern 5" },
                     { id: "qrCorporated", name: "QR Corp" },
+                    { id: "techDeveloper", name: "Tech Dev", badge: "New" },
+                    { id: "salesProfessional", name: "Sales Pro", badge: "New" },
+                    { id: "boldExecutive", name: "Executive", badge: "New" },
+                    { id: "medicalProfessional", name: "Medical", badge: "New" },
+                    { id: "consultant", name: "Consultant", badge: "New" },
+                    { id: "realEstateAgent", name: "Real Estate", badge: "New" },
+                    { id: "academicResearcher", name: "Academic", badge: "New" },
+                    { id: "nonProfit", name: "Non-Profit", badge: "New" },
+                    { id: "bilingual", name: "Bilingual", badge: "New" },
                   ].map((tpl) => (
                     <button
                       key={tpl.id}
@@ -453,7 +300,7 @@ export default function DashboardPage() {
                         setTemplate(newTemplate);
                         
                         // Agregar foto de ejemplo si el template usa foto y no hay foto
-                        const templatesWithPhoto = ["classic", "modern", "minimal", "modern4"];
+                        const templatesWithPhoto = ["classic", "modern", "minimal", "modernaSinBarra", "modern2", "modern3", "modern4"];
                         if (templatesWithPhoto.includes(newTemplate) && !signatureData.foto) {
                           setSignatureData({ ...signatureData, foto: EXAMPLE_PHOTO_URL });
                         }
@@ -620,12 +467,6 @@ export default function DashboardPage() {
                         <p className="text-xs text-gray-500 mt-1">
                           JPG, PNG o GIF (máx. 5MB)
                         </p>
-                        <p className="text-xs text-blue-600 mt-2 flex items-center justify-center gap-1">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span className="font-medium">Recomendación:</span> Usa logos con fondo transparente (PNG)
-                        </p>
                       </label>
                     </div>
                     <div className="relative">
@@ -670,123 +511,46 @@ export default function DashboardPage() {
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
                       placeholder="URL del logo (https://ejemplo.com/logo.png)"
                     />
-                    <p className="text-xs text-blue-600 mt-2 flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className="font-medium">Recomendación:</span> Usa logos con fondo transparente (PNG) para mejor resultado
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500">
                       ⚠️ También puedes cambiar la URL del logo manualmente
                     </p>
                   </div>
                 )}
-                
-                {/* Selector de posición del logo */}
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Posición del Logo
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[
-                      { value: "top", label: "Arriba", icon: "⬆️" },
-                      { value: "center", label: "Centro", icon: "↔️" },
-                      { value: "bottom", label: "Abajo", icon: "⬇️" },
-                    ].map((pos) => (
-                      <button
-                        key={pos.value}
-                        type="button"
-                        onClick={() =>
-                          setSignatureData({
-                            ...signatureData,
-                            logoPosicion: pos.value as "top" | "center" | "bottom",
-                          })
-                        }
-                        className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border ${
-                          signatureData.logoPosicion === pos.value
-                            ? "bg-blue-600 text-white border-blue-600 shadow-md"
-                            : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
-                        }`}
-                      >
-                        <span className="block text-lg mb-1">{pos.icon}</span>
-                        <span>{pos.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Elige dónde quieres que aparezca el logo verticalmente
-                  </p>
-                </div>
               </div>
             )}
 
             {/* Teléfono */}
             <div>
-              <div className="flex flex-col sm:grid sm:grid-cols-[1fr_auto] gap-3 items-end">
-                <div className="w-full">
+              <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Teléfono
                   </label>
                   <input
                     type="text"
                     value={signatureData.telefono}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setSignatureData({ ...signatureData, telefono: value });
-                      if (value.trim()) {
-                        const validation = validatePhone(value);
-                        if (!validation.valid) {
-                          setValidationErrors(prev => ({ ...prev, telefono: validation.error || "" }));
-                        } else {
-                          setValidationErrors(prev => {
-                            const newErrors = { ...prev };
-                            delete newErrors.telefono;
-                            return newErrors;
-                          });
-                        }
-                      } else {
-                        setValidationErrors(prev => {
-                          const newErrors = { ...prev };
-                          delete newErrors.telefono;
-                          return newErrors;
-                        });
-                      }
-                    }}
-                    onBlur={(e) => {
-                      const value = e.target.value;
-                      if (value.trim()) {
-                        const validation = validatePhone(value);
-                        if (!validation.valid) {
-                          setValidationErrors(prev => ({ ...prev, telefono: validation.error || "" }));
-                        }
-                      }
-                    }}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400 ${
-                      validationErrors.telefono ? "border-red-300" : "border-gray-200"
-                    }`}
+                    onChange={(e) =>
+                      setSignatureData({ ...signatureData, telefono: e.target.value })
+                    }
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
                     placeholder="+1 (555) 123-4567"
                   />
-                  {validationErrors.telefono && (
-                    <p className="text-xs text-red-600 mt-1">{validationErrors.telefono}</p>
-                  )}
                 </div>
-                <div className="w-full sm:w-auto">
-                  <IconPicker
-                    selectedIcon={signatureData.iconoTelefono}
-                    onSelectIcon={(icon) =>
-                      setSignatureData({ ...signatureData, iconoTelefono: icon })
-                    }
-                    label="Icono"
-                  />
-                </div>
+                <IconPicker
+                  selectedIcon={signatureData.iconoTelefono}
+                  onSelectIcon={(icon) =>
+                    setSignatureData({ ...signatureData, iconoTelefono: icon })
+                  }
+                  label="Icono"
+                />
               </div>
             </div>
 
             {/* Teléfono Móvil (Professional) */}
             {(template === "professional") && (
               <div>
-                <div className="flex flex-col sm:grid sm:grid-cols-[1fr_auto] gap-3 items-end">
-                  <div className="w-full">
+                <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Teléfono Móvil
                     </label>
@@ -797,18 +561,16 @@ export default function DashboardPage() {
                         setSignatureData({ ...signatureData, telefonoMovil: e.target.value })
                       }
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                      placeholder="+1 (555) 987-6543"
+                      placeholder="+34 614 19 54 89"
                     />
                   </div>
-                  <div className="w-full sm:w-auto">
-                    <IconPicker
-                      selectedIcon={signatureData.iconoTelefonoMovil}
-                      onSelectIcon={(icon) =>
-                        setSignatureData({ ...signatureData, iconoTelefonoMovil: icon })
-                      }
-                      label="Icono"
-                    />
-                  </div>
+                  <IconPicker
+                    selectedIcon={signatureData.iconoTelefonoMovil}
+                    onSelectIcon={(icon) =>
+                      setSignatureData({ ...signatureData, iconoTelefonoMovil: icon })
+                    }
+                    label="Icono"
+                  />
                 </div>
               </div>
             )}
@@ -816,8 +578,8 @@ export default function DashboardPage() {
             {/* Dirección (Professional) */}
             {(template === "professional") && (
               <div>
-                <div className="flex flex-col sm:grid sm:grid-cols-[1fr_auto] gap-3 items-end">
-                  <div className="w-full">
+                <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Dirección
                     </label>
@@ -828,18 +590,16 @@ export default function DashboardPage() {
                         setSignatureData({ ...signatureData, direccion: e.target.value })
                       }
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                      placeholder="Ej: 123 Main Street, New York, NY 10001, USA"
+                      placeholder="Ej: Rio Barbate, 5, Cádiz 11138, Spain"
                     />
                   </div>
-                  <div className="w-full sm:w-auto">
-                    <IconPicker
-                      selectedIcon={signatureData.iconoDireccion}
-                      onSelectIcon={(icon) =>
-                        setSignatureData({ ...signatureData, iconoDireccion: icon })
-                      }
-                      label="Icono"
-                    />
-                  </div>
+                  <IconPicker
+                    selectedIcon={signatureData.iconoDireccion}
+                    onSelectIcon={(icon) =>
+                      setSignatureData({ ...signatureData, iconoDireccion: icon })
+                    }
+                    label="Icono"
+                  />
                 </div>
               </div>
             )}
@@ -901,8 +661,8 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Selector de Color (Modern, Modern 4) */}
-            {(["modern", "modern4"].includes(template)) && (
+            {/* Selector de Color (Moderna sin barra, Modern 4, Bold Executive, Bilingual) */}
+            {(["modernaSinBarra", "modern4", "boldExecutive", "bilingual"].includes(template)) && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Color personalizado
@@ -927,35 +687,319 @@ export default function DashboardPage() {
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  {template === "modern" && "Color para borde, foto y enlaces"}
+                  {template === "modernaSinBarra" && "Color para borde de foto y cargo"}
                   {template === "modern4" && "Color para borde, línea y botón"}
+                  {template === "boldExecutive" && "Color para texto y fondo sutil"}
+                  {template === "bilingual" && "Color para borde y enlaces"}
                 </p>
               </div>
             )}
 
-            {/* Texto del CTA (Modern 4) */}
-            {(template === "modern4") && (
+            {/* Texto del CTA (Modern 4, Sales Professional) */}
+            {(["modern4", "salesProfessional"].includes(template)) && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Texto del botón CTA
                 </label>
+                  <input
+                    type="text"
+                    value={signatureData.ctaTexto || (template === "salesProfessional" ? "Agenda una llamada" : "Book a Meeting")}
+                    onChange={(e) =>
+                      setSignatureData({ ...signatureData, ctaTexto: e.target.value })
+                    }
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                    placeholder={template === "salesProfessional" ? "Ej: Agenda una llamada" : "Ej: Book a Meeting"}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Personaliza el texto del botón de llamada a la acción
+                  </p>
+                </div>
+              )}
+
+            {/* Stack Tecnológico (Tech Developer) */}
+            {(template === "techDeveloper") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Stack Tecnológico <span className="text-gray-400">(opcional)</span>
+                </label>
                 <input
                   type="text"
-                  value={signatureData.ctaTexto || "Book a Meeting"}
+                  value={signatureData.stackTecnologico}
                   onChange={(e) =>
-                    setSignatureData({ ...signatureData, ctaTexto: e.target.value })
+                    setSignatureData({ ...signatureData, stackTecnologico: e.target.value })
                   }
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="Ej: Book a Meeting"
+                  placeholder="Ej: React, Node.js, TypeScript, Python"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Personaliza el texto del botón de llamada a la acción
+                  Lista tus tecnologías principales separadas por comas
                 </p>
               </div>
             )}
 
-            {/* QR Link (QR Profesional, QR Corporated) */}
-            {(["qrProfesional", "qrCorporated"].includes(template)) && (
+            {/* Testimonio (Sales Professional) */}
+            {(template === "salesProfessional") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Testimonio/Calificación <span className="text-gray-400">(opcional)</span>
+                </label>
+                <textarea
+                  value={signatureData.testimonio}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, testimonio: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="Ej: 'Excelente servicio, muy profesional y eficiente' - Cliente satisfecho"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Agrega un testimonio o calificación para aumentar la confianza
+                </p>
+              </div>
+            )}
+
+            {/* Certificaciones (Medical Professional) */}
+            {(template === "medicalProfessional") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Certificaciones/Especialidades <span className="text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={signatureData.certificaciones}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, certificaciones: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="Ej: Cardiología, Certificado en..."
+                />
+              </div>
+            )}
+
+            {/* Horario de Consulta (Medical Professional) */}
+            {(template === "medicalProfessional") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Horario de Consulta <span className="text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={signatureData.horarioConsulta}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, horarioConsulta: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="Ej: Lunes a Viernes 9:00 - 18:00"
+                />
+              </div>
+            )}
+
+            {/* Portfolio (Consultant) */}
+            {(template === "consultant") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Link a Portfolio <span className="text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  type="url"
+                  value={signatureData.portfolio}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, portfolio: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="https://ejemplo.com/portfolio"
+                />
+              </div>
+            )}
+
+            {/* Tarifas (Consultant) */}
+            {(template === "consultant") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tarifas <span className="text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={signatureData.tarifas}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, tarifas: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="Ej: Desde $50/hora"
+                />
+              </div>
+            )}
+
+            {/* Testimonio (Consultant) */}
+            {(template === "consultant") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Testimonio <span className="text-gray-400">(opcional)</span>
+                </label>
+                <textarea
+                  value={signatureData.testimonio}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, testimonio: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="Ej: 'Excelente consultor, muy profesional' - Cliente"
+                />
+              </div>
+            )}
+
+            {/* Listings (Real Estate Agent) */}
+            {(template === "realEstateAgent") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Link a Propiedades/Listings <span className="text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  type="url"
+                  value={signatureData.listings}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, listings: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="https://ejemplo.com/propiedades"
+                />
+              </div>
+            )}
+
+            {/* Calendario de Citas (Real Estate Agent) */}
+            {(template === "realEstateAgent") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Link a Calendario de Citas <span className="text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  type="url"
+                  value={signatureData.calendarioCitas}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, calendarioCitas: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="https://calendly.com/usuario"
+                />
+              </div>
+            )}
+
+            {/* Publicaciones (Academic/Researcher) */}
+            {(template === "academicResearcher") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Link a Publicaciones <span className="text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  type="url"
+                  value={signatureData.publicaciones}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, publicaciones: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="https://scholar.google.com/..."
+                />
+              </div>
+            )}
+
+            {/* Afiliación Institucional (Academic/Researcher) */}
+            {(template === "academicResearcher") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Afiliación Institucional <span className="text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={signatureData.afiliacionInstitucional}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, afiliacionInstitucional: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="Ej: Universidad de..."
+                />
+              </div>
+            )}
+
+            {/* ORCID (Academic/Researcher) */}
+            {(template === "academicResearcher") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  ORCID ID <span className="text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={signatureData.orcid}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, orcid: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="0000-0000-0000-0000"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Tu identificador ORCID (sin https://orcid.org/)
+                </p>
+              </div>
+            )}
+
+            {/* Misión (Non-Profit) */}
+            {(template === "nonProfit") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Misión/Causa <span className="text-gray-400">(opcional)</span>
+                </label>
+                <textarea
+                  value={signatureData.mision}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, mision: e.target.value })
+                  }
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="Ej: Trabajamos por la educación de niños en situación vulnerable"
+                />
+              </div>
+            )}
+
+            {/* Donaciones (Non-Profit) */}
+            {(template === "nonProfit") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Link a Donaciones <span className="text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  type="url"
+                  value={signatureData.donaciones}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, donaciones: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="https://ejemplo.com/donar"
+                />
+              </div>
+            )}
+
+            {/* Idiomas (Bilingual/Multilingual) */}
+            {(template === "bilingual") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Idiomas <span className="text-gray-400">(opcional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={signatureData.idiomas}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, idiomas: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="Ej: Español, Inglés, Francés"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Lista los idiomas que hablas separados por comas
+                </p>
+              </div>
+            )}
+
+            {/* QR Link (QR Profesional, QR Corporated, Tech Developer, Medical Professional, Real Estate Agent, Non-Profit) */}
+            {(["qrProfesional", "qrCorporated", "techDeveloper", "medicalProfessional", "realEstateAgent", "nonProfit"].includes(template)) && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   URL para código QR
@@ -963,45 +1007,12 @@ export default function DashboardPage() {
                 <input
                   type="url"
                   value={signatureData.qrLink}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setSignatureData({ ...signatureData, qrLink: value });
-                    if (value.trim()) {
-                      const validation = validateUrl(value);
-                      if (!validation.valid) {
-                        setValidationErrors(prev => ({ ...prev, qrLink: validation.error || "" }));
-                      } else {
-                        setValidationErrors(prev => {
-                          const newErrors = { ...prev };
-                          delete newErrors.qrLink;
-                          return newErrors;
-                        });
-                      }
-                    } else {
-                      setValidationErrors(prev => {
-                        const newErrors = { ...prev };
-                        delete newErrors.qrLink;
-                        return newErrors;
-                      });
-                    }
-                  }}
-                  onBlur={(e) => {
-                    const value = e.target.value;
-                    if (value.trim()) {
-                      const validation = validateUrl(value);
-                      if (!validation.valid) {
-                        setValidationErrors(prev => ({ ...prev, qrLink: validation.error || "" }));
-                      }
-                    }
-                  }}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400 ${
-                    validationErrors.qrLink ? "border-red-300" : "border-gray-200"
-                  }`}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, qrLink: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
                   placeholder="https://ejemplo.com"
                 />
-                {validationErrors.qrLink && (
-                  <p className="text-xs text-red-600 mt-1">{validationErrors.qrLink}</p>
-                )}
                 <p className="text-xs text-gray-500 mt-1">
                   Esta URL se convertirá en un código QR en la firma
                 </p>
@@ -1116,51 +1127,15 @@ export default function DashboardPage() {
                   <input
                     type="text"
                     value={nuevaRed.url}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setNuevaRed({ ...nuevaRed, url: value });
-                      // Validar si parece email o URL
-                      if (value.trim()) {
-                        const isEmail = value.includes("@");
-                        const validation = isEmail ? validateEmail(value) : validateUrl(value);
-                        if (!validation.valid) {
-                          setValidationErrors(prev => ({ ...prev, nuevaRedUrl: validation.error || "" }));
-                        } else {
-                          setValidationErrors(prev => {
-                            const newErrors = { ...prev };
-                            delete newErrors.nuevaRedUrl;
-                            return newErrors;
-                          });
-                        }
-                      } else {
-                        setValidationErrors(prev => {
-                          const newErrors = { ...prev };
-                          delete newErrors.nuevaRedUrl;
-                          return newErrors;
-                        });
-                      }
-                    }}
-                    onBlur={(e) => {
-                      const value = e.target.value;
-                      if (value.trim()) {
-                        const isEmail = value.includes("@");
-                        const validation = isEmail ? validateEmail(value) : validateUrl(value);
-                        if (!validation.valid) {
-                          setValidationErrors(prev => ({ ...prev, nuevaRedUrl: validation.error || "" }));
-                        }
-                      }
-                    }}
-                    className={`flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400 ${
-                      validationErrors.nuevaRedUrl ? "border-red-300" : "border-gray-200"
-                    }`}
-                    placeholder="URL o Email"
+                    onChange={(e) =>
+                      setNuevaRed({ ...nuevaRed, url: e.target.value })
+                    }
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                    placeholder="URL"
                   />
-                  {validationErrors.nuevaRedUrl && (
-                    <p className="text-xs text-red-600 mt-1">{validationErrors.nuevaRedUrl}</p>
-                  )}
                 </div>
-                <div className="flex flex-col sm:flex-row gap-3 items-end">
-                  <div className="w-full sm:flex-1">
+                <div className="flex gap-3 items-end">
+                  <div className="flex-1">
                     <IconPicker
                       selectedIcon={nuevaRed.icono}
                       onSelectIcon={(icon) =>
@@ -1172,26 +1147,14 @@ export default function DashboardPage() {
                   <button
                     onClick={() => {
                       if (nuevaRed.nombre && nuevaRed.url) {
-                        // Validar antes de agregar
-                        const isEmail = nuevaRed.url.includes("@");
-                        const validation = isEmail ? validateEmail(nuevaRed.url) : validateUrl(nuevaRed.url);
-                        if (!validation.valid) {
-                          setValidationErrors(prev => ({ ...prev, nuevaRedUrl: validation.error || "" }));
-                          return;
-                        }
                         setSignatureData({
                           ...signatureData,
                           redes: [...signatureData.redes, { ...nuevaRed, icono: nuevaRed.icono || undefined } as RedSocial],
                         });
                         setNuevaRed({ nombre: "", url: "", icono: "" });
-                        setValidationErrors(prev => {
-                          const newErrors = { ...prev };
-                          delete newErrors.nuevaRedUrl;
-                          return newErrors;
-                        });
                       }
                     }}
-                    className="w-full sm:w-auto px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-semibold shadow-md shadow-blue-500/20 whitespace-nowrap"
+                    className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-semibold shadow-md shadow-blue-500/20 whitespace-nowrap"
                   >
                     + Agregar
                   </button>
@@ -1202,7 +1165,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Vista Previa - Card */}
-          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-lg p-4 sm:p-6 lg:p-8 lg:overflow-y-auto order-2 lg:order-2 flex flex-col">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-6 sm:p-8 lg:overflow-y-auto order-2 lg:order-2 flex flex-col">
             <div className="mb-6 pb-4 border-b border-gray-100">
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">
                 Vista Previa en Vivo
@@ -1213,11 +1176,11 @@ export default function DashboardPage() {
             </div>
 
             {/* Vista Previa Principal */}
-            <div className="bg-gradient-to-br from-gray-50 via-gray-50/50 to-gray-100 rounded-xl p-4 sm:p-6 lg:p-10 border border-gray-200 mb-4 sm:mb-6" style={{
+            <div className="bg-gradient-to-br from-gray-50 via-gray-50/50 to-gray-100 rounded-xl p-6 sm:p-10 border border-gray-200 mb-6" style={{
               backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0)',
               backgroundSize: '20px 20px'
             }}>
-              <div className="flex items-center justify-center min-h-[150px] sm:min-h-[180px] lg:min-h-[220px]">
+              <div className="flex items-center justify-center min-h-[180px] sm:min-h-[220px]">
                 <SignaturePreview
                   nombre={signatureData.nombre}
                   cargo={signatureData.cargo}
@@ -1230,65 +1193,83 @@ export default function DashboardPage() {
                   colorPersonalizado={signatureData.colorPersonalizado}
                   qrLink={signatureData.qrLink}
                   logoEmpresa={signatureData.logoEmpresa}
-                  logoPosicion={signatureData.logoPosicion}
                   ctaTexto={signatureData.ctaTexto}
                   telefonoMovil={signatureData.telefonoMovil}
                   direccion={signatureData.direccion}
                   iconoTelefono={signatureData.iconoTelefono}
                   iconoTelefonoMovil={signatureData.iconoTelefonoMovil}
                   iconoDireccion={signatureData.iconoDireccion}
+                  stackTecnologico={signatureData.stackTecnologico}
+                  testimonio={signatureData.testimonio}
+                  certificaciones={signatureData.certificaciones}
+                  horarioConsulta={signatureData.horarioConsulta}
+                  portfolio={signatureData.portfolio}
+                  tarifas={signatureData.tarifas}
+                  listings={signatureData.listings}
+                  calendarioCitas={signatureData.calendarioCitas}
+                  publicaciones={signatureData.publicaciones}
+                  afiliacionInstitucional={signatureData.afiliacionInstitucional}
+                  orcid={signatureData.orcid}
+                  mision={signatureData.mision}
+                  donaciones={signatureData.donaciones}
+                  idiomas={signatureData.idiomas}
                 />
               </div>
             </div>
 
-            {/* Vista Previa en Diferentes Clientes */}
-            <div className="bg-gray-50 rounded-xl p-3 sm:p-4 lg:p-5 border border-gray-200 mb-4 sm:mb-6">
-              <p className="text-xs text-gray-600 mb-2 sm:mb-3 font-semibold uppercase tracking-wide">
-                Vista previa en diferentes clientes de email
+            {/* Vista Simulada en Email */}
+            <div className="bg-gray-50 rounded-xl p-4 sm:p-5 border border-gray-200 mb-6">
+              <p className="text-xs text-gray-600 mb-3 font-semibold uppercase tracking-wide">
+                Vista simulada en correo electrónico
               </p>
-              <div className="bg-white p-3 sm:p-4 lg:p-5 rounded-lg border border-gray-200 shadow-sm">
-                <EmailClientPreview
-                  nombre={signatureData.nombre}
-                  cargo={signatureData.cargo}
-                  foto={signatureData.foto || undefined}
-                  telefono={signatureData.telefono || undefined}
-                  redes={signatureData.redes}
-                  template={template}
-                  horario={signatureData.horario}
-                  textoAdicional={signatureData.textoAdicional}
-                  colorPersonalizado={signatureData.colorPersonalizado}
-                  qrLink={signatureData.qrLink}
-                  logoEmpresa={signatureData.logoEmpresa}
-                  logoPosicion={signatureData.logoPosicion}
-                  ctaTexto={signatureData.ctaTexto}
-                  telefonoMovil={signatureData.telefonoMovil}
-                  direccion={signatureData.direccion}
-                  iconoTelefono={signatureData.iconoTelefono}
-                  iconoTelefonoMovil={signatureData.iconoTelefonoMovil}
-                  iconoDireccion={signatureData.iconoDireccion}
-                />
+              <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-sm">
+                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+                  Este es un ejemplo de cómo se verá tu firma en un correo
+                  electrónico. La firma se actualiza automáticamente mientras
+                  escribes.
+                </p>
+                <div className="border-t border-gray-200 pt-4">
+                  <SignaturePreview
+                    nombre={signatureData.nombre}
+                    cargo={signatureData.cargo}
+                    foto={signatureData.foto || undefined}
+                    telefono={signatureData.telefono || undefined}
+                    redes={signatureData.redes}
+                    template={template}
+                    horario={signatureData.horario}
+                    textoAdicional={signatureData.textoAdicional}
+                    colorPersonalizado={signatureData.colorPersonalizado}
+                    qrLink={signatureData.qrLink}
+                    logoEmpresa={signatureData.logoEmpresa}
+                    ctaTexto={signatureData.ctaTexto}
+                    telefonoMovil={signatureData.telefonoMovil}
+                    direccion={signatureData.direccion}
+                    iconoTelefono={signatureData.iconoTelefono}
+                    iconoTelefonoMovil={signatureData.iconoTelefonoMovil}
+                    iconoDireccion={signatureData.iconoDireccion}
+                  />
+                </div>
               </div>
             </div>
+
 
             {/* Botones de Acción */}
-            <div className="mt-auto pt-4 sm:pt-6 border-t border-gray-100">
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <div className="mt-auto pt-6 border-t border-gray-100">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-lg transition-all duration-200 font-semibold text-sm sm:text-base ${
+                  className={`flex-1 px-6 py-3.5 rounded-lg transition-all duration-200 font-semibold text-base ${
                     saving
                       ? "bg-gray-400 text-white cursor-not-allowed"
                       : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40"
                   }`}
                 >
-                  {saving 
-                    ? (editingSignatureId ? "Actualizando..." : "Guardando...") 
-                    : (editingSignatureId ? "Actualizar Firma" : "Guardar Firma")}
+                  {saving ? "Guardando..." : "Guardar Firma"}
                 </button>
                 <button
                   onClick={handleCopyToClipboard}
-                  className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-lg transition-all duration-200 font-semibold text-sm sm:text-base ${
+                  className={`flex-1 px-6 py-3.5 rounded-lg transition-all duration-200 font-semibold text-base ${
                     copied
                       ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30"
                       : "bg-gray-900 text-white hover:bg-gray-800 shadow-lg shadow-gray-900/20"
@@ -1302,113 +1283,21 @@ export default function DashboardPage() {
                   ¡Firma copiada! Ya puedes pegarla en Gmail o tu cliente de correo.
                 </p>
               )}
+              {saveMessage && (
+                <p
+                  className={`text-sm mt-3 text-center font-medium ${
+                    saveMessage.type === "success"
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
+                  {saveMessage.text}
+                </p>
+              )}
             </div>
           </div>
         </div>
       </div>
-
-      {/* Modal de sugerencia de registro */}
-      {showRegisterModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-md w-full">
-            <div className="p-4 sm:p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between gap-2 mb-4">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900">
-                  💡 Registro Recomendado
-                </h3>
-                <button
-                  onClick={() => setShowRegisterModal(false)}
-                  className="text-gray-400 hover:text-gray-600 transition flex-shrink-0"
-                  aria-label="Cerrar"
-                >
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <div className="space-y-3 text-sm sm:text-base text-gray-700">
-                <p>
-                  Para <strong>guardar tus firmas</strong> y acceder a ellas desde cualquier lugar, necesitas crear una cuenta gratuita.
-                </p>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
-                  <p className="font-semibold text-blue-900 mb-2">✨ ¡Pero no te preocupes!</p>
-                  <p className="text-blue-800">
-                    Puedes <strong>copiar el HTML de tu firma</strong> completamente gratis y usarla las veces que quieras, sin necesidad de registrarte.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="p-4 sm:p-6 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/register"
-                onClick={() => setShowRegisterModal(false)}
-                className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm sm:text-base text-center"
-              >
-                Crear Cuenta Gratis
-              </Link>
-              <button
-                onClick={() => setShowRegisterModal(false)}
-                className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold text-sm sm:text-base"
-              >
-                Continuar sin Registro
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal para copiar HTML manualmente (especialmente para iOS) */}
-      {showHtmlModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] flex flex-col">
-            <div className="p-4 sm:p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between gap-2">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900">
-                  Copiar HTML de la Firma
-                </h3>
-                <button
-                  onClick={() => setShowHtmlModal(false)}
-                  className="text-gray-400 hover:text-gray-600 transition flex-shrink-0"
-                  aria-label="Cerrar"
-                >
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              <p className="text-xs sm:text-sm text-gray-600 mt-2">
-                Selecciona todo el texto y cópialo (Cmd+C en Mac, Ctrl+C en Windows)
-              </p>
-            </div>
-            <div className="p-3 sm:p-6 flex-1 overflow-auto">
-              <textarea
-                ref={htmlTextareaRef}
-                value={htmlContent}
-                readOnly
-                className="w-full h-full min-h-[300px] sm:min-h-[400px] p-3 sm:p-4 border border-gray-300 rounded-lg font-mono text-xs sm:text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onClick={(e) => {
-                  // Seleccionar todo al hacer clic
-                  (e.target as HTMLTextAreaElement).select();
-                }}
-              />
-            </div>
-            <div className="p-4 sm:p-6 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={handleCopyFromModal}
-                className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm sm:text-base"
-              >
-                Copiar al Portapapeles
-              </button>
-              <button
-                onClick={() => setShowHtmlModal(false)}
-                className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold text-sm sm:text-base"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
