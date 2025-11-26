@@ -40,6 +40,7 @@ export default function DashboardPage() {
   });
 
   const [template, setTemplate] = useState<TemplateType>("professional");
+  const [editingSignatureId, setEditingSignatureId] = useState<string | null>(null);
   const [nuevaRed, setNuevaRed] = useState({ nombre: "", url: "", icono: "" });
   const [copied, setCopied] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -53,6 +54,26 @@ export default function DashboardPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
   const htmlTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Cargar firma para editar si viene de localStorage
+  useEffect(() => {
+    const editData = localStorage.getItem("editSignature");
+    if (editData) {
+      try {
+        const parsed = JSON.parse(editData);
+        if (parsed.data && parsed.template) {
+          setSignatureData(parsed.data);
+          setTemplate(parsed.template);
+          if (parsed.id) {
+            setEditingSignatureId(parsed.id);
+          }
+          localStorage.removeItem("editSignature");
+        }
+      } catch (err) {
+        console.error("Error al cargar firma para editar:", err);
+      }
+    }
+  }, []);
 
   // Agregar imágenes de ejemplo según el template cuando cambia
   useEffect(() => {
@@ -203,14 +224,42 @@ export default function DashboardPage() {
         image_url: signatureData.foto || null,
         social_links: signatureData.redes.length > 0 ? signatureData.redes : null,
         template_id: template,
+        logo_empresa: signatureData.logoEmpresa || null,
+        logo_posicion: signatureData.logoPosicion || null,
+        telefono_movil: signatureData.telefonoMovil || null,
+        direccion: signatureData.direccion || null,
+        horario: signatureData.horario || null,
+        texto_adicional: signatureData.textoAdicional || null,
+        color_personalizado: signatureData.colorPersonalizado || null,
+        qr_link: signatureData.qrLink || null,
+        cta_texto: signatureData.ctaTexto || null,
+        icono_telefono: signatureData.iconoTelefono || null,
+        icono_telefono_movil: signatureData.iconoTelefonoMovil || null,
+        icono_direccion: signatureData.iconoDireccion || null,
       };
 
-      // Insertar en la tabla signatures
-      const { data, error } = await supabase
-        .from("signatures")
-        .insert([signatureRecord])
-        .select()
-        .single();
+      // Insertar o actualizar en la tabla signatures
+      let data, error;
+      if (editingSignatureId) {
+        // Actualizar firma existente
+        const { data: updateData, error: updateError } = await supabase
+          .from("signatures")
+          .update(signatureRecord)
+          .eq("id", editingSignatureId)
+          .select()
+          .single();
+        data = updateData;
+        error = updateError;
+      } else {
+        // Insertar nueva firma
+        const { data: insertData, error: insertError } = await supabase
+          .from("signatures")
+          .insert([signatureRecord])
+          .select()
+          .single();
+        data = insertData;
+        error = insertError;
+      }
 
       if (error) {
         throw error;
@@ -218,8 +267,12 @@ export default function DashboardPage() {
 
       setSaveMessage({
         type: "success",
-        text: "¡Firma guardada exitosamente!",
+        text: editingSignatureId ? "¡Firma actualizada exitosamente!" : "¡Firma guardada exitosamente!",
       });
+      // Limpiar el ID de edición después de guardar
+      if (editingSignatureId) {
+        setEditingSignatureId(null);
+      }
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (error) {
       // Depuración: Imprimir el objeto error completo para ver detalles
@@ -1000,7 +1053,9 @@ export default function DashboardPage() {
                       : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40"
                   }`}
                 >
-                  {saving ? "Guardando..." : "Guardar Firma"}
+                  {saving 
+                    ? (editingSignatureId ? "Actualizando..." : "Guardando...") 
+                    : (editingSignatureId ? "Actualizar Firma" : "Guardar Firma")}
                 </button>
                 <button
                   onClick={handleCopyToClipboard}
