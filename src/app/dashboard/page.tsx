@@ -561,7 +561,7 @@ export default function DashboardPage() {
                         setSignatureData({ ...signatureData, telefonoMovil: e.target.value })
                       }
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                      placeholder="+34 614 19 54 89"
+                      placeholder="+1 (555) 987-6543"
                     />
                   </div>
                   <IconPicker
@@ -590,7 +590,7 @@ export default function DashboardPage() {
                         setSignatureData({ ...signatureData, direccion: e.target.value })
                       }
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                      placeholder="Ej: Rio Barbate, 5, Cádiz 11138, Spain"
+                      placeholder="Ej: 123 Main Street, New York, NY 10001, USA"
                     />
                   </div>
                   <IconPicker
