@@ -365,7 +365,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <ToastContainer toasts={toasts} onRemove={removeToast} />
       {/* Contenido Principal */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
@@ -600,6 +600,12 @@ export default function DashboardPage() {
                         </span>
                         <p className="text-xs text-gray-500 mt-1">
                           JPG, PNG o GIF (máx. 5MB)
+                        </p>
+                        <p className="text-xs text-blue-600 mt-2 flex items-center justify-center gap-1">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span className="font-medium">Recomendación:</span> Usa logos con fondo transparente (PNG)
                         </p>
                       </label>
                     </div>
