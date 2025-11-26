@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
