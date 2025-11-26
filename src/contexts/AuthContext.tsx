@@ -49,9 +49,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string) => {
+    // Obtener la URL base (producción o desarrollo)
+    const getRedirectUrl = () => {
+      if (typeof window !== "undefined") {
+        // En el cliente, usar la URL actual
+        return `${window.location.origin}/auth/callback`;
+      }
+      // En el servidor, usar variable de entorno o default
+      return process.env.NEXT_PUBLIC_SITE_URL 
+        ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+        : "https://firmacoding.vercel.app/auth/callback";
+    };
+
+    const redirectUrl = getRedirectUrl();
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: redirectUrl,
+      },
     });
     return { error };
   };
