@@ -105,25 +105,10 @@ export async function exportAsPDF(element: HTMLElement, filename: string = "firm
     // Obtener el tamaño real del contenido
     const bounds = getContentBounds(element);
     
-    // Crear un contenedor temporal para capturar solo el contenido
-    const tempContainer = document.createElement('div');
-    tempContainer.style.position = 'absolute';
-    tempContainer.style.left = '-9999px';
-    tempContainer.style.top = '0';
-    tempContainer.style.width = `${bounds.width}px`;
-    tempContainer.style.height = `${bounds.height}px`;
-    tempContainer.style.overflow = 'visible';
-    tempContainer.style.backgroundColor = 'transparent';
-    
-    // Clonar el contenido
-    const contentClone = element.cloneNode(true) as HTMLElement;
-    contentClone.style.margin = '0';
-    contentClone.style.padding = '0';
-    tempContainer.appendChild(contentClone);
-    document.body.appendChild(tempContainer);
-    
-    // Capturar solo el contenido con el tamaño exacto
-    const canvas = await html2canvas(tempContainer, {
+    // Capturar el elemento con el tamaño exacto del contenido
+    const canvas = await html2canvas(element, {
+      x: bounds.x,
+      y: bounds.y,
       width: bounds.width,
       height: bounds.height,
       scale: 2,
@@ -131,10 +116,9 @@ export async function exportAsPDF(element: HTMLElement, filename: string = "firm
       backgroundColor: null,
       useCORS: true,
       allowTaint: false,
+      windowWidth: bounds.width,
+      windowHeight: bounds.height,
     } as any);
-
-    // Limpiar el contenedor temporal
-    document.body.removeChild(tempContainer);
 
     const imgData = canvas.toDataURL("image/png");
     
