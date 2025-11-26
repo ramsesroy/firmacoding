@@ -355,7 +355,7 @@ function generateProfessionalHTML(
   if (website) {
     const websiteIcon = website.icono || "🌐";
     contactos.push(`<tr>
-      <td style="font-family: Arial, sans-serif; font-size: 12px; color: #666666; line-height: 1.6;">
+      <td style="font-family: Arial, sans-serif; font-size: 12px; color: #666666; padding-bottom: 6px; line-height: 1.6;">
         <span style="font-family: Arial, sans-serif; color: #333333; font-size: 13px;">${websiteIcon}</span> <a href="${escapeHtml(website.url)}" style="font-family: Arial, sans-serif; color: #666666; text-decoration: none;">${escapeHtml(website.url)}</a>
       </td>
     </tr>`);
@@ -374,7 +374,7 @@ function generateProfessionalHTML(
       <td valign="${valignLogo}" style="padding-right: 40px; font-family: Arial, sans-serif;">
         ${logoHTML}
       </td>
-      <td valign="top" style="font-family: Arial, sans-serif;">
+      <td valign="top" style="font-family: Arial, sans-serif; padding-bottom: 10px;">
         <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif;">
           <tbody>
             <tr>

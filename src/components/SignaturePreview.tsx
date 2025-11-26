@@ -551,7 +551,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                 />
               )}
             </td>
-            <td valign="top" style={{ fontFamily: "Arial, sans-serif" }}>
+            <td valign="top" style={{ fontFamily: "Arial, sans-serif", paddingBottom: "10px" }}>
               <table
                 cellPadding="0"
                 cellSpacing="0"
@@ -701,6 +701,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                           fontFamily: "Arial, sans-serif",
                           fontSize: "12px",
                           color: "#666666",
+                          paddingBottom: "6px",
                           lineHeight: "1.6",
                         }}
                       >
