@@ -49,6 +49,7 @@ export default function FirmasPage() {
       return;
     }
     loadSignatures();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, router]);
 
   const loadSignatures = async () => {

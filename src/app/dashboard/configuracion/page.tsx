@@ -31,6 +31,7 @@ export default function ConfiguracionPage() {
     } else {
       router.push("/register");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, router]);
 
   const loadStats = async () => {
