@@ -30,6 +30,7 @@ export default function DashboardPage() {
     colorPersonalizado: "",
     qrLink: "",
     logoEmpresa: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80", // Logo de ejemplo para template professional
+    logoPosicion: "center" as "top" | "center" | "bottom",
     ctaTexto: "",
     telefonoMovil: "",
     direccion: "",
@@ -241,33 +242,22 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navbar Superior */}
-      <nav className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="text-2xl font-bold text-gray-900">
-              Firma<span className="text-blue-600">Pro</span>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       {/* Contenido Principal */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+        <div className="mb-4 sm:mb-6 lg:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2">
             Editor de Firmas
           </h1>
-          <p className="text-base sm:text-lg text-gray-600">
+          <p className="text-sm sm:text-base lg:text-lg text-gray-600">
             Crea y personaliza tu firma digital profesional
           </p>
         </div>
 
         {/* Layout: Flex column en móvil, grid en desktop */}
-        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 sm:gap-8 lg:h-[calc(100vh-220px)]">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 lg:h-[calc(100vh-220px)]">
           {/* Formulario - Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-6 sm:p-8 lg:overflow-y-auto order-1 lg:order-1">
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-lg p-4 sm:p-6 lg:p-8 lg:overflow-y-auto order-1 lg:order-1">
             <h2 className="text-xl sm:text-2xl font-semibold mb-6 text-gray-900">
               Información de la Firma
             </h2>
@@ -516,13 +506,49 @@ export default function DashboardPage() {
                     </p>
                   </div>
                 )}
+                
+                {/* Selector de posición del logo */}
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Posición del Logo
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: "top", label: "Arriba", icon: "⬆️" },
+                      { value: "center", label: "Centro", icon: "↔️" },
+                      { value: "bottom", label: "Abajo", icon: "⬇️" },
+                    ].map((pos) => (
+                      <button
+                        key={pos.value}
+                        type="button"
+                        onClick={() =>
+                          setSignatureData({
+                            ...signatureData,
+                            logoPosicion: pos.value as "top" | "center" | "bottom",
+                          })
+                        }
+                        className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 border ${
+                          signatureData.logoPosicion === pos.value
+                            ? "bg-blue-600 text-white border-blue-600 shadow-md"
+                            : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100"
+                        }`}
+                      >
+                        <span className="block text-lg mb-1">{pos.icon}</span>
+                        <span>{pos.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Elige dónde quieres que aparezca el logo verticalmente
+                  </p>
+                </div>
               </div>
             )}
 
             {/* Teléfono */}
             <div>
-              <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
-                <div>
+              <div className="flex flex-col sm:grid sm:grid-cols-[1fr_auto] gap-3 items-end">
+                <div className="w-full">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Teléfono
                   </label>
@@ -536,21 +562,23 @@ export default function DashboardPage() {
                     placeholder="+1 (555) 123-4567"
                   />
                 </div>
-                <IconPicker
-                  selectedIcon={signatureData.iconoTelefono}
-                  onSelectIcon={(icon) =>
-                    setSignatureData({ ...signatureData, iconoTelefono: icon })
-                  }
-                  label="Icono"
-                />
+                <div className="w-full sm:w-auto">
+                  <IconPicker
+                    selectedIcon={signatureData.iconoTelefono}
+                    onSelectIcon={(icon) =>
+                      setSignatureData({ ...signatureData, iconoTelefono: icon })
+                    }
+                    label="Icono"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Teléfono Móvil (Professional) */}
             {(template === "professional") && (
               <div>
-                <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
-                  <div>
+                <div className="flex flex-col sm:grid sm:grid-cols-[1fr_auto] gap-3 items-end">
+                  <div className="w-full">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Teléfono Móvil
                     </label>
@@ -564,13 +592,15 @@ export default function DashboardPage() {
                       placeholder="+1 (555) 987-6543"
                     />
                   </div>
-                  <IconPicker
-                    selectedIcon={signatureData.iconoTelefonoMovil}
-                    onSelectIcon={(icon) =>
-                      setSignatureData({ ...signatureData, iconoTelefonoMovil: icon })
-                    }
-                    label="Icono"
-                  />
+                  <div className="w-full sm:w-auto">
+                    <IconPicker
+                      selectedIcon={signatureData.iconoTelefonoMovil}
+                      onSelectIcon={(icon) =>
+                        setSignatureData({ ...signatureData, iconoTelefonoMovil: icon })
+                      }
+                      label="Icono"
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -578,8 +608,8 @@ export default function DashboardPage() {
             {/* Dirección (Professional) */}
             {(template === "professional") && (
               <div>
-                <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
-                  <div>
+                <div className="flex flex-col sm:grid sm:grid-cols-[1fr_auto] gap-3 items-end">
+                  <div className="w-full">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Dirección
                     </label>
@@ -593,13 +623,15 @@ export default function DashboardPage() {
                       placeholder="Ej: 123 Main Street, New York, NY 10001, USA"
                     />
                   </div>
-                  <IconPicker
-                    selectedIcon={signatureData.iconoDireccion}
-                    onSelectIcon={(icon) =>
-                      setSignatureData({ ...signatureData, iconoDireccion: icon })
-                    }
-                    label="Icono"
-                  />
+                  <div className="w-full sm:w-auto">
+                    <IconPicker
+                      selectedIcon={signatureData.iconoDireccion}
+                      onSelectIcon={(icon) =>
+                        setSignatureData({ ...signatureData, iconoDireccion: icon })
+                      }
+                      label="Icono"
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -850,8 +882,8 @@ export default function DashboardPage() {
                     placeholder="URL"
                   />
                 </div>
-                <div className="flex gap-3 items-end">
-                  <div className="flex-1">
+                <div className="flex flex-col sm:flex-row gap-3 items-end">
+                  <div className="w-full sm:flex-1">
                     <IconPicker
                       selectedIcon={nuevaRed.icono}
                       onSelectIcon={(icon) =>
@@ -870,7 +902,7 @@ export default function DashboardPage() {
                         setNuevaRed({ nombre: "", url: "", icono: "" });
                       }
                     }}
-                    className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-semibold shadow-md shadow-blue-500/20 whitespace-nowrap"
+                    className="w-full sm:w-auto px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-semibold shadow-md shadow-blue-500/20 whitespace-nowrap"
                   >
                     + Agregar
                   </button>
@@ -881,7 +913,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Vista Previa - Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-6 sm:p-8 lg:overflow-y-auto order-2 lg:order-2 flex flex-col">
+          <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-lg p-4 sm:p-6 lg:p-8 lg:overflow-y-auto order-2 lg:order-2 flex flex-col">
             <div className="mb-6 pb-4 border-b border-gray-100">
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">
                 Vista Previa en Vivo
@@ -892,11 +924,11 @@ export default function DashboardPage() {
             </div>
 
             {/* Vista Previa Principal */}
-            <div className="bg-gradient-to-br from-gray-50 via-gray-50/50 to-gray-100 rounded-xl p-6 sm:p-10 border border-gray-200 mb-6" style={{
+            <div className="bg-gradient-to-br from-gray-50 via-gray-50/50 to-gray-100 rounded-xl p-4 sm:p-6 lg:p-10 border border-gray-200 mb-4 sm:mb-6" style={{
               backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0)',
               backgroundSize: '20px 20px'
             }}>
-              <div className="flex items-center justify-center min-h-[180px] sm:min-h-[220px]">
+              <div className="flex items-center justify-center min-h-[150px] sm:min-h-[180px] lg:min-h-[220px]">
                 <SignaturePreview
                   nombre={signatureData.nombre}
                   cargo={signatureData.cargo}
@@ -909,6 +941,7 @@ export default function DashboardPage() {
                   colorPersonalizado={signatureData.colorPersonalizado}
                   qrLink={signatureData.qrLink}
                   logoEmpresa={signatureData.logoEmpresa}
+                  logoPosicion={signatureData.logoPosicion}
                   ctaTexto={signatureData.ctaTexto}
                   telefonoMovil={signatureData.telefonoMovil}
                   direccion={signatureData.direccion}
@@ -920,11 +953,11 @@ export default function DashboardPage() {
             </div>
 
             {/* Vista Simulada en Email */}
-            <div className="bg-gray-50 rounded-xl p-4 sm:p-5 border border-gray-200 mb-6">
-              <p className="text-xs text-gray-600 mb-3 font-semibold uppercase tracking-wide">
+            <div className="bg-gray-50 rounded-xl p-3 sm:p-4 lg:p-5 border border-gray-200 mb-4 sm:mb-6">
+              <p className="text-xs text-gray-600 mb-2 sm:mb-3 font-semibold uppercase tracking-wide">
                 Vista simulada en correo electrónico
               </p>
-              <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-sm">
+              <div className="bg-white p-3 sm:p-4 lg:p-5 rounded-lg border border-gray-200 shadow-sm">
                 <p className="text-gray-600 mb-4 text-sm leading-relaxed">
                   Este es un ejemplo de cómo se verá tu firma en un correo
                   electrónico. La firma se actualiza automáticamente mientras
@@ -943,6 +976,7 @@ export default function DashboardPage() {
                     colorPersonalizado={signatureData.colorPersonalizado}
                     qrLink={signatureData.qrLink}
                     logoEmpresa={signatureData.logoEmpresa}
+                    logoPosicion={signatureData.logoPosicion}
                     ctaTexto={signatureData.ctaTexto}
                     telefonoMovil={signatureData.telefonoMovil}
                     direccion={signatureData.direccion}
@@ -955,12 +989,12 @@ export default function DashboardPage() {
             </div>
 
             {/* Botones de Acción */}
-            <div className="mt-auto pt-6 border-t border-gray-100">
-              <div className="flex flex-col sm:flex-row gap-3">
+            <div className="mt-auto pt-4 sm:pt-6 border-t border-gray-100">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className={`flex-1 px-6 py-3.5 rounded-lg transition-all duration-200 font-semibold text-base ${
+                  className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-lg transition-all duration-200 font-semibold text-sm sm:text-base ${
                     saving
                       ? "bg-gray-400 text-white cursor-not-allowed"
                       : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40"
@@ -970,7 +1004,7 @@ export default function DashboardPage() {
                 </button>
                 <button
                   onClick={handleCopyToClipboard}
-                  className={`flex-1 px-6 py-3.5 rounded-lg transition-all duration-200 font-semibold text-base ${
+                  className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-lg transition-all duration-200 font-semibold text-sm sm:text-base ${
                     copied
                       ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30"
                       : "bg-gray-900 text-white hover:bg-gray-800 shadow-lg shadow-gray-900/20"
@@ -1002,49 +1036,49 @@ export default function DashboardPage() {
 
       {/* Modal para copiar HTML manualmente (especialmente para iOS) */}
       {showHtmlModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-gray-900">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] flex flex-col">
+            <div className="p-4 sm:p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900">
                   Copiar HTML de la Firma
                 </h3>
                 <button
                   onClick={() => setShowHtmlModal(false)}
-                  className="text-gray-400 hover:text-gray-600 transition"
+                  className="text-gray-400 hover:text-gray-600 transition flex-shrink-0"
                   aria-label="Cerrar"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-xs sm:text-sm text-gray-600 mt-2">
                 Selecciona todo el texto y cópialo (Cmd+C en Mac, Ctrl+C en Windows)
               </p>
             </div>
-            <div className="p-6 flex-1 overflow-auto">
+            <div className="p-3 sm:p-6 flex-1 overflow-auto">
               <textarea
                 ref={htmlTextareaRef}
                 value={htmlContent}
                 readOnly
-                className="w-full h-full min-h-[400px] p-4 border border-gray-300 rounded-lg font-mono text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-full min-h-[300px] sm:min-h-[400px] p-3 sm:p-4 border border-gray-300 rounded-lg font-mono text-xs sm:text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onClick={(e) => {
                   // Seleccionar todo al hacer clic
                   (e.target as HTMLTextAreaElement).select();
                 }}
               />
             </div>
-            <div className="p-6 border-t border-gray-200 flex gap-3">
+            <div className="p-4 sm:p-6 border-t border-gray-200 flex flex-col sm:flex-row gap-3">
               <button
                 onClick={handleCopyFromModal}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+                className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm sm:text-base"
               >
                 Copiar al Portapapeles
               </button>
               <button
                 onClick={() => setShowHtmlModal(false)}
-                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold"
+                className="px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold text-sm sm:text-base"
               >
                 Cerrar
               </button>

@@ -6,13 +6,13 @@ export async function generateSignatureHTML(
   template: TemplateType,
   userName: string = "Usuario"
 ): Promise<string> {
-  const { nombre, cargo, foto, telefono, redes = [], horario, textoAdicional, colorPersonalizado, qrLink, logoEmpresa, ctaTexto, telefonoMovil, direccion, iconoTelefono, iconoTelefonoMovil, iconoDireccion } = data;
+  const { nombre, cargo, foto, telefono, redes = [], horario, textoAdicional, colorPersonalizado, qrLink, logoEmpresa, logoPosicion, ctaTexto, telefonoMovil, direccion, iconoTelefono, iconoTelefonoMovil, iconoDireccion } = data;
 
   let baseHTML: string;
   
   switch (template) {
     case "professional":
-      baseHTML = generateProfessionalHTML(nombre, cargo, telefono, redes, logoEmpresa, telefonoMovil, direccion, iconoTelefono, iconoTelefonoMovil, iconoDireccion);
+      baseHTML = generateProfessionalHTML(nombre, cargo, telefono, redes, logoEmpresa, logoPosicion, telefonoMovil, direccion, iconoTelefono, iconoTelefonoMovil, iconoDireccion);
       break;
     case "classic":
       baseHTML = generateClassicHTML(nombre, cargo, foto, telefono, redes);
@@ -297,6 +297,7 @@ function generateProfessionalHTML(
   telefono?: string,
   redes: RedSocial[] = [],
   logoEmpresa?: string,
+  logoPosicion: "top" | "center" | "bottom" = "center",
   telefonoMovil?: string,
   direccion?: string,
   iconoTelefono?: string,
@@ -360,14 +361,17 @@ function generateProfessionalHTML(
     </tr>`);
   }
 
+  // Determinar la alineación vertical según la posición
+  const valignLogo = logoPosicion === "top" ? "top" : logoPosicion === "bottom" ? "bottom" : "middle";
+  
   const logoHTML = logoEmpresa
-    ? `<img src="${escapeHtml(logoEmpresa)}" alt="Logo" width="120" height="40" style="width: 120px; max-width: 120px; height: 40px; display: block; border: 0;" />`
+    ? `<img src="${escapeHtml(logoEmpresa)}" alt="Logo" style="width: 120px; max-width: 120px; height: auto; max-height: 80px; display: block; border: 0; object-fit: contain;" />`
     : "";
 
   return `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Arial, sans-serif; font-size: 14px; color: #333333;">
   <tbody>
     <tr>
-      <td valign="top" style="padding-right: 40px; font-family: Arial, sans-serif;">
+      <td valign="${valignLogo}" style="padding-right: 40px; font-family: Arial, sans-serif;">
         ${logoHTML}
       </td>
       <td valign="top" style="font-family: Arial, sans-serif;">

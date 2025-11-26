@@ -16,6 +16,7 @@ export interface SignatureProps {
   colorPersonalizado?: string; // Para Moderna sin barra, Modern 4
   qrLink?: string; // Para QR Profesional y QR Corporated
   logoEmpresa?: string; // Para Enterprise Vintage y Professional
+  logoPosicion?: "top" | "center" | "bottom"; // Para Professional - posición del logo
   ctaTexto?: string; // Para Modern 4 (texto del botón CTA)
   telefonoMovil?: string; // Para Professional (teléfono móvil adicional)
   direccion?: string; // Para Professional (dirección)

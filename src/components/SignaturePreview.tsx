@@ -9,6 +9,7 @@ interface SignaturePreviewProps extends SignatureProps {
   colorPersonalizado?: string;
   qrLink?: string;
   logoEmpresa?: string;
+  logoPosicion?: "top" | "center" | "bottom";
   ctaTexto?: string;
   telefonoMovil?: string;
   direccion?: string;
@@ -29,6 +30,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
   colorPersonalizado,
   qrLink,
   logoEmpresa,
+  logoPosicion = "center",
   ctaTexto,
   telefonoMovil,
   direccion,
@@ -39,7 +41,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
   const renderTemplate = () => {
     switch (template) {
       case "professional":
-        return renderProfessionalTemplate();
+        return renderProfessionalTemplate(logoPosicion);
       case "classic":
         return renderClassicTemplate();
       case "modern":
@@ -502,7 +504,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
   };
 
   // Professional: Most Popular - Clean two-column design with company logo
-  const renderProfessionalTemplate = () => {
+  const renderProfessionalTemplate = (logoPos: "top" | "center" | "bottom" = "center") => {
     const iconoTel = iconoTelefono || "📞";
     const iconoTelMovil = iconoTelefonoMovil || "📱";
     const iconoDir = iconoDireccion || "📍";
@@ -527,7 +529,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
         <tbody>
           <tr>
             <td
-              valign="top"
+              valign={logoPos === "top" ? "top" : logoPos === "bottom" ? "bottom" : "middle"}
               style={{
                 paddingRight: "40px",
                 fontFamily: "Arial, sans-serif",
@@ -541,6 +543,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                     width: "120px",
                     height: "auto",
                     maxWidth: "120px",
+                    maxHeight: "80px",
                     display: "block",
                     border: "0",
                     objectFit: "contain",
