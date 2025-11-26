@@ -16,7 +16,7 @@ import ToastContainer from "@/components/ToastContainer";
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { toasts, success, error, removeToast } = useToast();
+  const { toasts, success, error: showError, removeToast } = useToast();
   
   // URLs de imágenes de ejemplo (imágenes reales profesionales de Unsplash)
   // Foto de perfil profesional - retrato empresarial de calidad
@@ -61,6 +61,7 @@ export default function DashboardPage() {
   const [showHtmlModal, setShowHtmlModal] = useState(false);
   const [htmlContent, setHtmlContent] = useState("");
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
   const htmlTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -274,7 +275,7 @@ export default function DashboardPage() {
   const handleSave = async () => {
     // Validar que los campos requeridos estén completos
     if (!signatureData.nombre || !signatureData.cargo) {
-      error("Por favor completa al menos el nombre y el cargo");
+      showError("Por favor completa al menos el nombre y el cargo");
       return;
     }
 
@@ -340,10 +341,7 @@ export default function DashboardPage() {
         throw error;
       }
 
-      setSaveMessage({
-        type: "success",
-        text: editingSignatureId ? "¡Firma actualizada exitosamente!" : "¡Firma guardada exitosamente!",
-      });
+      success(editingSignatureId ? "¡Firma actualizada exitosamente!" : "¡Firma guardada exitosamente!");
       // Limpiar el ID de edición y el nombre personalizado después de guardar
       if (editingSignatureId) {
         setEditingSignatureId(null);
@@ -351,7 +349,6 @@ export default function DashboardPage() {
       setSignatureCustomName("");
       // Limpiar borrador después de guardar exitosamente
       localStorage.removeItem("signatureDraft");
-      setTimeout(() => setSaveMessage(null), 3000);
     } catch (error) {
       // Depuración: Imprimir el objeto error completo para ver detalles
       console.error("Error al guardar la firma - Objeto completo:", error);
@@ -361,11 +358,7 @@ export default function DashboardPage() {
         stack: error instanceof Error ? error.stack : undefined,
       });
       
-      setSaveMessage({
-        type: "error",
-        text: error instanceof Error ? error.message : "Error al guardar la firma",
-      });
-      setTimeout(() => setSaveMessage(null), 3000);
+      showError(error instanceof Error ? error.message : "Error al guardar la firma");
     } finally {
       setSaving(false);
     }

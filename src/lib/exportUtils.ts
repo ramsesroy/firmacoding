@@ -7,10 +7,9 @@ import jsPDF from "jspdf";
 export async function exportAsPNG(element: HTMLElement, filename: string = "firma"): Promise<void> {
   try {
     const canvas = await html2canvas(element, {
-      backgroundColor: "#ffffff",
       scale: 2, // Mayor calidad
       logging: false,
-    });
+    } as any);
 
     // Convertir canvas a blob
     canvas.toBlob((blob) => {
@@ -40,10 +39,9 @@ export async function exportAsPNG(element: HTMLElement, filename: string = "firm
 export async function exportAsPDF(element: HTMLElement, filename: string = "firma"): Promise<void> {
   try {
     const canvas = await html2canvas(element, {
-      backgroundColor: "#ffffff",
       scale: 2,
       logging: false,
-    });
+    } as any);
 
     const imgData = canvas.toDataURL("image/png");
     const pdf = new jsPDF({

@@ -8,7 +8,17 @@ import { useTheme } from "@/contexts/ThemeContext";
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  
+  // useTheme puede no estar disponible durante SSR
+  let theme: "light" | "dark" = "light";
+  let toggleTheme = () => {};
+  try {
+    const themeContext = useTheme();
+    theme = themeContext.theme;
+    toggleTheme = themeContext.toggleTheme;
+  } catch {
+    // No hay ThemeProvider, usar valores por defecto
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 shadow-sm z-50">
@@ -38,7 +48,7 @@ export default function Header() {
                 </svg>
               )}
             </button>
-          <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-8">
             <Link
               href="#features"
               className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
@@ -82,6 +92,7 @@ export default function Header() {
                 </>
               )}
             </div>
+          </div>
           </div>
 
           {/* Mobile Menu Button */}

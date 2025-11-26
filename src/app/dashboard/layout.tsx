@@ -14,7 +14,17 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, signOut } = useAuth();
   const router = useRouter();
-  const { theme, toggleTheme } = useTheme();
+  
+  // useTheme puede no estar disponible durante SSR
+  let theme: "light" | "dark" = "light";
+  let toggleTheme = () => {};
+  try {
+    const themeContext = useTheme();
+    theme = themeContext.theme;
+    toggleTheme = themeContext.toggleTheme;
+  } catch {
+    // No hay ThemeProvider, usar valores por defecto
+  }
 
   const handleSignOut = async () => {
     await signOut();
