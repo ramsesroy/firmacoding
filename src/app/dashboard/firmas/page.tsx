@@ -8,7 +8,6 @@ import { copyToClipboard, generateSignatureHTML } from "@/lib/signatureUtils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useEffect } from "react";
 
 interface SignatureRecord {
   id: string;
