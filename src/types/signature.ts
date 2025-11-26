@@ -22,20 +22,6 @@ export interface SignatureProps {
   iconoTelefono?: string; // Icono personalizable para teléfono
   iconoDireccion?: string; // Icono personalizable para dirección
   iconoTelefonoMovil?: string; // Icono personalizable para teléfono móvil
-  stackTecnologico?: string; // Para Tech Developer (ej: "React, Node.js, TypeScript")
-  testimonio?: string; // Para Sales Professional (testimonio/calificación)
-  certificaciones?: string; // Para Medical Professional (certificaciones/especialidades)
-  horarioConsulta?: string; // Para Medical Professional (horario de consulta)
-  portfolio?: string; // Para Consultant (link a portfolio/proyectos)
-  tarifas?: string; // Para Consultant (tarifas, opcional)
-  listings?: string; // Para Real Estate Agent (listings destacados)
-  calendarioCitas?: string; // Para Real Estate Agent (link a calendario)
-  publicaciones?: string; // Para Academic/Researcher (publicaciones destacadas)
-  afiliacionInstitucional?: string; // Para Academic/Researcher (universidad/institución)
-  orcid?: string; // Para Academic/Researcher (ORCID ID)
-  mision?: string; // Para Non-Profit (misión/causa)
-  donaciones?: string; // Para Non-Profit (link a donaciones)
-  idiomas?: string; // Para Bilingual/Multilingual (idiomas hablados, ej: "Español, Inglés, Francés")
 }
 
 export type TemplateType = 
