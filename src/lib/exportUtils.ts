@@ -2,30 +2,23 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 /**
- * Obtiene el tamaño real del contenido de la firma
+ * Encuentra el elemento de contenido real (la tabla de la firma)
  */
-function getContentBounds(element: HTMLElement): { width: number; height: number; x: number; y: number } {
+function findContentElement(element: HTMLElement): HTMLElement | null {
   // Buscar el elemento table que contiene la firma real
   const tableElement = element.querySelector('table');
   if (tableElement) {
-    const rect = tableElement.getBoundingClientRect();
-    const parentRect = element.getBoundingClientRect();
-    return {
-      width: rect.width,
-      height: rect.height,
-      x: rect.left - parentRect.left,
-      y: rect.top - parentRect.top,
-    };
+    return tableElement as HTMLElement;
   }
   
-  // Si no hay tabla, usar el elemento completo
-  const rect = element.getBoundingClientRect();
-  return {
-    width: rect.width,
-    height: rect.height,
-    x: 0,
-    y: 0,
-  };
+  // Si no hay tabla, buscar el primer div con contenido
+  const contentDiv = element.querySelector('div > *');
+  if (contentDiv) {
+    return contentDiv as HTMLElement;
+  }
+  
+  // Si no hay nada, usar el elemento completo
+  return element;
 }
 
 /**
@@ -33,22 +26,20 @@ function getContentBounds(element: HTMLElement): { width: number; height: number
  */
 export async function exportAsPNG(element: HTMLElement, filename: string = "firma"): Promise<void> {
   try {
-    // Obtener el tamaño real del contenido
-    const bounds = getContentBounds(element);
+    // Encontrar el elemento de contenido real (la tabla)
+    const contentElement = findContentElement(element);
     
-    // Capturar el elemento con el tamaño exacto del contenido
-    const canvas = await html2canvas(element, {
-      x: bounds.x,
-      y: bounds.y,
-      width: bounds.width,
-      height: bounds.height,
+    if (!contentElement) {
+      throw new Error("No se encontró el contenido de la firma");
+    }
+
+    // Capturar el elemento de contenido
+    const canvas = await html2canvas(contentElement, {
       scale: 2, // Mayor calidad
       logging: false,
       backgroundColor: null, // Fondo transparente
       useCORS: true,
       allowTaint: false,
-      windowWidth: bounds.width,
-      windowHeight: bounds.height,
     } as any);
 
     // Convertir canvas a blob
@@ -69,7 +60,7 @@ export async function exportAsPNG(element: HTMLElement, filename: string = "firm
     }, "image/png");
   } catch (error) {
     console.error("Error al exportar como PNG:", error);
-    // Fallback: intentar con el elemento original sin recortar
+    // Fallback: intentar con el elemento original completo
     try {
       const canvas = await html2canvas(element, {
         scale: 2,
@@ -92,6 +83,7 @@ export async function exportAsPNG(element: HTMLElement, filename: string = "firm
         URL.revokeObjectURL(url);
       }, "image/png");
     } catch (fallbackError) {
+      console.error("Error en fallback PNG:", fallbackError);
       throw error;
     }
   }
@@ -102,22 +94,20 @@ export async function exportAsPNG(element: HTMLElement, filename: string = "firm
  */
 export async function exportAsPDF(element: HTMLElement, filename: string = "firma"): Promise<void> {
   try {
-    // Obtener el tamaño real del contenido
-    const bounds = getContentBounds(element);
+    // Encontrar el elemento de contenido real (la tabla)
+    const contentElement = findContentElement(element);
     
-    // Capturar el elemento con el tamaño exacto del contenido
-    const canvas = await html2canvas(element, {
-      x: bounds.x,
-      y: bounds.y,
-      width: bounds.width,
-      height: bounds.height,
+    if (!contentElement) {
+      throw new Error("No se encontró el contenido de la firma");
+    }
+
+    // Capturar el elemento de contenido
+    const canvas = await html2canvas(contentElement, {
       scale: 2,
       logging: false,
       backgroundColor: null,
       useCORS: true,
       allowTaint: false,
-      windowWidth: bounds.width,
-      windowHeight: bounds.height,
     } as any);
 
     const imgData = canvas.toDataURL("image/png");
@@ -144,7 +134,7 @@ export async function exportAsPDF(element: HTMLElement, filename: string = "firm
     pdf.save(`${filename}.pdf`);
   } catch (error) {
     console.error("Error al exportar como PDF:", error);
-    // Fallback: intentar con el elemento original
+    // Fallback: intentar con el elemento original completo
     try {
       const canvas = await html2canvas(element, {
         scale: 2,
@@ -170,6 +160,7 @@ export async function exportAsPDF(element: HTMLElement, filename: string = "firm
       pdf.addImage(imgData, "PNG", margin, margin, imgWidthMm, imgHeightMm);
       pdf.save(`${filename}.pdf`);
     } catch (fallbackError) {
+      console.error("Error en fallback PDF:", fallbackError);
       throw error;
     }
   }
