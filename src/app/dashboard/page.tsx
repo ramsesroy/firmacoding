@@ -645,7 +645,13 @@ export default function DashboardPage() {
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
                       placeholder="URL del logo (https://ejemplo.com/logo.png)"
                     />
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-blue-600 mt-2 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="font-medium">Recomendación:</span> Usa logos con fondo transparente (PNG) para mejor resultado
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
                       ⚠️ También puedes cambiar la URL del logo manualmente
                     </p>
                   </div>
