@@ -505,9 +505,6 @@ export default function DashboardPage() {
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
                       placeholder="URL del logo (https://ejemplo.com/logo.png)"
                     />
-                    <p className="text-xs text-gray-500">
-                      ⚠️ También puedes cambiar la URL del logo manualmente
-                    </p>
                   </div>
                 )}
               </div>
@@ -515,21 +512,19 @@ export default function DashboardPage() {
 
             {/* Teléfono */}
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Teléfono
+              </label>
               <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Teléfono
-                  </label>
-                  <input
-                    type="text"
-                    value={signatureData.telefono}
-                    onChange={(e) =>
-                      setSignatureData({ ...signatureData, telefono: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                    placeholder="+1 (555) 123-4567"
-                  />
-                </div>
+                <input
+                  type="text"
+                  value={signatureData.telefono}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, telefono: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="+1 (555) 123-4567"
+                />
                 <IconPicker
                   selectedIcon={signatureData.iconoTelefono}
                   onSelectIcon={(icon) =>
@@ -543,21 +538,19 @@ export default function DashboardPage() {
             {/* Teléfono Móvil (Professional) */}
             {(template === "professional") && (
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Teléfono Móvil
+                </label>
                 <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Teléfono Móvil
-                    </label>
-                    <input
-                      type="text"
-                      value={signatureData.telefonoMovil || ""}
-                      onChange={(e) =>
-                        setSignatureData({ ...signatureData, telefonoMovil: e.target.value })
-                      }
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                      placeholder="+34 614 19 54 89"
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    value={signatureData.telefonoMovil}
+                    onChange={(e) =>
+                      setSignatureData({ ...signatureData, telefonoMovil: e.target.value })
+                    }
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                    placeholder="+34 614 19 54 89"
+                  />
                   <IconPicker
                     selectedIcon={signatureData.iconoTelefonoMovil}
                     onSelectIcon={(icon) =>
@@ -572,21 +565,19 @@ export default function DashboardPage() {
             {/* Dirección (Professional) */}
             {(template === "professional") && (
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Dirección
+                </label>
                 <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Dirección
-                    </label>
-                    <input
-                      type="text"
-                      value={signatureData.direccion || ""}
-                      onChange={(e) =>
-                        setSignatureData({ ...signatureData, direccion: e.target.value })
-                      }
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                      placeholder="Ej: Rio Barbate, 5, Cádiz 11138, Spain"
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    value={signatureData.direccion}
+                    onChange={(e) =>
+                      setSignatureData({ ...signatureData, direccion: e.target.value })
+                    }
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                    placeholder="Calle Falsa 123, Ciudad"
+                  />
                   <IconPicker
                     selectedIcon={signatureData.iconoDireccion}
                     onSelectIcon={(icon) =>
@@ -598,32 +589,11 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Logo de Empresa (Enterprise Vintage) */}
-            {(template === "enterpriseVintage") && (
+            {/* Horario (Professional) */}
+            {(template === "professional") && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Logo de Empresa
-                </label>
-                <input
-                  type="text"
-                  value={signatureData.logoEmpresa || ""}
-                  onChange={(e) =>
-                    setSignatureData({ ...signatureData, logoEmpresa: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="URL del logo (recomendado) o deja vacío para ocultar"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  ⚠️ Se recomienda usar una URL pública del logo. Si dejas vacío, no se mostrará ningún logo.
-                </p>
-              </div>
-            )}
-
-            {/* Horario (QR Profesional) */}
-            {(template === "qrProfesional") && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Horario de atención
+                  Horario
                 </label>
                 <input
                   type="text"
@@ -632,142 +602,131 @@ export default function DashboardPage() {
                     setSignatureData({ ...signatureData, horario: e.target.value })
                   }
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="Ej: 08:00 a 16:00 hs"
+                  placeholder="Lun-Vie: 9:00-18:00"
                 />
               </div>
             )}
 
-            {/* Texto Adicional (Enterprise Vintage) */}
-            {(template === "enterpriseVintage") && (
+            {/* Texto Adicional (Professional) */}
+            {(template === "professional") && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Texto adicional (debajo del teléfono)
+                  Texto Adicional
                 </label>
-                <input
-                  type="text"
+                <textarea
                   value={signatureData.textoAdicional}
                   onChange={(e) =>
                     setSignatureData({ ...signatureData, textoAdicional: e.target.value })
                   }
+                  rows={3}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="Ej: Disponible de lunes a viernes"
+                  placeholder="Cualquier información extra relevante"
+                ></textarea>
+              </div>
+            )}
+
+            {/* Color Personalizado (Professional) */}
+            {(template === "professional") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Color Principal
+                </label>
+                <input
+                  type="color"
+                  value={signatureData.colorPersonalizado || "#1D4ED8"} // Default blue-700
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, colorPersonalizado: e.target.value })
+                  }
+                  className="w-full h-12 rounded-lg border border-gray-200 cursor-pointer"
+                  title="Elige un color"
                 />
               </div>
             )}
 
-            {/* Selector de Color (Moderna sin barra, Modern 4, Bold Executive, Bilingual) */}
-            {(["modernaSinBarra", "modern4"].includes(template)) && (
+            {/* QR Link (Professional) */}
+            {(template === "qrProfesional" || template === "qrCorporated") && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Color personalizado
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="color"
-                    value={signatureData.colorPersonalizado || "#0066cc"}
-                    onChange={(e) =>
-                      setSignatureData({ ...signatureData, colorPersonalizado: e.target.value })
-                    }
-                    className="w-16 h-12 border border-gray-200 rounded-lg cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={signatureData.colorPersonalizado}
-                    onChange={(e) =>
-                      setSignatureData({ ...signatureData, colorPersonalizado: e.target.value })
-                    }
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                    placeholder="#0066cc"
-                  />
-                </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  {template === "modernaSinBarra" && "Color para borde de foto y cargo"}
-                  {template === "modern4" && "Color para borde, línea y botón"}
-                </p>
-              </div>
-            )}
-
-            {/* Texto del CTA (Modern 4, Sales Professional) */}
-            {(template === "modern4") && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Texto del botón CTA
+                  Enlace para Código QR
                 </label>
                 <input
                   type="text"
-                  value={signatureData.ctaTexto || "Book a Meeting"}
-                  onChange={(e) =>
-                    setSignatureData({ ...signatureData, ctaTexto: e.target.value })
-                  }
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="Ej: Book a Meeting"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Personaliza el texto del botón de llamada a la acción
-                </p>
-              </div>
-            )}
-
-            {/* QR Link (QR Profesional, QR Corporated) */}
-            {(["qrProfesional", "qrCorporated"].includes(template)) && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  URL para código QR
-                </label>
-                <input
-                  type="url"
                   value={signatureData.qrLink}
                   onChange={(e) =>
                     setSignatureData({ ...signatureData, qrLink: e.target.value })
                   }
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="https://ejemplo.com"
+                  placeholder="https://tu-sitio.com"
                 />
-                <p className="text-xs text-gray-500 mt-1">
-                  Esta URL se convertirá en un código QR en la firma
+                <p className="mt-1 text-xs text-gray-500">
+                  Este enlace se usará para generar el código QR en tu firma.
                 </p>
               </div>
             )}
 
-            {/* Redes Sociales */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Redes Sociales
-              </label>
-              <div className="space-y-2 mb-2">
+            {/* Call to Action (Professional) */}
+            {(template === "professional") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Texto de Llamada a la Acción (CTA)
+                </label>
+                <input
+                  type="text"
+                  value={signatureData.ctaTexto}
+                  onChange={(e) =>
+                    setSignatureData({ ...signatureData, ctaTexto: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
+                  placeholder="Visita mi sitio web"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Un texto corto para un botón o enlace destacado.
+                </p>
+              </div>
+            )}
+
+            {/* Social Media Links */}
+            <div className="border-t border-gray-200 pt-6 mt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="material-symbols-outlined text-2xl text-blue-600">share</span>
+                <h3 className="text-lg font-bold text-gray-900">Redes Sociales</h3>
+              </div>
+              <div className="space-y-4">
                 {signatureData.redes.map((red, index) => (
                   <div
                     key={index}
-                    className="bg-gray-50 p-2 sm:p-3 rounded-lg"
+                    className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg p-3"
                   >
                     {editingRed === index ? (
-                      <div className="space-y-2">
-                        <input
-                          type="text"
-                          value={editRedForm.nombre}
-                          onChange={(e) =>
-                            setEditRedForm({ ...editRedForm, nombre: e.target.value })
-                          }
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                          placeholder="Nombre"
-                        />
-                        <input
-                          type="text"
-                          value={editRedForm.url}
-                          onChange={(e) =>
-                            setEditRedForm({ ...editRedForm, url: e.target.value })
-                          }
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                          placeholder="URL"
-                        />
+                      <div className="flex-1 space-y-2">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={editRedForm.nombre}
+                            onChange={(e) =>
+                              setEditRedForm({ ...editRedForm, nombre: e.target.value })
+                            }
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                            placeholder="Nombre"
+                          />
+                          <input
+                            type="text"
+                            value={editRedForm.url}
+                            onChange={(e) =>
+                              setEditRedForm({ ...editRedForm, url: e.target.value })
+                            }
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                            placeholder="URL"
+                          />
+                        </div>
                         <IconPicker
                           selectedIcon={editRedForm.icono}
                           onSelectIcon={(icon) =>
                             setEditRedForm({ ...editRedForm, icono: icon })
                           }
-                          label="Icono de la red"
+                          label="Icono"
                         />
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 mt-2">
                           <button
                             onClick={handleSaveEditRed}
                             className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 text-sm font-semibold shadow-sm"
@@ -792,12 +751,10 @@ export default function DashboardPage() {
                             <p className="text-sm font-medium text-gray-900 truncate">
                               {red.nombre}
                             </p>
-                            <p className="text-xs text-gray-500 truncate">
-                              {red.url}
-                            </p>
+                            <p className="text-xs text-gray-500 truncate">{red.url}</p>
                           </div>
                         </div>
-                        <div className="flex gap-1">
+                        <div className="flex-shrink-0 flex gap-1">
                           <button
                             onClick={() => handleEditRed(index)}
                             className="px-2 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition text-sm font-medium"
@@ -962,11 +919,11 @@ export default function DashboardPage() {
                   <div className="flex items-start gap-2">
                     {saveMessage.type === "success" ? (
                       <svg className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 10001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                     ) : (
                       <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1000-1.414 1.414L8.586 10l-1.293 1.293a1 10101.414 1.414L10 11.414l1.293 1.293a1 10001.414-1.414L11.414 10l1.293-1.293a1 1000-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                       </svg>
                     )}
                     <p
