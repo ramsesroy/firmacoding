@@ -8,8 +8,7 @@ import { copyToClipboard } from "@/lib/signatureUtils";
 import { uploadImage } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
 
-export default function DashboardPage(): JSX.Element {
-  // Componente del dashboard para crear y editar firmas digitales
+function DashboardPage() {
   // URLs de imágenes de ejemplo (imágenes reales profesionales de Unsplash)
   // Foto de perfil profesional - retrato empresarial de calidad
   const EXAMPLE_PHOTO_URL: string = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
@@ -989,3 +988,5 @@ export default function DashboardPage(): JSX.Element {
     </div>
   );
 }
+
+export default DashboardPage;
