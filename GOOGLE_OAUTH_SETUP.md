@@ -112,3 +112,4 @@ https://tu-dominio.com/**
 - Para producción, asegúrate de agregar tu dominio real en Google Cloud Console
 - El Client Secret solo se usa en Supabase, nunca en el código del frontend
 
+
