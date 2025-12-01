@@ -240,7 +240,7 @@ export default function LandingPage() {
             ¿Listo para crear tu firma profesional?
           </h2>
           <p className="text-lg sm:text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-            Únete a miles de profesionales que ya están usando FirmaPro para crear firmas impresionantes
+            Únete a miles de profesionales que ya están usando Signature For Me para crear firmas impresionantes
           </p>
           <Link
             href="/dashboard"

@@ -122,8 +122,11 @@ export default function FirmasPage() {
     return (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         <div className="mb-4 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Mis Firmas</h1>
-          <p className="text-sm sm:text-base text-gray-600">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="material-symbols-outlined text-3xl text-blue-600">badge</span>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mis Firmas</h1>
+          </div>
+          <p className="text-sm sm:text-base text-gray-600 ml-11">
             Gestiona todas tus firmas guardadas
           </p>
         </div>
@@ -139,8 +142,11 @@ export default function FirmasPage() {
     return (
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         <div className="mb-4 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Mis Firmas</h1>
-          <p className="text-sm sm:text-base text-gray-600">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="material-symbols-outlined text-3xl text-blue-600">badge</span>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mis Firmas</h1>
+          </div>
+          <p className="text-sm sm:text-base text-gray-600 ml-11">
             Gestiona todas tus firmas guardadas
           </p>
         </div>
@@ -167,8 +173,11 @@ export default function FirmasPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
       <div className="mb-4 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Mis Firmas</h1>
-        <p className="text-sm sm:text-base text-gray-600">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="material-symbols-outlined text-3xl text-blue-600">badge</span>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mis Firmas</h1>
+        </div>
+        <p className="text-sm sm:text-base text-gray-600 ml-11">
           Gestiona todas tus firmas guardadas
         </p>
       </div>

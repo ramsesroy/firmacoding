@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import SignaturePreview from "@/components/SignaturePreview";
 import IconPicker from "@/components/IconPicker";
 import { TemplateType, RedSocial } from "@/types/signature";
@@ -11,9 +11,9 @@ import { supabase } from "@/lib/supabaseClient";
 export default function DashboardPage() {
   // URLs de imágenes de ejemplo (imágenes reales profesionales de Unsplash)
   // Foto de perfil profesional - retrato empresarial de calidad
-  const EXAMPLE_PHOTO_URL = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
+  const EXAMPLE_PHOTO_URL: string = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
   // Logo de empresa de ejemplo - diseño minimalista corporativo
-  const EXAMPLE_LOGO_URL = "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80";
+  const EXAMPLE_LOGO_URL: string = "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80";
 
   const [signatureData, setSignatureData] = useState({
     nombre: "Juan Pérez",
@@ -57,22 +57,25 @@ export default function DashboardPage() {
     // Templates que usan logo
     const templatesWithLogo = ["professional", "enterpriseVintage"];
     
-    setSignatureData(prev => {
-      const updates: Partial<typeof signatureData> = {};
+    const photoUrl = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
+    const logoUrl = "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80";
+    
+    setSignatureData((prev) => {
+      const updates: any = {};
       
       // Agregar foto de ejemplo si el template la requiere y no hay foto
       if (templatesWithPhoto.includes(template) && !prev.foto) {
-        updates.foto = EXAMPLE_PHOTO_URL;
+        updates.foto = photoUrl;
       }
       
       // Agregar logo de ejemplo si el template lo requiere y no hay logo
       if (templatesWithLogo.includes(template) && !prev.logoEmpresa) {
-        updates.logoEmpresa = EXAMPLE_LOGO_URL;
+        updates.logoEmpresa = logoUrl;
       }
       
       return Object.keys(updates).length > 0 ? { ...prev, ...updates } : prev;
     });
-  }, [template]); // Se ejecuta cuando cambia el template
+  }, [template]);
 
   const handleCopyToClipboard = async () => {
     const success = await copyToClipboard(signatureData, template, signatureData.nombre || "Usuario");
@@ -237,36 +240,31 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navbar Superior */}
-      <nav className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="text-2xl font-bold text-gray-900">
-              Firma<span className="text-blue-600">Pro</span>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       {/* Contenido Principal */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-            Editor de Firmas
-          </h1>
-          <p className="text-base sm:text-lg text-gray-600">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="material-symbols-outlined text-3xl sm:text-4xl text-blue-600">edit_document</span>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
+              Editor de Firmas
+            </h1>
+          </div>
+          <p className="text-base sm:text-lg text-gray-600 ml-11">
             Crea y personaliza tu firma digital profesional
           </p>
         </div>
 
         {/* Layout: Flex column en móvil, grid en desktop */}
-        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 sm:gap-8 lg:h-[calc(100vh-220px)]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:h-[calc(100vh-180px)]">
           {/* Formulario - Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-6 sm:p-8 lg:overflow-y-auto order-1 lg:order-1">
-            <h2 className="text-xl sm:text-2xl font-semibold mb-6 text-gray-900">
-              Información de la Firma
-            </h2>
+          <div className="lg:col-span-5 bg-white rounded-xl border border-gray-200 shadow-sm p-6 sm:p-8 overflow-y-auto">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="material-symbols-outlined text-2xl text-blue-600">edit_document</span>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                Información de la Firma
+              </h2>
+            </div>
 
             <div className="space-y-6">
               {/* Template Selection */}
@@ -874,25 +872,27 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
-          </div>
 
           {/* Vista Previa - Card */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-lg p-6 sm:p-8 lg:overflow-y-auto order-2 lg:order-2 flex flex-col">
-            <div className="mb-6 pb-4 border-b border-gray-100">
-              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">
-                Vista Previa en Vivo
-              </h2>
-              <p className="text-sm text-gray-500">
-                Los cambios se actualizan automáticamente
-              </p>
+          <div className="lg:col-span-7 bg-white rounded-xl border border-gray-200 shadow-sm p-6 sm:p-8 overflow-y-auto flex flex-col">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="material-symbols-outlined text-2xl text-blue-600">preview</span>
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  Vista Previa en Vivo
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Los cambios se actualizan automáticamente
+                </p>
+              </div>
             </div>
 
             {/* Vista Previa Principal */}
-            <div className="bg-gradient-to-br from-gray-50 via-gray-50/50 to-gray-100 rounded-xl p-6 sm:p-10 border border-gray-200 mb-6" style={{
+            <div className="flex-1 bg-gradient-to-br from-gray-50 via-gray-50/50 to-gray-100 rounded-xl p-6 sm:p-10 border border-gray-200 mb-6" style={{
               backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0)',
               backgroundSize: '20px 20px'
             }}>
-              <div className="flex items-center justify-center min-h-[180px] sm:min-h-[220px]">
+              <div className="flex items-center justify-center min-h-[300px]">
                 <SignaturePreview
                   nombre={signatureData.nombre}
                   cargo={signatureData.cargo}
@@ -915,65 +915,35 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Vista Simulada en Email */}
-            <div className="bg-gray-50 rounded-xl p-4 sm:p-5 border border-gray-200 mb-6">
-              <p className="text-xs text-gray-600 mb-3 font-semibold uppercase tracking-wide">
-                Vista simulada en correo electrónico
-              </p>
-              <div className="bg-white p-4 sm:p-5 rounded-lg border border-gray-200 shadow-sm">
-                <p className="text-gray-600 mb-4 text-sm leading-relaxed">
-                  Este es un ejemplo de cómo se verá tu firma en un correo
-                  electrónico. La firma se actualiza automáticamente mientras
-                  escribes.
-                </p>
-                <div className="border-t border-gray-200 pt-4">
-                  <SignaturePreview
-                    nombre={signatureData.nombre}
-                    cargo={signatureData.cargo}
-                    foto={signatureData.foto || undefined}
-                    telefono={signatureData.telefono || undefined}
-                    redes={signatureData.redes}
-                    template={template}
-                    horario={signatureData.horario}
-                    textoAdicional={signatureData.textoAdicional}
-                    colorPersonalizado={signatureData.colorPersonalizado}
-                    qrLink={signatureData.qrLink}
-                    logoEmpresa={signatureData.logoEmpresa}
-                    ctaTexto={signatureData.ctaTexto}
-                    telefonoMovil={signatureData.telefonoMovil}
-                    direccion={signatureData.direccion}
-                    iconoTelefono={signatureData.iconoTelefono}
-                    iconoTelefonoMovil={signatureData.iconoTelefonoMovil}
-                    iconoDireccion={signatureData.iconoDireccion}
-                  />
-                </div>
-              </div>
-            </div>
-
-
             {/* Botones de Acción */}
-            <div className="mt-auto pt-6 border-t border-gray-100">
+            <div className="mt-auto pt-6 border-t border-gray-200">
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className={`flex-1 px-6 py-3.5 rounded-lg transition-all duration-200 font-semibold text-base ${
-                    saving
-                      ? "bg-gray-400 text-white cursor-not-allowed"
-                      : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40"
-                  }`}
-                >
-                  {saving ? "Guardando..." : "Guardar Firma"}
-                </button>
-                <button
                   onClick={handleCopyToClipboard}
-                  className={`flex-1 px-6 py-3.5 rounded-lg transition-all duration-200 font-semibold text-base ${
+                  className={`flex-1 px-6 py-3.5 rounded-lg transition-all duration-200 font-semibold text-base flex items-center justify-center gap-2 ${
                     copied
                       ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30"
                       : "bg-gray-900 text-white hover:bg-gray-800 shadow-lg shadow-gray-900/20"
                   }`}
                 >
-                  {copied ? "✓ Copiado!" : "Copiar HTML"}
+                  <span className="material-symbols-outlined text-lg">
+                    {copied ? "check_circle" : "content_copy"}
+                  </span>
+                  {copied ? "¡Copiado!" : "Copiar HTML"}
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className={`flex-1 px-6 py-3.5 rounded-lg transition-all duration-200 font-semibold text-base flex items-center justify-center gap-2 ${
+                    saving
+                      ? "bg-gray-400 text-white cursor-not-allowed"
+                      : "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-lg">
+                    {saving ? "hourglass_empty" : "save"}
+                  </span>
+                  {saving ? "Guardando..." : "Guardar Firma"}
                 </button>
               </div>
               {copied && (

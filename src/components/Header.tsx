@@ -7,13 +7,14 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm z-50">
+    <header className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm z-50">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group">
-            <div className="text-2xl lg:text-3xl font-bold text-gray-900">
-              Firma<span className="text-blue-600">Pro</span>
+          <Link href="/" className="flex items-center space-x-3 group">
+            <span className="material-symbols-outlined text-3xl lg:text-4xl text-blue-600 group-hover:scale-110 transition-transform">draw</span>
+            <div className="text-xl lg:text-2xl font-bold text-gray-900">
+              Signature For Me
             </div>
           </Link>
 
@@ -59,28 +60,9 @@ export default function Header() {
             className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition"
             aria-label="Toggle menu"
           >
-            <svg
-              className="w-6 h-6 text-gray-700"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {mobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
+            <span className="material-symbols-outlined text-gray-700">
+              {mobileMenuOpen ? "close" : "menu"}
+            </span>
           </button>
         </div>
 

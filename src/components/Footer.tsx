@@ -8,7 +8,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="text-2xl font-bold text-white mb-4 block">
-              Firma<span className="text-blue-400">Pro</span>
+              Signature<span className="text-blue-400">For Me</span>
             </Link>
             <p className="text-sm text-gray-400 mb-4">
               Crea firmas digitales profesionales en minutos. La herramienta más fácil para gestionar tu identidad profesional.
@@ -103,22 +103,22 @@ export default function Footer() {
             <h3 className="text-white font-semibold mb-4">Legal</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="#" className="text-sm hover:text-white transition-colors">
+                <Link href="/legal/privacidad" className="text-sm hover:text-white transition-colors">
                   Privacidad
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-sm hover:text-white transition-colors">
+                <Link href="/legal/terminos" className="text-sm hover:text-white transition-colors">
                   Términos
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-sm hover:text-white transition-colors">
+                <Link href="/legal/cookies" className="text-sm hover:text-white transition-colors">
                   Cookies
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-sm hover:text-white transition-colors">
+                <Link href="/legal/licencia" className="text-sm hover:text-white transition-colors">
                   Licencia
                 </Link>
               </li>
@@ -129,13 +129,13 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-gray-400">
-              &copy; {new Date().getFullYear()} FirmaPro. Todos los derechos reservados.
+              &copy; {new Date().getFullYear()} Signature For Me. Todos los derechos reservados.
             </p>
             <div className="mt-4 md:mt-0 flex items-center space-x-6">
-              <Link href="#" className="text-sm text-gray-400 hover:text-white transition-colors">
+              <Link href="/legal/privacidad" className="text-sm text-gray-400 hover:text-white transition-colors">
                 Política de Privacidad
               </Link>
-              <Link href="#" className="text-sm text-gray-400 hover:text-white transition-colors">
+              <Link href="/legal/terminos" className="text-sm text-gray-400 hover:text-white transition-colors">
                 Términos de Servicio
               </Link>
             </div>

@@ -141,8 +141,11 @@ export default function ConfiguracionPage() {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         <div className="mb-4 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Configuración</h1>
-          <p className="text-sm sm:text-base text-gray-600">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="material-symbols-outlined text-3xl text-blue-600">settings</span>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Configuración</h1>
+          </div>
+          <p className="text-sm sm:text-base text-gray-600 ml-11">
             Gestiona las preferencias de tu cuenta
           </p>
         </div>
@@ -157,8 +160,11 @@ export default function ConfiguracionPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
       <div className="mb-4 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Configuración</h1>
-        <p className="text-sm sm:text-base text-gray-600">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="material-symbols-outlined text-3xl text-blue-600">settings</span>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Configuración</h1>
+        </div>
+        <p className="text-sm sm:text-base text-gray-600 ml-11">
           Gestiona las preferencias de tu cuenta
         </p>
       </div>

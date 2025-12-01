@@ -15,6 +15,21 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
+    // Verificar si hay errores de autenticación en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const authError = urlParams.get("error");
+    if (authError) {
+      if (authError === "authentication_failed") {
+        setError("Error al autenticarse con Google. Por favor intenta nuevamente.");
+      } else if (authError === "no_auth_data") {
+        setError("No se recibieron los datos de autenticación. Por favor intenta nuevamente.");
+      } else {
+        setError("Error en la autenticación. Por favor intenta nuevamente.");
+      }
+      // Limpiar la URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     // Verificar si ya está autenticado (sin verificar config, para que funcione siempre)
     const checkUser = async () => {
       try {
@@ -109,16 +124,23 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      const { error: googleError } = await supabase.auth.signInWithOAuth({
+      const { data, error: googleError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
       });
 
       if (googleError) {
         throw googleError;
       }
+
+      // OAuth redirige automáticamente, no necesitamos hacer nada más aquí
+      // El loading se mantendrá hasta la redirección
     } catch (err: any) {
       console.error("Error en Google OAuth:", err);
       setError(err.message || "Error al iniciar sesión con Google. Por favor intenta nuevamente.");
@@ -133,7 +155,7 @@ export default function LoginPage() {
         <div className="text-center">
           <Link href="/" className="inline-block">
             <div className="text-3xl font-bold text-gray-900 mb-2">
-              Firma<span className="text-blue-600">Pro</span>
+              Signature<span className="text-blue-600">For Me</span>
             </div>
           </Link>
           <h2 className="text-2xl font-bold text-gray-900">
