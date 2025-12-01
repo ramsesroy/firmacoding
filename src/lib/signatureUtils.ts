@@ -1169,8 +1169,6 @@ export async function copyToClipboard(
     return true;
   } catch (error) {
     // Fallback para navegadores que no soportan ClipboardItem con múltiples tipos
-    console.warn("ClipboardItem not supported, using fallback:", error);
-    
     try {
       // Crear un elemento temporal con el HTML
       const tempDiv = document.createElement("div");
@@ -1192,7 +1190,6 @@ export async function copyToClipboard(
 
       return success;
     } catch (fallbackError) {
-      console.error("Failed to copy to clipboard:", fallbackError);
       return false;
     }
   }

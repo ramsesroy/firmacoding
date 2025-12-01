@@ -170,15 +170,27 @@ export default function DashboardPage() {
     setSaveMessage(null);
 
     try {
+      // Obtener el usuario autenticado
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error(`Error de autenticación: ${sessionError.message}`);
+      }
+
+      if (!session?.user) {
+        throw new Error("No estás autenticado. Por favor inicia sesión nuevamente.");
+      }
+
       // Preparar los datos para insertar
       // Asegurar que las propiedades coincidan exactamente con la estructura de la base de datos
-      const signatureRecord = {
+      const signatureRecord: any = {
         name: signatureData.nombre,
         role: signatureData.cargo,
         phone: signatureData.telefono || null,
         image_url: signatureData.foto || null,
         social_links: signatureData.redes.length > 0 ? signatureData.redes : null,
         template_id: template,
+        user_id: session.user.id, // Asociar la firma al usuario autenticado
       };
 
       // Insertar en la tabla signatures
@@ -189,7 +201,20 @@ export default function DashboardPage() {
         .single();
 
       if (error) {
-        throw error;
+        // Mostrar un mensaje más descriptivo según el tipo de error
+        let errorMessage = error.message;
+        
+        if (error.code === "23505") {
+          errorMessage = "Ya existe una firma con estos datos. Por favor modifica algunos campos.";
+        } else if (error.code === "42501") {
+          errorMessage = "No tienes permiso para realizar esta acción. Verifica tu autenticación.";
+        } else if (error.code === "42P01") {
+          errorMessage = "La tabla 'signatures' no existe en la base de datos. Por favor crea la tabla primero.";
+        } else if (error.message.includes("permission denied") || error.message.includes("RLS")) {
+          errorMessage = "Error de permisos. Verifica las políticas de seguridad (RLS) en Supabase.";
+        }
+        
+        throw new Error(errorMessage);
       }
 
       setSaveMessage({
@@ -198,19 +223,13 @@ export default function DashboardPage() {
       });
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (error) {
-      // Depuración: Imprimir el objeto error completo para ver detalles
-      console.error("Error al guardar la firma - Objeto completo:", error);
-      console.error("Error al guardar la firma - Detalles:", {
-        message: error instanceof Error ? error.message : "Error desconocido",
-        error,
-        stack: error instanceof Error ? error.stack : undefined,
-      });
+      console.error("Error al guardar la firma:", error);
       
       setSaveMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Error al guardar la firma",
+        text: error instanceof Error ? error.message : "Error al guardar la firma. Por favor intenta nuevamente.",
       });
-      setTimeout(() => setSaveMessage(null), 3000);
+      setTimeout(() => setSaveMessage(null), 5000);
     } finally {
       setSaving(false);
     }
@@ -963,15 +982,34 @@ export default function DashboardPage() {
                 </p>
               )}
               {saveMessage && (
-                <p
-                  className={`text-sm mt-3 text-center font-medium ${
+                <div
+                  className={`mt-4 p-4 rounded-lg border ${
                     saveMessage.type === "success"
-                      ? "text-green-600"
-                      : "text-red-600"
+                      ? "bg-green-50 border-green-200"
+                      : "bg-red-50 border-red-200"
                   }`}
                 >
-                  {saveMessage.text}
-                </p>
+                  <div className="flex items-start gap-2">
+                    {saveMessage.type === "success" ? (
+                      <svg className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                    <p
+                      className={`text-sm font-medium whitespace-pre-line ${
+                        saveMessage.type === "success"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {saveMessage.text}
+                    </p>
+                  </div>
+                </div>
               )}
             </div>
           </div>
