@@ -8,6 +8,7 @@ import { TemplateType, RedSocial } from "@/types/signature";
 import { copyToClipboard } from "@/lib/signatureUtils";
 import { uploadImage } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
+import { useToast } from "@/components/Toast";
 
 // Force dynamic rendering for this page to support search params
 export const dynamic = "force-dynamic";
@@ -15,6 +16,7 @@ export const dynamic = "force-dynamic";
 function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { showToast } = useToast();
   
   // Example image URLs categorized by template type - Optimized for each template's specific dimensions and style
   const getExamplePhoto = (template: TemplateType): string => {
@@ -189,7 +191,7 @@ function DashboardContent() {
       }
     } catch (err: any) {
       console.error("Error loading signature:", err);
-      alert(err.message || "Error loading signature. Please try again.");
+      showToast(err.message || "Error loading signature. Please try again.", "error");
       router.replace("/dashboard", { scroll: false });
     } finally {
       setLoadingSignature(false);
@@ -227,9 +229,10 @@ function DashboardContent() {
     const success = await copyToClipboard(signatureData, template, signatureData.nombre || "User");
     if (success) {
       setCopied(true);
+      showToast("Signature copied to clipboard!", "success");
       setTimeout(() => setCopied(false), 2000);
     } else {
-      alert("Error copying to clipboard. Please try again.");
+      showToast("Error copying to clipboard. Please try again.", "error");
     }
   };
 
@@ -241,8 +244,9 @@ function DashboardContent() {
     try {
       const imageURL = await uploadImage(file);
       setSignatureData({ ...signatureData, foto: imageURL });
+      showToast("Image uploaded successfully!", "success");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Error uploading image");
+      showToast(error instanceof Error ? error.message : "Error uploading image", "error");
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -266,8 +270,9 @@ function DashboardContent() {
     try {
       const imageURL = await uploadImage(file);
       setSignatureData({ ...signatureData, logoEmpresa: imageURL });
+      showToast("Logo uploaded successfully!", "success");
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Error uploading logo");
+      showToast(error instanceof Error ? error.message : "Error uploading logo", "error");
       if (logoFileInputRef.current) {
         logoFileInputRef.current.value = "";
       }

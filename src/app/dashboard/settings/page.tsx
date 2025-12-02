@@ -3,9 +3,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { useToast } from "@/components/Toast";
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -133,7 +135,7 @@ export default function SettingsPage() {
       router.refresh();
     } catch (err: any) {
       console.error("Error signing out:", err);
-      alert("Error signing out. Please try again.");
+      showToast("Error signing out. Please try again.", "error");
     }
   };
 

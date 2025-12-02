@@ -8,6 +8,7 @@ import SignaturePreview from "@/components/SignaturePreview";
 import { TemplateType, RedSocial } from "@/types/signature";
 import { copyToClipboard } from "@/lib/signatureUtils";
 import { exportToPNG, exportToPDF, exportToPNGHQ, exportToPDFHQ, ExportSize, getSizeLabel } from "@/lib/exportUtils";
+import { useToast } from "@/components/Toast";
 
 interface SignatureRecord {
   id: string;
@@ -34,6 +35,7 @@ export default function SignaturesPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const router = useRouter();
   const previewRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const { showToast } = useToast();
 
   const fetchSignatures = useCallback(async () => {
     try {
@@ -133,17 +135,18 @@ export default function SignaturesPage() {
 
       await copyToClipboard(signatureData, signature.template_id);
       setCopiedId(signature.id);
+      showToast("Signature copied to clipboard!", "success");
       setTimeout(() => setCopiedId(null), 3000);
     } catch (err) {
       console.error("Error copying signature:", err);
-      alert("Error copying signature");
+      showToast("Error copying signature", "error");
     }
   };
 
   const handleExportPNG = async (signature: SignatureRecord) => {
     const previewRef = previewRefs.current[signature.id];
     if (!previewRef) {
-      alert("Preview not available");
+      showToast("Preview not available", "error");
       return;
     }
 
@@ -161,10 +164,11 @@ export default function SignaturesPage() {
         size: exportSize,
         margin: 20,
       });
+      showToast("PNG exported successfully!", "success");
       setShowExportMenu(null);
     } catch (error) {
       console.error("Error exporting PNG:", error);
-      alert(error instanceof Error ? error.message : "Error exporting to PNG");
+      showToast(error instanceof Error ? error.message : "Error exporting to PNG", "error");
     } finally {
       setExporting(null);
     }
@@ -173,7 +177,7 @@ export default function SignaturesPage() {
   const handleExportPDF = async (signature: SignatureRecord) => {
     const previewRef = previewRefs.current[signature.id];
     if (!previewRef) {
-      alert("Preview not available");
+      showToast("Preview not available", "error");
       return;
     }
 
@@ -191,10 +195,11 @@ export default function SignaturesPage() {
         size: exportSize,
         margin: 20,
       });
+      showToast("PDF exported successfully!", "success");
       setShowExportMenu(null);
     } catch (error) {
       console.error("Error exporting PDF:", error);
-      alert(error instanceof Error ? error.message : "Error exporting to PDF");
+      showToast(error instanceof Error ? error.message : "Error exporting to PDF", "error");
     } finally {
       setExporting(null);
     }
