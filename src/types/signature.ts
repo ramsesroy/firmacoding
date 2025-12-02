@@ -38,13 +38,4 @@ export type TemplateType =
   | "modern4"                  // Modern 4 (template_09)
   | "qrCorporated"             // QR Corporated (template_10)
   | "developerMinimal2025";    // Developer Minimal 2025 - Para desarrolladores
-  | "techDeveloper"            // Tech Developer - Para desarrolladores
-  | "salesProfessional"        // Sales Professional - Para comerciales
-  | "boldExecutive"            // Bold Executive - Para ejecutivos
-  | "medicalProfessional"     // Medical Professional - Para profesionales de salud
-  | "consultant"               // Consultant - Para consultores independientes
-  | "realEstateAgent"          // Real Estate Agent - Para agentes inmobiliarios
-  | "academicResearcher"       // Academic/Researcher - Para académicos/investigadores
-  | "nonProfit"                // Non-Profit/Social Impact - Para ONGs/fundaciones
-  | "bilingual";               // Bilingual/Multilingual - Para profesionales multilingües
 
