@@ -78,7 +78,7 @@ export default function Pricing() {
       ],
       ctaText: "Upgrade now",
       ctaHref: "/dashboard",
-      ribbon: "Coming January 2026",
+      ribbon: "Coming Soon",
     },
     {
       name: "Agency",
@@ -96,7 +96,7 @@ export default function Pricing() {
       ],
       ctaText: "Upgrade now",
       ctaHref: "/dashboard",
-      badge: "Perfect for agencies",
+      ribbon: "Coming Soon",
     },
   ];
 
@@ -222,23 +222,25 @@ export default function Pricing() {
                   </div>
 
                   {/* Price */}
-                  <div className="mb-6">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white">
-                        {displayPrice}
-                      </span>
-                      {price > 0 && (
-                        <span className="text-lg text-gray-600 dark:text-gray-400 font-light">
-                          {period}
+                  {!tier.ribbon && (
+                    <div className="mb-6">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white">
+                          {displayPrice}
                         </span>
+                        {price > 0 && (
+                          <span className="text-lg text-gray-600 dark:text-gray-400 font-light">
+                            {period}
+                          </span>
+                        )}
+                      </div>
+                      {isAnnual && price > 0 && discount > 0 && (
+                        <p className="text-sm text-green-600 dark:text-green-400 font-medium mt-1">
+                          Save {discount}% vs monthly
+                        </p>
                       )}
                     </div>
-                    {isAnnual && price > 0 && discount > 0 && (
-                      <p className="text-sm text-green-600 dark:text-green-400 font-medium mt-1">
-                        Save {discount}% vs monthly
-                      </p>
-                    )}
-                  </div>
+                  )}
 
                   {/* CTA Button */}
                   <Link

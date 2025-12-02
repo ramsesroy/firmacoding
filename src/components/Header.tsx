@@ -33,7 +33,7 @@ export default function Header() {
               How It Works
             </Link>
             <Link
-              href="/dashboard"
+              href="#pricing"
               className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
             >
               Pricing
@@ -85,7 +85,7 @@ export default function Header() {
                 How It Works
               </Link>
               <Link
-                href="/dashboard"
+                href="#pricing"
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-base font-medium text-gray-700 hover:text-blue-600 transition-colors"
               >
