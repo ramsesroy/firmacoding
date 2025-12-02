@@ -164,6 +164,7 @@ export default function SettingsPage() {
           <p className="mt-4 text-gray-600">Loading settings...</p>
         </div>
       </div>
+      </>
     );
   }
 
