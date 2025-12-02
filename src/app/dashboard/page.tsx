@@ -133,7 +133,7 @@ function DashboardContent() {
     if (loadingSignature || editingSignatureId) return;
 
     // Templates that use photo
-    const templatesWithPhoto = ["classic", "modern", "modernaSinBarra", "qrProfesional", "developerMinimal2025", "growthMarketing", "freelanceDesigner"];
+    const templatesWithPhoto = ["classic", "modern", "modernaSinBarra", "qrProfesional", "developerMinimal2025", "growthMarketing", "freelanceDesigner", "interiorDesign", "universityBanner", "creativePortfolio"];
     // Templates that use logo
     const templatesWithLogo = ["professional", "corporateConsultant", "interiorDesign", "universityProfessor"];
     
