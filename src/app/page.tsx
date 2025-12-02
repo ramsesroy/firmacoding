@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Pricing from "@/components/Pricing";
 
 export default function LandingPage() {
   return (
@@ -209,6 +210,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Pricing Section */}
+      <Pricing />
 
       {/* CTA Section */}
       <section className="py-24 sm:py-32 lg:py-40 bg-gray-900 px-4 sm:px-6 lg:px-8">
