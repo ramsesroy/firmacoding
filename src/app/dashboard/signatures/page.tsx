@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
@@ -35,11 +35,7 @@ export default function SignaturesPage() {
   const router = useRouter();
   const previewRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
-  useEffect(() => {
-    fetchSignatures();
-  }, []);
-
-  const fetchSignatures = async () => {
+  const fetchSignatures = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -71,7 +67,11 @@ export default function SignaturesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    fetchSignatures();
+  }, [fetchSignatures]);
 
   const handleDeleteClick = (id: string) => {
     setDeleteConfirmId(id);
