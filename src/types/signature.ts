@@ -38,5 +38,8 @@ export type TemplateType =
   | "modern4"                  // Modern 4 (template_09)
   | "qrCorporated"             // QR Corporated (template_10)
   | "developerMinimal2025"     // Developer Minimal 2025 - Para desarrolladores
-  | "ultraMinimal";            // Ultra Minimal - Text-only minimal design
+  | "ultraMinimal"             // Ultra Minimal - Text-only minimal design
+  | "growthMarketing"          // Growth Marketing - With CTA button for promotions
+  | "freelanceDesigner"        // Freelance Designer - With portfolio links
+  | "corporateConsultant";     // Corporate Consultant - With company logo and disclaimer
 

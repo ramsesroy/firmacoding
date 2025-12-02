@@ -424,6 +424,9 @@ function DashboardContent() {
                     { id: "qrCorporated", name: "QR Corp", icon: "qr_code_2", color: "from-teal-500 to-cyan-600" },
                     { id: "developerMinimal2025", name: "Dev Minimal", icon: "code", color: "from-slate-700 to-gray-900", badge: "New" },
                     { id: "ultraMinimal", name: "Ultra Minimal", icon: "minimize", color: "from-gray-600 to-gray-800", badge: "New" },
+                    { id: "growthMarketing", name: "Growth Marketing", icon: "trending_up", color: "from-purple-500 to-pink-600", badge: "New" },
+                    { id: "freelanceDesigner", name: "Freelance Designer", icon: "brush", color: "from-orange-500 to-red-600", badge: "New" },
+                    { id: "corporateConsultant", name: "Corporate", icon: "business", color: "from-blue-600 to-indigo-700", badge: "New" },
                   ].map((tpl) => (
                     <button
                       key={tpl.id}
@@ -432,13 +435,13 @@ function DashboardContent() {
                         setTemplate(newTemplate);
                         
                         // Add example photo if template uses photo and no photo exists
-                        const templatesWithPhoto = ["classic", "modern", "minimal", "modernaSinBarra", "modern2", "modern3", "modern4"];
+                        const templatesWithPhoto = ["classic", "modern", "minimal", "modernaSinBarra", "modern2", "modern3", "modern4", "growthMarketing", "freelanceDesigner"];
                         if (templatesWithPhoto.includes(newTemplate) && !signatureData.foto) {
                           setSignatureData({ ...signatureData, foto: EXAMPLE_PHOTO_URL });
                         }
                         
                         // Add example logo if template uses logo and no logo exists
-                        const templatesWithLogo = ["professional", "enterpriseVintage"];
+                        const templatesWithLogo = ["professional", "enterpriseVintage", "corporateConsultant"];
                         if (templatesWithLogo.includes(newTemplate) && !signatureData.logoEmpresa) {
                           setSignatureData({ ...signatureData, logoEmpresa: EXAMPLE_LOGO_URL });
                         }

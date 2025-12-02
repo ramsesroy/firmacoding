@@ -53,6 +53,15 @@ export async function generateSignatureHTML(
     case "ultraMinimal":
       baseHTML = generateUltraMinimalHTML(nombre, cargo, redes);
       break;
+    case "growthMarketing":
+      baseHTML = generateGrowthMarketingHTML(nombre, cargo, foto, redes, ctaTexto);
+      break;
+    case "freelanceDesigner":
+      baseHTML = generateFreelanceDesignerHTML(nombre, cargo, foto, telefono, redes);
+      break;
+    case "corporateConsultant":
+      baseHTML = generateCorporateConsultantHTML(nombre, cargo, logoEmpresa, telefono, redes, textoAdicional);
+      break;
     default:
       baseHTML = generateClassicHTML(nombre, cargo, foto, telefono, redes);
   }
@@ -97,6 +106,12 @@ export function getBaseSignatureHTML(
       return generateDeveloperMinimal2025HTML(nombre, cargo, foto, telefono, redes);
     case "ultraMinimal":
       return generateUltraMinimalHTML(nombre, cargo, redes);
+    case "growthMarketing":
+      return generateGrowthMarketingHTML(nombre, cargo, foto, redes, ctaTexto);
+    case "freelanceDesigner":
+      return generateFreelanceDesignerHTML(nombre, cargo, foto, telefono, redes);
+    case "corporateConsultant":
+      return generateCorporateConsultantHTML(nombre, cargo, logoEmpresa, telefono, redes, textoAdicional);
     default:
       return generateClassicHTML(nombre, cargo, foto, telefono, redes);
   }
@@ -1313,6 +1328,199 @@ function generateUltraMinimalHTML(
         <span style="color: #9ca3af; margin: 0 10px;">•</span>
         <span style="font-size: 13px; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em;">${escapeHtml(cargo)}</span>
         ${linksHTML ? `<br>${linksHTML}` : ""}
+      </td>
+    </tr>
+  </tbody>
+</table>`;
+}
+
+function generateGrowthMarketingHTML(
+  nombre: string,
+  cargo: string,
+  foto?: string,
+  redes: RedSocial[] = [],
+  ctaTexto?: string
+): string {
+  const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+  const calendly = redes.find((r) => r.url.toLowerCase().includes("calendly") || r.nombre.toLowerCase().includes("book") || r.nombre.toLowerCase().includes("call"));
+
+  const fotoHTML = foto
+    ? `<td valign="top" style="padding-right: 16px; vertical-align: top;">
+        <img src="${escapeHtml(foto)}" alt="${escapeHtml(nombre)}" width="64" height="64" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; display: block; border: 2px solid #e5e7eb;" />
+      </td>`
+    : "";
+
+  const emailHTML = email
+    ? `<td style="padding-right: 20px; padding-bottom: 8px;">
+        <a href="mailto:${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}" style="color: #374151; text-decoration: none; font-size: 14px;">${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}</a>
+      </td>`
+    : "";
+
+  const calendlyHTML = calendly
+    ? `<td style="padding-right: 20px; padding-bottom: 8px;">
+        <a href="${escapeHtml(calendly.url)}" style="color: #374151; text-decoration: none; font-size: 14px;">Book a call</a>
+      </td>`
+    : "";
+
+  const ctaHTML = ctaTexto
+    ? `<td colspan="2" style="padding-top: 8px;">
+        <a href="#" style="background: linear-gradient(135deg,#8b5cf6,#3b82f6); color: white; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-block;">
+          ${escapeHtml(ctaTexto)}
+        </a>
+      </td>`
+    : "";
+
+  return `
+<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #333333; line-height: 1.5;">
+  <tbody>
+    <tr>
+      ${fotoHTML}
+      <td valign="top" style="vertical-align: top;">
+        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+          <tbody>
+            <tr>
+              <td style="padding-bottom: 4px;">
+                <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+                  <tbody>
+                    <tr>
+                      <td style="font-size: 18px; font-weight: 600; color: #111827; padding-right: 12px;">${escapeHtml(nombre)}</td>
+                      <td style="font-size: 18px; color: #9ca3af; padding-right: 12px;">|</td>
+                      <td style="font-size: 14px; font-weight: 500; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em;">${escapeHtml(cargo)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-top: 4px;">
+                <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+                  <tbody>
+                    <tr>
+                      ${emailHTML}
+                      ${calendlyHTML}
+                    </tr>
+                    ${ctaHTML ? `<tr>${ctaHTML}</tr>` : ""}
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>`;
+}
+
+function generateFreelanceDesignerHTML(
+  nombre: string,
+  cargo: string,
+  foto?: string,
+  telefono?: string,
+  redes: RedSocial[] = []
+): string {
+  const website = redes.find((r) => {
+    const url = r.url.toLowerCase();
+    const name = r.nombre.toLowerCase();
+    return (url.includes("http") || url.includes("www") || url.includes(".")) && 
+           !url.includes("behance") &&
+           !name.includes("behance");
+  });
+  const behance = redes.find((r) => r.url.toLowerCase().includes("behance") || r.nombre.toLowerCase().includes("behance"));
+
+  const fotoHTML = foto
+    ? `<td valign="top" style="padding-right: 16px; vertical-align: top;">
+        <img src="${escapeHtml(foto)}" alt="${escapeHtml(nombre)}" width="64" height="64" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; display: block; border: 2px solid #e5e7eb;" />
+      </td>`
+    : "";
+
+  const telefonoHTML = telefono
+    ? `<a href="tel:${telefono.replace(/[^0-9+]/g, "")}" style="color: #374151; text-decoration: none; margin-right: 16px;">${escapeHtml(telefono)}</a>`
+    : "";
+
+  const websiteHTML = website
+    ? `<a href="${escapeHtml(website.url.includes("http") ? website.url : `https://${website.url}`)}" style="color: #374151; text-decoration: none; margin-right: 16px;">${escapeHtml(website.url.replace(/^https?:\/\//, "").replace(/^www\./, ""))}</a>`
+    : "";
+
+  const behanceHTML = behance
+    ? `<a href="${escapeHtml(behance.url.includes("http") ? behance.url : `https://${behance.url}`)}" style="color: #374151; text-decoration: none;">Behance</a>`
+    : "";
+
+  return `
+<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #333333; line-height: 1.5;">
+  <tbody>
+    <tr>
+      ${fotoHTML}
+      <td valign="top" style="vertical-align: top;">
+        <strong style="font-size: 16px; color: #111827;">${escapeHtml(nombre)}</strong>
+        <span style="color: #9ca3af; margin: 0 10px;">|</span>
+        <span style="font-size: 13px; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em;">${escapeHtml(cargo)}</span>
+        <br><br>
+        ${telefonoHTML}
+        ${websiteHTML}
+        ${behanceHTML}
+      </td>
+    </tr>
+  </tbody>
+</table>`;
+}
+
+function generateCorporateConsultantHTML(
+  nombre: string,
+  cargo: string,
+  logoEmpresa?: string,
+  telefono?: string,
+  redes: RedSocial[] = [],
+  textoAdicional?: string
+): string {
+  const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+
+  const logoHTML = logoEmpresa
+    ? `<td valign="top" style="padding-right: 16px; vertical-align: top;">
+        <img src="${escapeHtml(logoEmpresa)}" alt="Company Logo" width="120" height="40" style="display: block;" />
+      </td>`
+    : "";
+
+  const telefonoHTML = telefono
+    ? `<a href="tel:${telefono.replace(/[^0-9+]/g, "")}" style="color: #374151; text-decoration: none; margin-right: 20px;">${escapeHtml(telefono)}</a>`
+    : "";
+
+  const emailHTML = email
+    ? `<a href="mailto:${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}" style="color: #374151; text-decoration: none;">${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}</a>`
+    : "";
+
+  const disclaimerHTML = textoAdicional
+    ? `<tr>
+        <td style="padding-top: 8px; font-size: 10px; color: #9ca3af;">
+          ${escapeHtml(textoAdicional)}
+        </td>
+      </tr>`
+    : "";
+
+  return `
+<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #333333; line-height: 1.5;">
+  <tbody>
+    <tr>
+      ${logoHTML}
+      <td valign="top" style="vertical-align: top;">
+        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+          <tbody>
+            <tr>
+              <td style="padding-bottom: 4px;">
+                <strong style="font-size: 16px; color: #111827;">${escapeHtml(nombre)}</strong>
+                <span style="color: #9ca3af; margin: 0 10px;">|</span>
+                <span style="font-size: 13px; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em;">${escapeHtml(cargo)}</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-top: 4px;">
+                ${telefonoHTML}
+                ${emailHTML}
+              </td>
+            </tr>
+            ${disclaimerHTML}
+          </tbody>
+        </table>
       </td>
     </tr>
   </tbody>

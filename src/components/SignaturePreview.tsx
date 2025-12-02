@@ -66,6 +66,12 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
         return renderDeveloperMinimal2025();
       case "ultraMinimal":
         return renderUltraMinimal();
+      case "growthMarketing":
+        return renderGrowthMarketing();
+      case "freelanceDesigner":
+        return renderFreelanceDesigner();
+      case "corporateConsultant":
+        return renderCorporateConsultant();
       default:
         return renderClassicTemplate();
     }
@@ -2942,6 +2948,279 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                   {links}
                 </>
               )}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderGrowthMarketing = () => {
+    const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+    const calendly = redes.find((r) => r.url.toLowerCase().includes("calendly") || r.nombre.toLowerCase().includes("book") || r.nombre.toLowerCase().includes("call"));
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#333333",
+          lineHeight: "1.5",
+        }}
+      >
+        <tbody>
+          <tr>
+            {foto && (
+              <td valign="top" style={{ paddingRight: "16px", verticalAlign: "top" }}>
+                <img
+                  src={foto}
+                  alt={nombre}
+                  width={64}
+                  height={64}
+                  style={{
+                    width: "64px",
+                    height: "64px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    display: "block",
+                    border: "2px solid #e5e7eb",
+                  }}
+                />
+              </td>
+            )}
+            <td valign="top" style={{ verticalAlign: "top" }}>
+              <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ paddingBottom: "4px" }}>
+                      <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                        <tbody>
+                          <tr>
+                            <td style={{ fontSize: "18px", fontWeight: "600", color: "#111827", paddingRight: "12px" }}>
+                              {nombre}
+                            </td>
+                            <td style={{ fontSize: "18px", color: "#9ca3af", paddingRight: "12px" }}>|</td>
+                            <td style={{ fontSize: "14px", fontWeight: "500", color: "#4b5563", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                              {cargo}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ paddingTop: "4px" }}>
+                      <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                        <tbody>
+                          <tr>
+                            {email && (
+                              <td style={{ paddingRight: "20px", paddingBottom: "8px" }}>
+                                <a
+                                  href={`mailto:${email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}`}
+                                  style={{ color: "#374151", textDecoration: "none", fontSize: "14px" }}
+                                >
+                                  {email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}
+                                </a>
+                              </td>
+                            )}
+                            {calendly && (
+                              <td style={{ paddingRight: "20px", paddingBottom: "8px" }}>
+                                <a href={calendly.url} style={{ color: "#374151", textDecoration: "none", fontSize: "14px" }}>
+                                  Book a call
+                                </a>
+                              </td>
+                            )}
+                          </tr>
+                          {ctaTexto && (
+                            <tr>
+                              <td colSpan={2} style={{ paddingTop: "8px" }}>
+                                <a
+                                  href="#"
+                                  style={{
+                                    background: "linear-gradient(135deg,#8b5cf6,#3b82f6)",
+                                    color: "white",
+                                    padding: "10px 16px",
+                                    borderRadius: "8px",
+                                    textDecoration: "none",
+                                    fontWeight: "600",
+                                    fontSize: "13px",
+                                    display: "inline-block",
+                                  }}
+                                >
+                                  {ctaTexto}
+                                </a>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderFreelanceDesigner = () => {
+    const website = redes.find((r) => {
+      const url = r.url.toLowerCase();
+      const name = r.nombre.toLowerCase();
+      return (url.includes("http") || url.includes("www") || url.includes(".")) && 
+             !url.includes("behance") &&
+             !name.includes("behance");
+    });
+    const behance = redes.find((r) => r.url.toLowerCase().includes("behance") || r.nombre.toLowerCase().includes("behance"));
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#333333",
+          lineHeight: "1.5",
+        }}
+      >
+        <tbody>
+          <tr>
+            {foto && (
+              <td valign="top" style={{ paddingRight: "16px", verticalAlign: "top" }}>
+                <img
+                  src={foto}
+                  alt={nombre}
+                  width={64}
+                  height={64}
+                  style={{
+                    width: "64px",
+                    height: "64px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    display: "block",
+                    border: "2px solid #e5e7eb",
+                  }}
+                />
+              </td>
+            )}
+            <td valign="top" style={{ verticalAlign: "top" }}>
+              <strong style={{ fontSize: "16px", color: "#111827" }}>{nombre}</strong>
+              <span style={{ color: "#9ca3af", margin: "0 10px" }}>|</span>
+              <span style={{ fontSize: "13px", color: "#4b5563", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                {cargo}
+              </span>
+              <br />
+              <br />
+              {telefono && (
+                <a
+                  href={`tel:${telefono.replace(/[^0-9+]/g, "")}`}
+                  style={{ color: "#374151", textDecoration: "none", marginRight: "16px" }}
+                >
+                  {telefono}
+                </a>
+              )}
+              {website && (
+                <a
+                  href={website.url.includes("http") ? website.url : `https://${website.url}`}
+                  style={{ color: "#374151", textDecoration: "none", marginRight: "16px" }}
+                >
+                  {website.url.replace(/^https?:\/\//, "").replace(/^www\./, "")}
+                </a>
+              )}
+              {behance && (
+                <a
+                  href={behance.url.includes("http") ? behance.url : `https://${behance.url}`}
+                  style={{ color: "#374151", textDecoration: "none" }}
+                >
+                  Behance
+                </a>
+              )}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderCorporateConsultant = () => {
+    const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#333333",
+          lineHeight: "1.5",
+        }}
+      >
+        <tbody>
+          <tr>
+            {logoEmpresa && (
+              <td valign="top" style={{ paddingRight: "16px", verticalAlign: "top" }}>
+                <img
+                  src={logoEmpresa}
+                  alt="Company Logo"
+                  width={120}
+                  height={40}
+                  style={{ display: "block" }}
+                />
+              </td>
+            )}
+            <td valign="top" style={{ verticalAlign: "top" }}>
+              <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ paddingBottom: "4px" }}>
+                      <strong style={{ fontSize: "16px", color: "#111827" }}>{nombre}</strong>
+                      <span style={{ color: "#9ca3af", margin: "0 10px" }}>|</span>
+                      <span style={{ fontSize: "13px", color: "#4b5563", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                        {cargo}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ paddingTop: "4px" }}>
+                      {telefono && (
+                        <a
+                          href={`tel:${telefono.replace(/[^0-9+]/g, "")}`}
+                          style={{ color: "#374151", textDecoration: "none", marginRight: "20px" }}
+                        >
+                          {telefono}
+                        </a>
+                      )}
+                      {email && (
+                        <a
+                          href={`mailto:${email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}`}
+                          style={{ color: "#374151", textDecoration: "none" }}
+                        >
+                          {email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}
+                        </a>
+                      )}
+                    </td>
+                  </tr>
+                  {textoAdicional && (
+                    <tr>
+                      <td style={{ paddingTop: "8px", fontSize: "10px", color: "#9ca3af" }}>
+                        {textoAdicional}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </td>
           </tr>
         </tbody>
