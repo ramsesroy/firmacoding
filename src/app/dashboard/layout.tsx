@@ -35,19 +35,19 @@ export default function DashboardLayout({
   const navItems = [
     {
       href: "/dashboard",
-      label: "Editor de Firmas",
+      label: "Signature Editor",
       icon: "edit_square",
       active: pathname === "/dashboard",
     },
     {
       href: "/dashboard/firmas",
-      label: "Mis Firmas",
+      label: "My Signatures",
       icon: "badge",
       active: pathname === "/dashboard/firmas",
     },
     {
       href: "/dashboard/configuracion",
-      label: "Configuración",
+      label: "Settings",
       icon: "settings",
       active: pathname === "/dashboard/configuracion",
     },
@@ -133,7 +133,7 @@ export default function DashboardLayout({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {user.user_metadata?.full_name || user.email?.split("@")[0] || "Usuario"}
+                  {user.user_metadata?.full_name || user.email?.split("@")[0] || "User"}
                 </p>
                 <p className="text-xs text-gray-500 truncate">{user.email}</p>
               </div>
@@ -144,7 +144,7 @@ export default function DashboardLayout({
             className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 text-sm font-medium"
           >
             <span className="material-symbols-outlined text-xl">logout</span>
-            <span>Cerrar Sesión</span>
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>

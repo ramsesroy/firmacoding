@@ -29,7 +29,7 @@ export default function ConfiguracionPage() {
     try {
       setLoading(true);
       
-      // Obtener sesión actual
+      // Get current session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError || !session) {
@@ -41,15 +41,15 @@ export default function ConfiguracionPage() {
       setUser(currentUser);
       setEmail(currentUser.email || "");
       
-      // Obtener metadata del usuario si existe
+      // Get user metadata if exists
       const displayName = currentUser.user_metadata?.full_name || 
                          currentUser.user_metadata?.name || 
                          "";
       setName(displayName);
       
     } catch (err: any) {
-      console.error("Error al cargar datos del usuario:", err);
-      setError("Error al cargar los datos del usuario");
+      console.error("Error loading user data:", err);
+      setError("Error loading user data");
     } finally {
       setLoading(false);
     }
@@ -71,11 +71,11 @@ export default function ConfiguracionPage() {
 
       if (updateError) throw updateError;
 
-      setSuccess("Perfil actualizado exitosamente");
+      setSuccess("Profile updated successfully");
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
-      console.error("Error al actualizar perfil:", err);
-      setError(err.message || "Error al actualizar el perfil");
+      console.error("Error updating profile:", err);
+      setError(err.message || "Error updating profile");
     } finally {
       setSaving(false);
     }
@@ -87,42 +87,42 @@ export default function ConfiguracionPage() {
     setError(null);
     setSuccess(null);
 
-    // Validaciones
+    // Validations
     if (newPassword.length < 6) {
-      setError("La nueva contraseña debe tener al menos 6 caracteres");
+      setError("New password must be at least 6 characters");
       setSaving(false);
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError("Las contraseñas no coinciden");
+      setError("Passwords do not match");
       setSaving(false);
       return;
     }
 
     try {
-      // Actualizar contraseña
+      // Update password
       const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword,
       });
 
       if (updateError) throw updateError;
 
-      setSuccess("Contraseña actualizada exitosamente");
+      setSuccess("Password updated successfully");
       setNewPassword("");
       setConfirmPassword("");
       setShowPasswordForm(false);
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
-      console.error("Error al cambiar contraseña:", err);
-      setError(err.message || "Error al cambiar la contraseña");
+      console.error("Error changing password:", err);
+      setError(err.message || "Error changing password");
     } finally {
       setSaving(false);
     }
   };
 
   const handleSignOut = async () => {
-    if (!confirm("¿Estás seguro de que quieres cerrar sesión?")) {
+    if (!confirm("Are you sure you want to sign out?")) {
       return;
     }
 
@@ -132,8 +132,8 @@ export default function ConfiguracionPage() {
       router.push("/");
       router.refresh();
     } catch (err: any) {
-      console.error("Error al cerrar sesión:", err);
-      alert("Error al cerrar sesión. Por favor intenta nuevamente.");
+      console.error("Error signing out:", err);
+      alert("Error signing out. Please try again.");
     }
   };
 
@@ -143,15 +143,15 @@ export default function ConfiguracionPage() {
         <div className="mb-4 sm:mb-8">
           <div className="flex items-center gap-3 mb-2">
             <span className="material-symbols-outlined text-3xl text-blue-600">settings</span>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Configuración</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Settings</h1>
           </div>
           <p className="text-sm sm:text-base text-gray-600 ml-11">
-            Gestiona las preferencias de tu cuenta
+            Manage your account preferences
           </p>
         </div>
         <div className="bg-white rounded-lg shadow-md p-8 text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Cargando configuración...</p>
+          <p className="mt-4 text-gray-600">Loading settings...</p>
         </div>
       </div>
     );
@@ -162,14 +162,14 @@ export default function ConfiguracionPage() {
       <div className="mb-4 sm:mb-8">
         <div className="flex items-center gap-3 mb-2">
           <span className="material-symbols-outlined text-3xl text-blue-600">settings</span>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Configuración</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Settings</h1>
         </div>
         <p className="text-sm sm:text-base text-gray-600 ml-11">
-          Gestiona las preferencias de tu cuenta
+          Manage your account preferences
         </p>
       </div>
 
-      {/* Mensajes de éxito/error */}
+      {/* Success/error messages */}
       {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
           <div className="flex items-start gap-2">
@@ -193,20 +193,20 @@ export default function ConfiguracionPage() {
       )}
 
       <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 space-y-6">
-        {/* Perfil */}
+        {/* Profile */}
         <div>
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">Perfil</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">Profile</h2>
           <form onSubmit={handleUpdateProfile} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nombre
+                Name
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                placeholder="Tu nombre"
+                placeholder="Your name"
               />
             </div>
             <div>
@@ -218,10 +218,10 @@ export default function ConfiguracionPage() {
                 value={email}
                 disabled
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-                placeholder="tu@email.com"
+                placeholder="your@email.com"
               />
               <p className="mt-1 text-xs text-gray-500">
-                El email no se puede cambiar desde aquí
+                Email cannot be changed from here
               </p>
             </div>
             <div className="pt-2">
@@ -230,22 +230,22 @@ export default function ConfiguracionPage() {
                 disabled={saving}
                 className="bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {saving ? "Guardando..." : "Guardar Cambios"}
+                {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </form>
         </div>
 
-        {/* Cambiar Contraseña */}
+        {/* Change Password */}
         <div className="border-t pt-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg sm:text-xl font-semibold">Seguridad</h2>
+            <h2 className="text-lg sm:text-xl font-semibold">Security</h2>
             {!showPasswordForm && (
               <button
                 onClick={() => setShowPasswordForm(true)}
                 className="text-sm text-blue-600 hover:text-blue-700 font-medium"
               >
-                Cambiar contraseña
+                Change password
               </button>
             )}
           </div>
@@ -254,27 +254,27 @@ export default function ConfiguracionPage() {
             <form onSubmit={handleChangePassword} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nueva Contraseña
+                  New Password
                 </label>
                 <input
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="Minimum 6 characters"
                   minLength={6}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirmar Nueva Contraseña
+                  Confirm New Password
                 </label>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  placeholder="Confirma tu nueva contraseña"
+                  placeholder="Confirm your new password"
                   minLength={6}
                 />
               </div>
@@ -284,7 +284,7 @@ export default function ConfiguracionPage() {
                   disabled={saving}
                   className="bg-blue-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {saving ? "Actualizando..." : "Actualizar Contraseña"}
+                  {saving ? "Updating..." : "Update Password"}
                 </button>
                 <button
                   type="button"
@@ -296,26 +296,26 @@ export default function ConfiguracionPage() {
                   }}
                   className="bg-gray-200 text-gray-700 px-4 sm:px-6 py-2 rounded-lg hover:bg-gray-300 transition font-medium text-sm sm:text-base"
                 >
-                  Cancelar
+                  Cancel
                 </button>
               </div>
             </form>
           )}
         </div>
 
-        {/* Información de la Cuenta */}
+        {/* Account Information */}
         <div className="border-t pt-6">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">Información de la Cuenta</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">Account Information</h2>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">ID de Usuario:</span>
+              <span className="text-gray-600">User ID:</span>
               <span className="text-gray-900 font-mono text-xs">{user?.id || "N/A"}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Cuenta creada:</span>
+              <span className="text-gray-600">Account created:</span>
               <span className="text-gray-900">
                 {user?.created_at
-                  ? new Date(user.created_at).toLocaleDateString("es-ES", {
+                  ? new Date(user.created_at).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
@@ -324,10 +324,10 @@ export default function ConfiguracionPage() {
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-600">Última actualización:</span>
+              <span className="text-gray-600">Last updated:</span>
               <span className="text-gray-900">
                 {user?.updated_at
-                  ? new Date(user.updated_at).toLocaleDateString("es-ES", {
+                  ? new Date(user.updated_at).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
@@ -338,14 +338,14 @@ export default function ConfiguracionPage() {
           </div>
         </div>
 
-        {/* Cerrar Sesión */}
+        {/* Sign Out */}
         <div className="border-t pt-6">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4">Cerrar Sesión</h2>
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">Sign Out</h2>
           <button
             onClick={handleSignOut}
             className="bg-gray-200 text-gray-700 px-4 sm:px-6 py-2 rounded-lg hover:bg-gray-300 transition font-medium text-sm sm:text-base"
           >
-            Cerrar Sesión
+            Sign Out
           </button>
         </div>
       </div>

@@ -275,8 +275,8 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 max-h-64 overflow-y-auto pr-2">
                   {[
                     { id: "professional", name: "Professional", badge: "Most Popular" },
-                    { id: "classic", name: "Clásica" },
-                    { id: "modern", name: "Moderna" },
+                    { id: "classic", name: "Classic" },
+                    { id: "modern", name: "Modern" },
                     { id: "minimal", name: "Minimal" },
                     { id: "minimalCorporate", name: "Corp" },
                     { id: "modernaSinBarra", name: "Modern 2" },
@@ -406,7 +406,7 @@ export default function DashboardPage() {
                   <div className="border border-gray-200 rounded-xl p-5 bg-gray-50/50">
                     <img
                       src={signatureData.foto}
-                      alt="Vista previa"
+                      alt="Preview"
                       className="max-w-full h-40 object-contain mx-auto rounded-lg shadow-sm"
                     />
                       <button
@@ -486,7 +486,7 @@ export default function DashboardPage() {
                     <div className="border border-gray-200 rounded-xl p-5 bg-gray-50/50">
                       <img
                         src={signatureData.logoEmpresa}
-                        alt="Vista previa del logo"
+                        alt="Logo preview"
                         className="max-w-full h-32 object-contain mx-auto rounded-lg shadow-sm"
                       />
                       <button

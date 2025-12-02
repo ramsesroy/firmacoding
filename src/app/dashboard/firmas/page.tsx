@@ -36,7 +36,7 @@ export default function FirmasPage() {
       setLoading(true);
       setError(null);
 
-      // Verificar autenticación
+      // Check authentication
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError || !session) {
@@ -44,7 +44,7 @@ export default function FirmasPage() {
         return;
       }
 
-      // Obtener las firmas del usuario
+      // Get user signatures
       const { data, error: fetchError } = await supabase
         .from("signatures")
         .select("*")
@@ -52,21 +52,21 @@ export default function FirmasPage() {
         .order("created_at", { ascending: false });
 
       if (fetchError) {
-        console.error("Error al obtener firmas:", fetchError);
+        console.error("Error fetching signatures:", fetchError);
         throw fetchError;
       }
 
       setSignatures(data || []);
     } catch (err: any) {
-      console.error("Error al cargar firmas:", err);
-      setError(err.message || "Error al cargar las firmas. Por favor intenta nuevamente.");
+      console.error("Error loading signatures:", err);
+      setError(err.message || "Error loading signatures. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("¿Estás seguro de que quieres eliminar esta firma?")) {
+    if (!confirm("Are you sure you want to delete this signature?")) {
       return;
     }
 
@@ -80,11 +80,11 @@ export default function FirmasPage() {
         throw deleteError;
       }
 
-      // Recargar la lista
+      // Reload list
       await fetchSignatures();
     } catch (err: any) {
-      console.error("Error al eliminar firma:", err);
-      alert(`Error al eliminar la firma: ${err.message}`);
+      console.error("Error deleting signature:", err);
+      alert(`Error deleting signature: ${err.message}`);
     }
   };
 
@@ -113,8 +113,8 @@ export default function FirmasPage() {
       setCopiedId(signature.id);
       setTimeout(() => setCopiedId(null), 3000);
     } catch (err) {
-      console.error("Error al copiar firma:", err);
-      alert("Error al copiar la firma");
+      console.error("Error copying signature:", err);
+      alert("Error copying signature");
     }
   };
 
@@ -124,15 +124,15 @@ export default function FirmasPage() {
         <div className="mb-4 sm:mb-8">
           <div className="flex items-center gap-3 mb-2">
             <span className="material-symbols-outlined text-3xl text-blue-600">badge</span>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mis Firmas</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Signatures</h1>
           </div>
           <p className="text-sm sm:text-base text-gray-600 ml-11">
-            Gestiona todas tus firmas guardadas
+            Manage all your saved signatures
           </p>
         </div>
         <div className="bg-white rounded-lg shadow-md p-8 text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Cargando firmas...</p>
+          <p className="mt-4 text-gray-600">Loading signatures...</p>
         </div>
       </div>
     );
@@ -144,10 +144,10 @@ export default function FirmasPage() {
         <div className="mb-4 sm:mb-8">
           <div className="flex items-center gap-3 mb-2">
             <span className="material-symbols-outlined text-3xl text-blue-600">badge</span>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mis Firmas</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Signatures</h1>
           </div>
           <p className="text-sm sm:text-base text-gray-600 ml-11">
-            Gestiona todas tus firmas guardadas
+            Manage all your saved signatures
           </p>
         </div>
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">
@@ -161,7 +161,7 @@ export default function FirmasPage() {
                 onClick={fetchSignatures}
                 className="mt-3 text-sm text-red-600 hover:text-red-700 underline"
               >
-                Intentar nuevamente
+                Try again
               </button>
             </div>
           </div>
@@ -175,10 +175,10 @@ export default function FirmasPage() {
       <div className="mb-4 sm:mb-8">
         <div className="flex items-center gap-3 mb-2">
           <span className="material-symbols-outlined text-3xl text-blue-600">badge</span>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mis Firmas</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Signatures</h1>
         </div>
         <p className="text-sm sm:text-base text-gray-600 ml-11">
-          Gestiona todas tus firmas guardadas
+          Manage all your saved signatures
         </p>
       </div>
 
@@ -198,15 +198,15 @@ export default function FirmasPage() {
                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
               />
             </svg>
-            <p className="text-base sm:text-lg mb-2">No tienes firmas guardadas aún</p>
+            <p className="text-base sm:text-lg mb-2">You don't have any saved signatures yet</p>
             <p className="text-xs sm:text-sm mb-4">
-              Crea tu primera firma en el editor
+              Create your first signature in the editor
             </p>
             <Link
               href="/dashboard"
               className="inline-block bg-indigo-600 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-indigo-700 transition text-sm sm:text-base"
             >
-              Ir al Editor
+              Go to Editor
             </Link>
           </div>
         </div>
@@ -222,7 +222,7 @@ export default function FirmasPage() {
                 <div className="flex-1 min-w-0">
                   <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                     <div className="text-xs text-gray-500 mb-2">
-                      Plantilla: <span className="font-medium">{signature.template_id}</span>
+                      Template: <span className="font-medium">{signature.template_id}</span>
                     </div>
                     <div className="overflow-x-auto">
                       <SignaturePreview
@@ -248,7 +248,7 @@ export default function FirmasPage() {
                         {signature.role}
                       </p>
                       <p className="text-xs text-gray-500">
-                        Creada: {new Date(signature.created_at).toLocaleDateString("es-ES", {
+                        Created: {new Date(signature.created_at).toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
@@ -265,13 +265,13 @@ export default function FirmasPage() {
                             : "bg-blue-600 text-white hover:bg-blue-700"
                         }`}
                       >
-                        {copiedId === signature.id ? "✓ Copiado" : "Copiar"}
+                        {copiedId === signature.id ? "✓ Copied" : "Copy"}
                       </button>
                       <button
                         onClick={() => handleDelete(signature.id)}
                         className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
                       >
-                        Eliminar
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -290,7 +290,7 @@ export default function FirmasPage() {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Crear nueva firma
+          Create new signature
         </Link>
       </div>
     </div>

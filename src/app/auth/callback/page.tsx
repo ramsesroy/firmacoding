@@ -15,28 +15,28 @@ function AuthCallbackContent() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Verificar si hay un error en la URL
+        // Check if there's an error in the URL
         const errorParam = searchParams.get("error");
         const errorDescription = searchParams.get("error_description");
         
         if (errorParam) {
-          setError(errorDescription || "Error en la autenticación con Google");
+          setError(errorDescription || "Error authenticating with Google");
           setTimeout(() => {
             router.push("/login");
           }, 3000);
           return;
         }
 
-        // Supabase con detectSessionInUrl: true debería manejar automáticamente
-        // la sesión cuando detecta el código en la URL.
-        // Verificar la sesión después de un breve delay
+        // Supabase with detectSessionInUrl: true should automatically handle
+        // the session when it detects the code in the URL.
+        // Check the session after a brief delay
         await new Promise(resolve => setTimeout(resolve, 500));
         
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           console.error("Error getting session:", sessionError);
-          setError("Error al procesar la autenticación. Por favor intenta nuevamente.");
+          setError("Error processing authentication. Please try again.");
           setTimeout(() => {
             router.push("/login");
           }, 3000);
@@ -47,14 +47,14 @@ function AuthCallbackContent() {
           router.push("/dashboard");
           router.refresh();
         } else {
-          setError("No se pudo establecer la sesión. Por favor intenta nuevamente.");
+          setError("Could not establish session. Please try again.");
           setTimeout(() => {
             router.push("/login");
           }, 3000);
         }
       } catch (error: any) {
         console.error("Error in auth callback:", error);
-        setError("Error inesperado durante la autenticación.");
+        setError("Unexpected error during authentication.");
         setTimeout(() => {
           router.push("/login");
         }, 3000);
@@ -73,12 +73,12 @@ function AuthCallbackContent() {
             <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
               <p className="text-sm text-red-600">{error}</p>
             </div>
-            <p className="text-sm text-gray-600">Redirigiendo al inicio de sesión...</p>
+            <p className="text-sm text-gray-600">Redirecting to sign in...</p>
           </>
         ) : (
           <>
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-            <p className="text-gray-600">Procesando autenticación...</p>
+            <p className="text-gray-600">Processing authentication...</p>
           </>
         )}
       </div>
@@ -92,7 +92,7 @@ export default function AuthCallbackPage() {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4">
         <div className="text-center max-w-md w-full">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600">Cargando...</p>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     }>

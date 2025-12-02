@@ -23,15 +23,15 @@ export default function ForgotPasswordPage() {
 
       if (resetError) throw resetError;
 
-      setMessage("¡Revisa tu correo electrónico! Te hemos enviado un enlace para restablecer tu contraseña.");
+      setMessage("Check your email! We've sent you a link to reset your password.");
       setEmail("");
     } catch (err: any) {
-      let errorMessage = "Ocurrió un error. Por favor intenta nuevamente.";
+      let errorMessage = "An error occurred. Please try again.";
       if (err.message) {
         if (err.message?.includes("fetch") || err.message?.includes("Failed to fetch") || err.message?.includes("network")) {
-          errorMessage = "Error de conexión con Supabase. Verifica tu conexión a internet.";
+          errorMessage = "Supabase connection error. Check your internet connection.";
         } else {
-          errorMessage = err.message || "Error desconocido";
+          errorMessage = err.message || "Unknown error";
         }
       }
       setError(errorMessage);
@@ -50,10 +50,10 @@ export default function ForgotPasswordPage() {
             </div>
           </Link>
           <h2 className="text-2xl font-bold text-gray-900">
-            Recuperar Contraseña
+            Reset Password
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña
+            Enter your email and we'll send you a link to reset your password
           </p>
         </div>
 
@@ -96,7 +96,7 @@ export default function ForgotPasswordPage() {
               disabled={loading}
               className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Enviando..." : "Enviar enlace de recuperación"}
+              {loading ? "Sending..." : "Send recovery link"}
             </button>
           </form>
 
@@ -105,7 +105,7 @@ export default function ForgotPasswordPage() {
               href="/login"
               className="text-sm font-medium text-blue-600 hover:text-blue-500"
             >
-              ← Volver al inicio de sesión
+              ← Back to sign in
             </Link>
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function ForgotPasswordPage() {
             href="/"
             className="text-sm text-gray-600 hover:text-gray-900"
           >
-            ← Volver al inicio
+            ← Back to home
           </Link>
         </div>
       </div>

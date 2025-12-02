@@ -14,11 +14,11 @@ export default function ResetPasswordPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Verificar que hay una sesión válida (viene del enlace de recuperación)
+    // Verify there's a valid session (comes from recovery link)
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        setError("El enlace de recuperación no es válido o ha expirado. Por favor solicita uno nuevo.");
+        setError("The recovery link is not valid or has expired. Please request a new one.");
       }
     };
     checkSession();
@@ -31,13 +31,13 @@ export default function ResetPasswordPage() {
     setMessage(null);
 
     if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres");
+      setError("Password must be at least 6 characters");
       setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden");
+      setError("Passwords do not match");
       setLoading(false);
       return;
     }
@@ -49,17 +49,17 @@ export default function ResetPasswordPage() {
 
       if (updateError) throw updateError;
 
-      setMessage("¡Contraseña actualizada exitosamente! Redirigiendo al inicio de sesión...");
+      setMessage("Password updated successfully! Redirecting to sign in...");
       setTimeout(() => {
         router.push("/login");
       }, 2000);
     } catch (err: any) {
-      let errorMessage = "Ocurrió un error al actualizar la contraseña. Por favor intenta nuevamente.";
+      let errorMessage = "An error occurred while updating the password. Please try again.";
       if (err.message) {
         if (err.message?.includes("fetch") || err.message?.includes("Failed to fetch") || err.message?.includes("network")) {
-          errorMessage = "Error de conexión con Supabase. Verifica tu conexión a internet.";
+          errorMessage = "Supabase connection error. Check your internet connection.";
         } else {
-          errorMessage = err.message || "Error desconocido";
+          errorMessage = err.message || "Unknown error";
         }
       }
       setError(errorMessage);
@@ -78,10 +78,10 @@ export default function ResetPasswordPage() {
             </div>
           </Link>
           <h2 className="text-2xl font-bold text-gray-900">
-            Restablecer Contraseña
+            Reset Password
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Ingresa tu nueva contraseña
+            Enter your new password
           </p>
         </div>
 
@@ -104,7 +104,7 @@ export default function ResetPasswordPage() {
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Nueva Contraseña
+                New Password
               </label>
               <input
                 id="password"
@@ -115,7 +115,7 @@ export default function ResetPasswordPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                placeholder="Mínimo 6 caracteres"
+                placeholder="Minimum 6 characters"
                 minLength={6}
               />
             </div>
@@ -125,7 +125,7 @@ export default function ResetPasswordPage() {
                 htmlFor="confirmPassword"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Confirmar Nueva Contraseña
+                Confirm New Password
               </label>
               <input
                 id="confirmPassword"
@@ -136,7 +136,7 @@ export default function ResetPasswordPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                placeholder="Confirma tu nueva contraseña"
+                placeholder="Confirm your new password"
                 minLength={6}
               />
             </div>
@@ -146,7 +146,7 @@ export default function ResetPasswordPage() {
               disabled={loading}
               className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Actualizando..." : "Actualizar Contraseña"}
+              {loading ? "Updating..." : "Update Password"}
             </button>
           </form>
 
@@ -155,7 +155,7 @@ export default function ResetPasswordPage() {
               href="/login"
               className="text-sm font-medium text-blue-600 hover:text-blue-500"
             >
-              ← Volver al inicio de sesión
+              ← Back to sign in
             </Link>
           </div>
         </div>
@@ -165,7 +165,7 @@ export default function ResetPasswordPage() {
             href="/"
             className="text-sm text-gray-600 hover:text-gray-900"
           >
-            ← Volver al inicio
+            ← Back to home
           </Link>
         </div>
       </div>

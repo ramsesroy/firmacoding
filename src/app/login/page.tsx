@@ -15,30 +15,30 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Verificar si hay errores de autenticación en la URL
+    // Check for authentication errors in URL
     const urlParams = new URLSearchParams(window.location.search);
     const authError = urlParams.get("error");
     if (authError) {
       if (authError === "authentication_failed") {
-        setError("Error al autenticarse con Google. Por favor intenta nuevamente.");
+        setError("Error authenticating with Google. Please try again.");
       } else if (authError === "no_auth_data") {
-        setError("No se recibieron los datos de autenticación. Por favor intenta nuevamente.");
+        setError("Authentication data was not received. Please try again.");
       } else {
-        setError("Error en la autenticación. Por favor intenta nuevamente.");
+        setError("Authentication error. Please try again.");
       }
-      // Limpiar la URL
+      // Clear URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
 
-    // Verificar si ya está autenticado (sin verificar config, para que funcione siempre)
+    // Check if already authenticated (without checking config, to always work)
     const checkUser = async () => {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         if (sessionError) {
-          console.error("Error al verificar sesión:", sessionError);
-          // Si el error es de configuración, mostrar mensaje más claro
+          console.error("Error checking session:", sessionError);
+          // If error is configuration-related, show clearer message
           if (sessionError.message?.includes("fetch") || sessionError.message?.includes("network")) {
-            setError("Error de conexión con Supabase. Por favor verifica que las variables NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY estén configuradas correctamente en tu archivo .env.local");
+            setError("Supabase connection error. Please verify that NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are correctly configured in your .env.local file");
           }
           return;
         }
@@ -46,7 +46,7 @@ export default function LoginPage() {
           router.push("/dashboard");
         }
       } catch (err) {
-        console.error("Error al verificar usuario:", err);
+        console.error("Error checking user:", err);
       }
     };
     checkUser();
@@ -60,7 +60,7 @@ export default function LoginPage() {
 
     try {
       if (isSignUp) {
-        // Registro
+        // Sign up
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -74,13 +74,13 @@ export default function LoginPage() {
         }
 
         if (data?.user) {
-          setMessage("¡Registro exitoso! Por favor verifica tu email antes de iniciar sesión.");
-          // Limpiar formulario
+          setMessage("Registration successful! Please verify your email before signing in.");
+          // Clear form
           setEmail("");
           setPassword("");
         }
       } else {
-        // Inicio de sesión
+        // Sign in
         const { data, error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -92,24 +92,24 @@ export default function LoginPage() {
 
         if (data?.user) {
           router.push("/dashboard");
-          router.refresh(); // Refrescar para asegurar que se carga la sesión
+          router.refresh(); // Refresh to ensure session loads
         }
       }
     } catch (err: any) {
-      console.error("Error en autenticación:", err);
+      console.error("Authentication error:", err);
       
-      // Mensajes de error más descriptivos
-      let errorMessage = "Ocurrió un error. Por favor intenta nuevamente.";
+      // More descriptive error messages
+      let errorMessage = "An error occurred. Please try again.";
       
       if (err.message) {
         if (err.message?.includes("Invalid login credentials")) {
-          errorMessage = "Email o contraseña incorrectos. Por favor verifica tus credenciales.";
+          errorMessage = "Incorrect email or password. Please verify your credentials.";
         } else if (err.message?.includes("Email rate limit exceeded")) {
-          errorMessage = "Demasiados intentos. Por favor espera unos minutos antes de intentar nuevamente.";
+          errorMessage = "Too many attempts. Please wait a few minutes before trying again.";
         } else if (err.message?.includes("fetch") || err.message?.includes("Failed to fetch") || err.message?.includes("network")) {
-          errorMessage = "Error de conexión con Supabase. Verifica que:\n1. Las variables NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY estén en tu archivo .env.local\n2. Los valores sean correctos (sin espacios)\n3. Hayas reiniciado el servidor después de agregar las variables\n4. Tu conexión a internet funcione correctamente";
+          errorMessage = "Supabase connection error. Verify that:\n1. NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are in your .env.local file\n2. Values are correct (no spaces)\n3. You've restarted the server after adding the variables\n4. Your internet connection is working";
         } else {
-          errorMessage = err.message || "Error desconocido";
+          errorMessage = err.message || "Unknown error";
         }
       }
       
@@ -139,11 +139,11 @@ export default function LoginPage() {
         throw googleError;
       }
 
-      // OAuth redirige automáticamente, no necesitamos hacer nada más aquí
-      // El loading se mantendrá hasta la redirección
+      // OAuth redirects automatically, no need to do anything else here
+      // Loading will remain until redirect
     } catch (err: any) {
-      console.error("Error en Google OAuth:", err);
-      setError(err.message || "Error al iniciar sesión con Google. Por favor intenta nuevamente.");
+      console.error("Google OAuth error:", err);
+      setError(err.message || "Error signing in with Google. Please try again.");
       setLoading(false);
     }
   };
@@ -159,12 +159,12 @@ export default function LoginPage() {
             </div>
           </Link>
           <h2 className="text-2xl font-bold text-gray-900">
-            {isSignUp ? "Crea tu cuenta" : "Inicia sesión"}
+            {isSignUp ? "Create your account" : "Sign in"}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             {isSignUp
-              ? "Ya tienes una cuenta? "
-              : "¿No tienes una cuenta? "}
+              ? "Already have an account? "
+              : "Don't have an account? "}
             <button
               onClick={() => {
                 setIsSignUp(!isSignUp);
@@ -173,7 +173,7 @@ export default function LoginPage() {
               }}
               className="font-medium text-blue-600 hover:text-blue-500"
             >
-              {isSignUp ? "Inicia sesión" : "Regístrate"}
+              {isSignUp ? "Sign in" : "Sign up"}
             </button>
           </p>
         </div>
@@ -223,7 +223,7 @@ export default function LoginPage() {
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Contraseña
+                Password
               </label>
               <input
                 id="password"
@@ -239,7 +239,7 @@ export default function LoginPage() {
               />
               {isSignUp && (
                 <p className="mt-1 text-xs text-gray-500">
-                  Mínimo 6 caracteres
+                  Minimum 6 characters
                 </p>
               )}
             </div>
@@ -250,10 +250,10 @@ export default function LoginPage() {
               className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading
-                ? "Cargando..."
+                ? "Loading..."
                 : isSignUp
-                ? "Crear cuenta"
-                : "Iniciar sesión"}
+                ? "Create account"
+                : "Sign in"}
             </button>
           </form>
 
@@ -264,7 +264,7 @@ export default function LoginPage() {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">O continúa con</span>
+                <span className="px-2 bg-white text-gray-500">Or continue with</span>
               </div>
             </div>
           </div>
@@ -293,7 +293,7 @@ export default function LoginPage() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            Continuar con Google
+            Continue with Google
           </button>
 
           {/* Forgot Password */}
@@ -303,7 +303,7 @@ export default function LoginPage() {
                 href="/forgot-password"
                 className="text-sm font-medium text-blue-600 hover:text-blue-500"
               >
-                ¿Olvidaste tu contraseña?
+                Forgot your password?
               </Link>
             </div>
           )}
@@ -315,7 +315,7 @@ export default function LoginPage() {
             href="/"
             className="text-sm text-gray-600 hover:text-gray-900"
           >
-            ← Volver al inicio
+            ← Back to home
           </Link>
         </div>
       </div>
