@@ -64,25 +64,25 @@ function DashboardContent() {
   const getExampleLogo = (template: TemplateType): string => {
     const logoMap: Record<string, string> = {
       // Professional: 120x40px horizontal corporate logo
-      professional: "https://png.pngtree.com/element_our/png/20180913/real-estate-company-logo-design.-png_95049.jpg",
+      professional: "https://drive.google.com/uc?export=view&id=18DheVuw2txVP5XvbEd1hviaQrbZzwfeE",
       
       // Corporate Consultant: 140x45px horizontal business logo
-      corporateConsultant: "https://png.pngtree.com/element_our/png/20180913/real-estate-company-logo-design.-png_95049.jpg",
+      corporateConsultant: "https://drive.google.com/uc?export=view&id=18DheVuw2txVP5XvbEd1hviaQrbZzwfeE",
       
       // Interior Design: Needs a design/architecture style logo - horizontal format
       interiorDesign: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=400&h=120&fit=crop&auto=format&q=90",
       
       // University Professor: 60x60px square (1:1 ratio) - Academic shield logo
-      universityProfessor: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4tuqBwqRYtqhpRD-q3t4KJocKsRlPn6wQNA&s",
+      universityProfessor: "https://drive.google.com/uc?export=view&id=1JSI2CV9cVZH97IztuiIqQ06cNd1TSwMk",
       
       // University President: 60x60px square (1:1 ratio) - Academic shield logo
-      universityPresident: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4tuqBwqRYtqhpRD-q3t4KJocKsRlPn6wQNA&s",
+      universityPresident: "https://drive.google.com/uc?export=view&id=1JSI2CV9cVZH97IztuiIqQ06cNd1TSwMk",
       
       // Church Professional: height 80px, width flexible - Church logo
-      churchProfessional: "https://images.seeklogo.com/logo-png/43/1/unsplash-new-celebration-logo-png_seeklogo-433464.png",
+      churchProfessional: "https://drive.google.com/uc?export=view&id=1dPx94TWUx0G7BEuUat9OGUKuJQJrgjAJ",
       
       // Pastor Signature: 80x80px square for circular crop (1:1 ratio) - Church logo
-      pastorSignature: "https://images.seeklogo.com/logo-png/43/1/unsplash-new-celebration-logo-png_seeklogo-433464.png",
+      pastorSignature: "https://drive.google.com/uc?export=view&id=1dPx94TWUx0G7BEuUat9OGUKuJQJrgjAJ",
       
       // Default corporate logo (horizontal)
       default: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=360&h=120&fit=crop&auto=format&q=90",
