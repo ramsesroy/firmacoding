@@ -1092,14 +1092,14 @@ function DashboardContent() {
             </div>
 
             {/* Main Preview */}
-            <div className="flex-1 bg-gradient-to-br from-gray-50 via-white to-gray-50 rounded-2xl p-6 sm:p-10 border-2 border-gray-100 mb-6 shadow-inner" style={{
-              backgroundImage: `
-                linear-gradient(45deg, transparent 25%, rgba(0,0,0,.02) 25%, rgba(0,0,0,.02) 50%, transparent 50%, transparent 75%, rgba(0,0,0,.02) 75%, rgba(0,0,0,.02)),
-                linear-gradient(45deg, transparent 25%, rgba(0,0,0,.02) 25%, rgba(0,0,0,.02) 50%, transparent 50%, transparent 75%, rgba(0,0,0,.02) 75%, rgba(0,0,0,.02))
-              `,
-              backgroundSize: '30px 30px',
-              backgroundPosition: '0 0, 15px 15px'
-            }}>
+            <div 
+              className="flex-1 bg-gradient-to-br from-gray-50 via-white to-gray-50 rounded-2xl p-6 sm:p-10 border-2 border-gray-100 mb-6 shadow-inner" 
+              style={{
+                backgroundImage: `linear-gradient(45deg, transparent 25%, rgba(0,0,0,.02) 25%, rgba(0,0,0,.02) 50%, transparent 50%, transparent 75%, rgba(0,0,0,.02) 75%, rgba(0,0,0,.02)), linear-gradient(45deg, transparent 25%, rgba(0,0,0,.02) 25%, rgba(0,0,0,.02) 50%, transparent 50%, transparent 75%, rgba(0,0,0,.02) 75%, rgba(0,0,0,.02))`,
+                backgroundSize: '30px 30px',
+                backgroundPosition: '0 0, 15px 15px'
+              }}
+            >
               <div ref={previewRef} className="flex items-center justify-center min-h-[350px] bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                 <SignaturePreview
                   nombre={signatureData.nombre}
