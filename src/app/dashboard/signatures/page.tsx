@@ -29,6 +29,9 @@ export default function SignaturesPage() {
   const [exportSize, setExportSize] = useState<ExportSize>("auto");
   const [showExportMenu, setShowExportMenu] = useState<string | null>(null);
   const [exporting, setExporting] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const router = useRouter();
   const previewRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
@@ -70,27 +73,41 @@ export default function SignaturesPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this signature?")) {
-      return;
-    }
+  const handleDeleteClick = (id: string) => {
+    setDeleteConfirmId(id);
+    setDeleteError(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirmId) return;
 
     try {
+      setDeleting(true);
+      setDeleteError(null);
+
       const { error: deleteError } = await supabase
         .from("signatures")
         .delete()
-        .eq("id", id);
+        .eq("id", deleteConfirmId);
 
       if (deleteError) {
         throw deleteError;
       }
 
-      // Reload list
+      // Close modal and reload list
+      setDeleteConfirmId(null);
       await fetchSignatures();
     } catch (err: any) {
       console.error("Error deleting signature:", err);
-      alert(`Error deleting signature: ${err.message}`);
+      setDeleteError(err.message || "Error deleting signature. Please try again.");
+    } finally {
+      setDeleting(false);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmId(null);
+    setDeleteError(null);
   };
 
   const handleCopy = async (signature: SignatureRecord) => {
@@ -346,7 +363,7 @@ export default function SignaturesPage() {
                           {copiedId === signature.id ? "✓ Copied" : "Copy"}
                         </button>
                         <button
-                          onClick={() => handleDelete(signature.id)}
+                          onClick={() => handleDeleteClick(signature.id)}
                           className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
                         >
                           Delete
@@ -433,6 +450,75 @@ export default function SignaturesPage() {
           Create new signature
         </Link>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirmId && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity"
+            onClick={handleDeleteCancel}
+          />
+          
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full border-2 border-gray-200 overflow-hidden animate-in fade-in zoom-in duration-200">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-2xl text-white">warning</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">Delete Signature</h3>
+                    <p className="text-sm text-red-100">This action cannot be undone</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="px-6 py-6">
+                <p className="text-gray-700 mb-2">
+                  Are you sure you want to delete this signature?
+                </p>
+                {deleteError && (
+                  <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{deleteError}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex gap-3">
+                <button
+                  onClick={handleDeleteCancel}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 transition-all shadow-lg shadow-red-500/30 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {deleting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Deleting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-base">delete</span>
+                      <span>Delete</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
