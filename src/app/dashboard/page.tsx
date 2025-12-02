@@ -320,18 +320,49 @@ export default function DashboardPage() {
                       }}
                       className={`group relative px-4 py-4 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden ${
                         template === tpl.id
-                          ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30 ring-2 ring-blue-500 ring-offset-2 transform scale-[1.02]"
-                          : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-2 border-gray-200 hover:border-gray-300 hover:shadow-md"
+                          ? "bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white shadow-2xl shadow-blue-500/40 ring-2 ring-blue-400 ring-offset-2 ring-offset-white transform scale-[1.02]"
+                          : "bg-white text-gray-700 hover:bg-gradient-to-br hover:from-gray-50 hover:to-gray-100 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10"
                       }`}
+                      style={template === tpl.id ? {
+                        boxShadow: '0 20px 25px -5px rgba(59, 130, 246, 0.4), 0 10px 10px -5px rgba(59, 130, 246, 0.2)'
+                      } : {}}
                     >
                       <div className="flex flex-col items-center gap-2 relative z-10">
                         {template === tpl.id ? (
-                          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tpl.color} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
-                            <span className="material-symbols-outlined text-2xl text-white" style={{ fontVariationSettings: '"FILL" 1, "wght" 400, "GRAD" 0, "opsz" 48 }}>{tpl.icon}</span>
+                          <div className={`relative w-12 h-12 rounded-2xl bg-gradient-to-br ${tpl.color} flex items-center justify-center shadow-2xl shadow-black/20 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}
+                            style={{
+                              boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)'
+                            }}
+                          >
+                            <span 
+                              className="material-symbols-outlined text-2xl text-white drop-shadow-lg" 
+                              style={{ 
+                                fontVariationSettings: '"FILL" 1, "wght" 600, "GRAD" 200, "opsz" 48',
+                                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+                                textShadow: '0 2px 4px rgba(0,0,0,0.4)'
+                              }}
+                            >
+                              {tpl.icon}
+                            </span>
+                            <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
                           </div>
                         ) : (
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-110">
-                            <span className="material-symbols-outlined text-2xl text-gray-600" style={{ fontVariationSettings: '"FILL" 0, "wght" 500, "GRAD" 0, "opsz" 48 }}>{tpl.icon}</span>
+                          <div 
+                            className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200 flex items-center justify-center shadow-lg border-2 border-gray-200/50 group-hover:shadow-xl group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-300"
+                            style={{
+                              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                            }}
+                          >
+                            <span 
+                              className="material-symbols-outlined text-2xl text-gray-700" 
+                              style={{ 
+                                fontVariationSettings: '"FILL" 1, "wght" 500, "GRAD" 200, "opsz" 48',
+                                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))'
+                              }}
+                            >
+                              {tpl.icon}
+                            </span>
+                            <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-white/50 to-transparent pointer-events-none"></div>
                           </div>
                         )}
                         <span className="text-xs">{tpl.name}</span>
@@ -794,7 +825,7 @@ export default function DashboardPage() {
                             onChange={(e) =>
                               setEditRedForm({ ...editRedForm, nombre: e.target.value })
                             }
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                            className="flex-1 px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400 hover:border-gray-300 text-sm"
                             placeholder="Name"
                           />
                           <input
@@ -803,7 +834,7 @@ export default function DashboardPage() {
                             onChange={(e) =>
                               setEditRedForm({ ...editRedForm, url: e.target.value })
                             }
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                            className="flex-1 px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400 hover:border-gray-300 text-sm"
                             placeholder="URL"
                           />
                         </div>
@@ -812,18 +843,18 @@ export default function DashboardPage() {
                           onSelectIcon={(icon) =>
                             setEditRedForm({ ...editRedForm, icono: icon })
                           }
-                          label="Icono"
+                          label="Icon"
                         />
-                        <div className="flex gap-2 mt-2">
+                        <div className="flex gap-2 mt-3">
                           <button
                             onClick={handleSaveEditRed}
-                            className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 text-sm font-semibold shadow-sm"
+                            className="flex-1 px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-200 text-sm font-semibold shadow-lg shadow-green-500/30 hover:shadow-xl"
                           >
                             Save
                           </button>
                           <button
                             onClick={handleCancelEditRed}
-                            className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 text-sm font-semibold border border-gray-200"
+                            className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 text-sm font-semibold border-2 border-gray-200 hover:border-gray-300"
                           >
                             Cancel
                           </button>

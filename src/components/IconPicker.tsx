@@ -40,15 +40,17 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className={`group flex items-center justify-center w-14 h-12 border-2 rounded-xl transition-all duration-200 text-2xl cursor-pointer ${
+          className={`group relative flex items-center justify-center w-14 h-12 border-2 rounded-xl transition-all duration-300 text-2xl cursor-pointer hover:scale-105 ${
             selectedIcon
-              ? "border-blue-300 bg-blue-50 hover:bg-blue-100 hover:border-blue-400"
-              : "border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400"
+              ? "border-blue-400 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 hover:border-blue-500 shadow-md shadow-blue-500/20"
+              : "border-gray-300 bg-white hover:bg-gradient-to-br hover:from-gray-50 hover:to-gray-100 hover:border-blue-300"
           }`}
           title="Select icon"
         >
-          {selectedIcon || (
-            <span className="material-symbols-outlined text-gray-400 text-xl">add_circle_outline</span>
+          {selectedIcon ? (
+            <span className="text-2xl transform group-hover:scale-110 transition-transform duration-300">{selectedIcon}</span>
+          ) : (
+            <span className="material-symbols-outlined text-gray-400 text-xl group-hover:text-blue-600 transition-colors">add_circle_outline</span>
           )}
         </button>
         {selectedIcon && (
@@ -73,7 +75,11 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
           />
           
           {/* Icon selection panel */}
-          <div className="absolute z-50 mt-2 bg-white border-2 border-gray-200 rounded-2xl shadow-2xl p-5 w-full max-w-md max-h-[500px] overflow-hidden flex flex-col">
+          <div className="absolute z-50 mt-2 bg-white border-2 border-gray-200 rounded-2xl shadow-2xl p-5 w-full max-w-md max-h-[500px] overflow-hidden flex flex-col backdrop-blur-sm bg-white/95"
+            style={{
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)'
+            }}
+          >
             {/* Header */}
             <div className="flex items-center justify-between mb-4 pb-3 border-b-2 border-gray-100">
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -119,16 +125,22 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
                       onSelectIcon(icon);
                       setIsOpen(false);
                     }}
-                    className={`group w-12 h-12 flex items-center justify-center text-2xl rounded-xl transition-all duration-200 hover:scale-110 ${
+                    className={`group relative w-12 h-12 flex items-center justify-center text-2xl rounded-xl transition-all duration-300 hover:scale-110 hover:-translate-y-1 ${
                       selectedIcon === icon
-                        ? "bg-gradient-to-br from-blue-500 to-blue-600 ring-4 ring-blue-200 shadow-lg scale-110"
-                        : "bg-gray-50 hover:bg-blue-50 border-2 border-transparent hover:border-blue-200"
+                        ? "bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 ring-4 ring-blue-300 ring-offset-2 shadow-xl scale-110 transform rotate-3"
+                        : "bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg"
                     }`}
+                    style={selectedIcon === icon ? {
+                      boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.4), 0 4px 6px -2px rgba(59, 130, 246, 0.3)'
+                    } : {}}
                     title={`Select ${icon}`}
                   >
-                    <span className={selectedIcon === icon ? "filter drop-shadow-lg" : ""}>
+                    <span className={`transition-all duration-300 ${selectedIcon === icon ? "filter drop-shadow-xl transform scale-110" : "group-hover:scale-110"}`}>
                       {icon}
                     </span>
+                    {selectedIcon === icon && (
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-black/10 to-transparent pointer-events-none"></div>
+                    )}
                   </button>
                 ))}
               </div>
