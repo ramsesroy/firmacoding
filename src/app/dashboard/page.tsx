@@ -29,7 +29,7 @@ export default function DashboardPage() {
     textoAdicional: "",
     colorPersonalizado: "",
     qrLink: "",
-    logoEmpresa: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80", // Logo de ejemplo para template professional
+    logoEmpresa: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80", // Example logo for professional template
     ctaTexto: "",
     telefonoMovil: "",
     direccion: "",
@@ -240,7 +240,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100">
-      {/* Contenido Principal */}
+      {/* Main Content */}
       <div className="p-4 sm:p-6 lg:p-8 max-w-[1920px] mx-auto">
         {/* Header */}
         <div className="mb-8 sm:mb-10">
@@ -254,9 +254,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Layout: Flex column en móvil, grid en desktop */}
+        {/* Layout: Flex column on mobile, grid on desktop */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 lg:h-[calc(100vh-200px)]">
-          {/* Formulario - Card */}
+          {/* Form - Card */}
           <div className="lg:col-span-5 bg-white rounded-2xl border border-gray-200/80 shadow-lg shadow-gray-900/5 p-6 sm:p-8 overflow-y-auto custom-scrollbar">
             <div className="mb-8">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-full mb-4">

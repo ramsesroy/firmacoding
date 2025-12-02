@@ -218,7 +218,7 @@ export default function FirmasPage() {
               className="bg-white rounded-lg shadow-md p-4 sm:p-6 border border-gray-100 hover:shadow-lg transition-shadow"
             >
               <div className="flex flex-col lg:flex-row lg:items-start gap-4">
-                {/* Vista previa de la firma */}
+                {/* Signature preview */}
                 <div className="flex-1 min-w-0">
                   <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                     <div className="text-xs text-gray-500 mb-2">
@@ -237,7 +237,7 @@ export default function FirmasPage() {
                   </div>
                 </div>
 
-                {/* Información y acciones */}
+                {/* Information and actions */}
                 <div className="lg:w-64 flex-shrink-0">
                   <div className="space-y-3">
                     <div>
