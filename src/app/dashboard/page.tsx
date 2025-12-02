@@ -431,7 +431,13 @@ function DashboardContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100">
+    <>
+      <MetadataHead
+        title="Dashboard - Signature For Me"
+        description="Create and customize your professional email signature with our intuitive editor."
+        keywords={["dashboard", "signature editor", "create signature"]}
+      />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100">
       {/* Main Content */}
       <div className="p-4 sm:p-6 lg:p-8 max-w-[1920px] mx-auto">
         {/* Header */}
