@@ -24,10 +24,9 @@ export async function uploadImage(file: File): Promise<string> {
     throw new Error("La imagen no debe exceder 5MB");
   }
 
-  // Generar un nombre único para el archivo usando el user_id para organización
+  // Generar un nombre único para el archivo
   const fileExt = file.name.split(".").pop();
-  const userId = session.user.id;
-  const fileName = `${userId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+  const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
   const filePath = `signatures/${fileName}`;
 
   // Subir el archivo al bucket 'demomail'
