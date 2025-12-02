@@ -9,6 +9,7 @@ import { copyToClipboard } from "@/lib/signatureUtils";
 import { uploadImage } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/components/Toast";
+import { MetadataHead } from "@/components/MetadataHead";
 
 // Force dynamic rendering for this page to support search params
 export const dynamic = "force-dynamic";
