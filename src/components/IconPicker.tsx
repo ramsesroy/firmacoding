@@ -78,41 +78,42 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
           
           {/* Icon selection panel - Responsive: modal on mobile, dropdown on desktop */}
           <div 
-            className="fixed sm:absolute inset-x-4 sm:inset-x-auto bottom-4 sm:top-full sm:bottom-auto sm:mt-2 sm:left-0 sm:right-auto z-[9999] bg-white border-2 border-gray-200 rounded-2xl shadow-2xl p-4 sm:p-5 w-auto sm:w-full max-w-full sm:max-w-md max-h-[85vh] sm:max-h-[500px] overflow-hidden flex flex-col backdrop-blur-sm bg-white/95"
+            className="fixed sm:absolute inset-x-3 sm:inset-x-auto top-1/2 sm:top-full left-0 right-0 sm:left-0 sm:right-auto sm:bottom-auto sm:mt-2 -translate-y-1/2 sm:translate-y-0 z-[9999] bg-white border-2 border-gray-200 rounded-xl sm:rounded-2xl shadow-2xl p-3 sm:p-4 w-auto sm:w-full max-w-full sm:max-w-md h-[65vh] sm:h-auto max-h-[65vh] sm:max-h-[380px] overflow-hidden flex flex-col backdrop-blur-sm bg-white/95"
             style={{
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)'
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+              maxHeight: 'calc(100vh - 2rem)'
             }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-3 sm:mb-4 pb-3 border-b-2 border-gray-100">
-              <h3 className="text-base sm:text-lg font-bold text-gray-900 flex items-center gap-2">
-                <span className="material-symbols-outlined text-lg sm:text-xl text-blue-600">emoji_emotions</span>
+            <div className="flex items-center justify-between mb-2 sm:mb-3 pb-2 border-b-2 border-gray-100 flex-shrink-0">
+              <h3 className="text-sm sm:text-base font-bold text-gray-900 flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-base sm:text-lg text-blue-600">emoji_emotions</span>
                 <span className="hidden sm:inline">Select Icon</span>
                 <span className="sm:hidden">Icons</span>
               </h3>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 sm:p-1.5 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation"
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation flex-shrink-0"
                 title="Close"
                 aria-label="Close icon picker"
               >
-                <span className="material-symbols-outlined text-gray-600 text-lg sm:text-xl">close</span>
+                <span className="material-symbols-outlined text-gray-600 text-base sm:text-lg">close</span>
               </button>
             </div>
 
             {/* Categories - Responsive scroll */}
-            <div className="flex gap-2 mb-4 overflow-x-auto pb-2 custom-scrollbar -mx-1 px-1">
+            <div className="flex gap-1.5 sm:gap-2 mb-2 sm:mb-3 overflow-x-auto pb-2 custom-scrollbar -mx-1 px-1 flex-shrink-0">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-semibold rounded-xl whitespace-nowrap transition-all duration-200 flex-shrink-0 ${
+                  className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-all duration-200 flex-shrink-0 ${
                     selectedCategory === cat
-                      ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-transparent hover:border-gray-300"
+                      ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-500/30"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-transparent hover:border-gray-300"
                   }`}
                 >
                   {cat}
@@ -121,8 +122,8 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
             </div>
 
             {/* Icon grid - Responsive columns */}
-            <div className="overflow-y-auto flex-1 custom-scrollbar">
-              <div className="grid grid-cols-6 sm:grid-cols-8 gap-2 sm:gap-3">
+            <div className="overflow-y-auto flex-1 min-h-0 custom-scrollbar">
+              <div className="grid grid-cols-6 sm:grid-cols-8 gap-1.5 sm:gap-2">
                 {displayIcons.map((icon, index) => (
                   <button
                     key={index}
@@ -131,10 +132,10 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
                       onSelectIcon(icon);
                       setIsOpen(false);
                     }}
-                    className={`group relative w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center text-xl sm:text-2xl rounded-xl transition-all duration-300 hover:scale-110 hover:-translate-y-1 ${
+                    className={`group relative w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center text-lg sm:text-xl rounded-lg transition-all duration-300 hover:scale-110 hover:-translate-y-1 ${
                       selectedIcon === icon
-                        ? "bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 ring-2 sm:ring-4 ring-blue-300 ring-offset-1 sm:ring-offset-2 shadow-xl scale-110 transform rotate-3"
-                        : "bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg"
+                        ? "bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700 ring-2 sm:ring-3 ring-blue-300 ring-offset-1 shadow-lg scale-110 transform rotate-3"
+                        : "bg-gradient-to-br from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 border border-gray-200 hover:border-blue-300 hover:shadow-md"
                     }`}
                     style={selectedIcon === icon ? {
                       boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.4), 0 4px 6px -2px rgba(59, 130, 246, 0.3)'
@@ -153,14 +154,14 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
             </div>
 
             {/* Footer */}
-            <div className="mt-4 pt-3 border-t-2 border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0">
+            <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t-2 border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-0 flex-shrink-0">
               <p className="text-xs text-gray-500 text-center sm:text-left">
-                {displayIcons.length} icon{displayIcons.length !== 1 ? "s" : ""} available
+                {displayIcons.length} icon{displayIcons.length !== 1 ? "s" : ""}
               </p>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="px-4 py-2.5 sm:py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 text-sm font-semibold shadow-lg shadow-blue-500/30 touch-manipulation"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 text-xs sm:text-sm font-semibold shadow-md shadow-blue-500/30 touch-manipulation"
               >
                 Done
               </button>
