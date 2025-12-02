@@ -8,14 +8,11 @@ interface IconPickerProps {
   label?: string;
 }
 
-// Icon catalog organized by categories (email-compatible emojis)
+// Icon catalog - Only essential icons for email signatures
 const ICON_CATEGORIES = {
-  Communication: ["📞", "📱", "✉️", "📧", "💬", "📨", "📮", "📠"],
-  Location: ["📍", "🗺️", "🌍", "🏢", "🏠", "🏪", "🏛️", "🚗"],
-  Social: ["🌐", "💼", "🔗", "📱", "💻", "📸", "🎥", "📺"],
-  Time: ["🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚", "🕛", "⏰", "📅", "🗓️"],
-  Information: ["ℹ️", "📋", "📝", "📄", "📎", "📌", "⭐", "✅"],
-  Other: ["⚡", "🔥", "💡", "🎯", "🚀", "⭐", "✨", "🎨", "🎭", "🎪", "🎬", "🎤", "🎧", "🎮", "🎲"],
+  Contact: ["📞", "📱", "✉️", "📧", "📍", "🌐"],
+  Social: ["💼", "🔗", "💻", "📸", "📺"],
+  Time: ["🕐", "⏰", "📅"],
 };
 
 const ALL_ICONS = Object.values(ICON_CATEGORIES).flat();
@@ -76,17 +73,17 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
             onClick={() => setIsOpen(false)}
           />
           
-          {/* Icon selection panel - Opens upward to always fit in viewport */}
+          {/* Icon selection panel - Opens upward, optimized size */}
           <div 
-            className="fixed sm:absolute inset-x-2 sm:inset-x-auto top-auto sm:bottom-full bottom-2 sm:top-auto left-0 right-0 sm:left-0 sm:right-auto sm:mb-2 z-[9999] bg-white border border-gray-300 rounded-lg shadow-xl p-2 sm:p-3 w-auto sm:w-full max-w-full sm:max-w-sm h-auto max-h-[50vh] sm:max-h-[320px] overflow-hidden flex flex-col"
+            className="fixed sm:absolute inset-x-2 sm:inset-x-auto top-auto sm:bottom-full bottom-2 sm:top-auto left-0 right-0 sm:left-0 sm:right-auto sm:mb-2 z-[9999] bg-white border border-gray-300 rounded-lg shadow-xl p-3 sm:p-4 w-auto sm:w-full max-w-full sm:max-w-sm h-auto max-h-[55vh] sm:max-h-[360px] overflow-hidden flex flex-col"
             style={{
               boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
             }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-200 flex-shrink-0">
-              <span className="text-xs sm:text-sm font-semibold text-gray-700">Select Icon</span>
+            <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-200 flex-shrink-0">
+              <span className="text-sm font-semibold text-gray-700">Select Icon</span>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
@@ -94,18 +91,18 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
                 title="Close"
                 aria-label="Close"
               >
-                <span className="material-symbols-outlined text-gray-500 text-sm">close</span>
+                <span className="material-symbols-outlined text-gray-500 text-base">close</span>
               </button>
             </div>
 
             {/* Categories */}
-            <div className="flex gap-1 mb-2 overflow-x-auto pb-1 custom-scrollbar flex-shrink-0">
+            <div className="flex gap-2 mb-3 overflow-x-auto pb-2 custom-scrollbar flex-shrink-0">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-2.5 py-1 text-[10px] sm:text-xs font-medium rounded-md whitespace-nowrap transition-all duration-200 flex-shrink-0 ${
+                  className={`px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap transition-all duration-200 flex-shrink-0 ${
                     selectedCategory === cat
                       ? "bg-blue-600 text-white shadow-sm"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -116,9 +113,9 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
               ))}
             </div>
 
-            {/* Icon grid - Balanced size */}
+            {/* Icon grid - Larger icons, fewer columns */}
             <div className="overflow-y-auto flex-1 min-h-0 custom-scrollbar">
-              <div className="grid grid-cols-8 sm:grid-cols-10 gap-1.5">
+              <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
                 {displayIcons.map((icon, index) => (
                   <button
                     key={index}
@@ -127,7 +124,7 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
                       onSelectIcon(icon);
                       setIsOpen(false);
                     }}
-                    className={`group relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-base sm:text-lg rounded-md transition-all duration-200 hover:scale-110 ${
+                    className={`group relative w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center text-xl sm:text-2xl rounded-lg transition-all duration-200 hover:scale-110 ${
                       selectedIcon === icon
                         ? "bg-blue-600 ring-2 ring-blue-300 shadow-md scale-105"
                         : "bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300"
