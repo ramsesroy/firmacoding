@@ -51,7 +51,6 @@ export async function exportToPNG(
 
     // Configure html2canvas options
     const canvas = await html2canvas(element, {
-      backgroundColor: "#ffffff",
       scale: scale,
       logging: false,
       useCORS: true,
@@ -159,7 +158,6 @@ export async function exportToPDF(
 
     // Capture element to canvas
     const canvas = await html2canvas(element, {
-      backgroundColor: "#ffffff",
       scale: scale,
       logging: false,
       useCORS: true,
