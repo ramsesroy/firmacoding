@@ -1070,8 +1070,6 @@ function DashboardContent() {
                 </div>
               </div>
             </div>
-          </div>
-          </div>
 
             {/* Preview - Card */}
           <div className="lg:col-span-7 bg-white rounded-2xl border border-gray-200/80 shadow-lg shadow-gray-900/5 p-6 sm:p-8 overflow-y-auto flex flex-col custom-scrollbar">
@@ -1126,8 +1124,7 @@ function DashboardContent() {
             {/* Action Buttons */}
             <div className="mt-auto pt-6 border-t-2 border-gray-100">
               <div className="flex flex-col gap-4">
-                {/* Main Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <button
                     onClick={handleCopyToClipboard}
                     className={`group flex-1 px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 ${
