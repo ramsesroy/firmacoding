@@ -1070,8 +1070,9 @@ function DashboardContent() {
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Preview - Card */}
+          {/* Preview - Card */}
           <div className="lg:col-span-7 bg-white rounded-2xl border border-gray-200/80 shadow-lg shadow-gray-900/5 p-6 sm:p-8 overflow-y-auto flex flex-col custom-scrollbar">
             <div className="mb-6 pb-6 border-b border-gray-100">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-100 rounded-full mb-4">
