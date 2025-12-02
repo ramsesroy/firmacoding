@@ -58,6 +58,73 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Crear trigger para updated_at
+DROP TRIGGER IF EXISTS set_updated_at ON public.signatures;
+CREATE TRIGGER set_updated_at
+    BEFORE UPDATE ON public.signatures
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
+
+-- ============================================
+-- CONFIGURACIÓN DE STORAGE (BUCKET: demomail)
+-- ============================================
+-- Nota: Debes crear el bucket 'demomail' en el Storage de Supabase antes de ejecutar estas políticas
+
+-- Habilitar RLS en el bucket (esto se hace automáticamente al crear el bucket con RLS habilitado)
+-- Si el bucket ya existe, verifica que RLS esté habilitado en la configuración del Storage
+
+-- Política: Usuarios autenticados pueden subir archivos en su propia carpeta
+CREATE POLICY "Authenticated users can upload own files"
+    ON storage.objects
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (
+        bucket_id = 'demomail' AND
+        (storage.foldername(name))[1] = auth.uid()::text
+    );
+
+-- Política: Usuarios autenticados pueden leer sus propios archivos
+CREATE POLICY "Authenticated users can read own files"
+    ON storage.objects
+    FOR SELECT
+    TO authenticated
+    USING (
+        bucket_id = 'demomail' AND
+        (storage.foldername(name))[1] = auth.uid()::text
+    );
+
+-- Política: Usuarios autenticados pueden actualizar sus propios archivos
+CREATE POLICY "Authenticated users can update own files"
+    ON storage.objects
+    FOR UPDATE
+    TO authenticated
+    USING (
+        bucket_id = 'demomail' AND
+        (storage.foldername(name))[1] = auth.uid()::text
+    )
+    WITH CHECK (
+        bucket_id = 'demomail' AND
+        (storage.foldername(name))[1] = auth.uid()::text
+    );
+
+-- Política: Usuarios autenticados pueden eliminar sus propios archivos
+CREATE POLICY "Authenticated users can delete own files"
+    ON storage.objects
+    FOR DELETE
+    TO authenticated
+    USING (
+        bucket_id = 'demomail' AND
+        (storage.foldername(name))[1] = auth.uid()::text
+    );
+
+-- Política: Los archivos son públicos para lectura (para que las URLs públicas funcionen)
+CREATE POLICY "Public read access"
+    ON storage.objects
+    FOR SELECT
+    TO public
+    USING (bucket_id = 'demomail');
+$$ LANGUAGE plpgsql;
+
 -- Trigger para actualizar updated_at
 CREATE TRIGGER set_updated_at
     BEFORE UPDATE ON public.signatures
