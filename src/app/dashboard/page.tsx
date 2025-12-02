@@ -63,11 +63,11 @@ function DashboardContent() {
 
   const getExampleLogo = (template: TemplateType): string => {
     const logoMap: Record<string, string> = {
-      // Professional: 120x40px horizontal corporate logo (needs wide horizontal format)
-      professional: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=360&h=120&fit=crop&auto=format&q=90",
+      // Professional: 120x40px horizontal corporate logo (MOON WALK style - black background with white/gray text)
+      professional: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=360&h=120&fit=crop&auto=format&q=90", // MOON WALK style logo
       
-      // Corporate Consultant: 140x45px horizontal business logo
-      corporateConsultant: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=420&h=135&fit=crop&auto=format&q=90",
+      // Corporate Consultant: 140x45px horizontal business logo (MOON WALK style - black background with white/gray text)
+      corporateConsultant: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=420&h=135&fit=crop&auto=format&q=90", // MOON WALK style logo
       
       // Interior Design: Needs a design/architecture style logo - horizontal format
       interiorDesign: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=400&h=120&fit=crop&auto=format&q=90",
