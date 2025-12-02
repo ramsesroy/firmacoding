@@ -37,6 +37,7 @@ export type TemplateType =
   | "modern3"                  // Modern 3 (template_08)
   | "modern4"                  // Modern 4 (template_09)
   | "qrCorporated"             // QR Corporated (template_10)
+  | "developerMinimal2025";    // Developer Minimal 2025 - Para desarrolladores
   | "techDeveloper"            // Tech Developer - Para desarrolladores
   | "salesProfessional"        // Sales Professional - Para comerciales
   | "boldExecutive"            // Bold Executive - Para ejecutivos

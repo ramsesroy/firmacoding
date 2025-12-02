@@ -62,6 +62,8 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
         return renderTemplate09();
       case "qrCorporated":
         return renderTemplate10();
+      case "developerMinimal2025":
+        return renderDeveloperMinimal2025();
       default:
         return renderClassicTemplate();
     }
@@ -2612,6 +2614,229 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                       any third party without the sender's written consent. If this email reached
                       you by mistake, please let us know so that we can ensure that this doesn't
                       happen in the future and delete the message.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  // Developer Minimal 2025: Minimal design for developers with clean layout
+  const renderDeveloperMinimal2025 = () => {
+    const email = redes.find((r) => r.url.includes("@"));
+    const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+    const github = redes.find((r) => r.nombre.toLowerCase().includes("github"));
+    const twitter = redes.find((r) => r.nombre.toLowerCase().includes("twitter") || r.nombre.toLowerCase().includes("x.com"));
+    const website = redes.find((r) => r.url.includes("www") && !r.url.includes("linkedin") && !r.url.includes("github") && !r.url.includes("twitter") && !r.url.includes("x.com"));
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#333333",
+          lineHeight: "1.5",
+        }}
+      >
+        <tbody>
+          <tr>
+            {foto && (
+              <td
+                valign="top"
+                style={{
+                  paddingRight: "16px",
+                  verticalAlign: "top",
+                }}
+              >
+                <img
+                  src={foto}
+                  alt={nombre}
+                  style={{
+                    width: "64px",
+                    height: "64px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    display: "block",
+                    border: "2px solid #e5e7eb",
+                  }}
+                />
+              </td>
+            )}
+            <td valign="top" style={{ verticalAlign: "top" }}>
+              <table
+                cellPadding="0"
+                cellSpacing="0"
+                border={0}
+                style={{
+                  borderCollapse: "collapse",
+                }}
+              >
+                <tbody>
+                  {/* Nombre + Cargo */}
+                  <tr>
+                    <td style={{ paddingBottom: "4px" }}>
+                      <table
+                        cellPadding="0"
+                        cellSpacing="0"
+                        border={0}
+                        style={{
+                          borderCollapse: "collapse",
+                        }}
+                      >
+                        <tbody>
+                          <tr>
+                            <td
+                              style={{
+                                fontSize: "18px",
+                                fontWeight: "600",
+                                color: "#111827",
+                                paddingRight: "12px",
+                                fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                              }}
+                            >
+                              {nombre}
+                            </td>
+                            <td
+                              style={{
+                                fontSize: "18px",
+                                color: "#9ca3af",
+                                paddingRight: "12px",
+                              }}
+                            >
+                              |
+                            </td>
+                            <td
+                              style={{
+                                fontSize: "14px",
+                                fontWeight: "500",
+                                color: "#4b5563",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.05em",
+                                fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                              }}
+                            >
+                              {cargo}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+
+                  {/* Links con iconos */}
+                  <tr>
+                    <td style={{ paddingTop: "4px" }}>
+                      <table
+                        cellPadding="0"
+                        cellSpacing="0"
+                        border={0}
+                        style={{
+                          borderCollapse: "collapse",
+                        }}
+                      >
+                        <tbody>
+                          <tr>
+                            {telefono && (
+                              <td style={{ paddingRight: "20px", paddingBottom: "2px" }}>
+                                <a
+                                  href={`tel:${telefono.replace(/[^0-9+]/g, "")}`}
+                                  style={{
+                                    color: "#374151",
+                                    textDecoration: "none",
+                                    fontSize: "14px",
+                                    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                                  }}
+                                >
+                                  📞 {telefono}
+                                </a>
+                              </td>
+                            )}
+                            {email && (
+                              <td style={{ paddingRight: "20px", paddingBottom: "2px" }}>
+                                <a
+                                  href={`mailto:${email.url}`}
+                                  style={{
+                                    color: "#374151",
+                                    textDecoration: "none",
+                                    fontSize: "14px",
+                                    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                                  }}
+                                >
+                                  ✉️ {email.url}
+                                </a>
+                              </td>
+                            )}
+                            {linkedin && (
+                              <td style={{ paddingRight: "20px", paddingBottom: "2px" }}>
+                                <a
+                                  href={linkedin.url}
+                                  style={{
+                                    color: "#374151",
+                                    textDecoration: "none",
+                                    fontSize: "14px",
+                                    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                                  }}
+                                >
+                                  💼 LinkedIn
+                                </a>
+                              </td>
+                            )}
+                            {github && (
+                              <td style={{ paddingRight: "20px", paddingBottom: "2px" }}>
+                                <a
+                                  href={github.url}
+                                  style={{
+                                    color: "#374151",
+                                    textDecoration: "none",
+                                    fontSize: "14px",
+                                    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                                  }}
+                                >
+                                  💻 GitHub
+                                </a>
+                              </td>
+                            )}
+                            {twitter && (
+                              <td style={{ paddingRight: "20px", paddingBottom: "2px" }}>
+                                <a
+                                  href={twitter.url}
+                                  style={{
+                                    color: "#374151",
+                                    textDecoration: "none",
+                                    fontSize: "14px",
+                                    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                                  }}
+                                >
+                                  🐦 Twitter
+                                </a>
+                              </td>
+                            )}
+                            {website && (
+                              <td style={{ paddingRight: "20px", paddingBottom: "2px" }}>
+                                <a
+                                  href={website.url}
+                                  style={{
+                                    color: "#374151",
+                                    textDecoration: "none",
+                                    fontSize: "14px",
+                                    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+                                  }}
+                                >
+                                  🌐 {website.nombre || "Website"}
+                                </a>
+                              </td>
+                            )}
+                          </tr>
+                        </tbody>
+                      </table>
                     </td>
                   </tr>
                 </tbody>

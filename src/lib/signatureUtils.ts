@@ -87,6 +87,8 @@ export function getBaseSignatureHTML(
       return generateTemplate09HTML(nombre, cargo, foto, telefono, redes, colorPersonalizado, ctaTexto);
     case "qrCorporated":
       return generateTemplate10HTML(nombre, cargo, telefono, redes, qrLink);
+    case "developerMinimal2025":
+      return generateDeveloperMinimal2025HTML(nombre, cargo, foto, telefono, redes);
     default:
       return generateClassicHTML(nombre, cargo, foto, telefono, redes);
   }
