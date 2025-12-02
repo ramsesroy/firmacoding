@@ -292,7 +292,7 @@ export default function SignaturesPage() {
                       Template: <span className="font-medium">{signature.template_id}</span>
                     </div>
                     <div 
-                      ref={(el) => (previewRefs.current[signature.id] = el)}
+                      ref={(el) => { previewRefs.current[signature.id] = el; }}
                       className="overflow-x-auto"
                     >
                       <SignaturePreview
