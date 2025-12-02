@@ -120,9 +120,16 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
               ))}
             </div>
 
-            {/* Icon grid - Balanced size for visibility */}
-            <div className="overflow-y-auto flex-1 min-h-0 custom-scrollbar">
-              <div className="grid grid-cols-5 sm:grid-cols-6 gap-3 sm:gap-3.5">
+            {/* Icon grid - Horizontal scroll layout */}
+            <div 
+              className="overflow-x-auto overflow-y-hidden pb-4 custom-scrollbar-horizontal flex-1 min-h-0"
+              style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#64748b #f1f5f9',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              <div className="flex gap-3 sm:gap-3.5 min-w-max">
                 {displayIcons.map((icon, index) => (
                   <button
                     key={index}
@@ -131,7 +138,7 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
                       onSelectIcon(icon);
                       setIsOpen(false);
                     }}
-                    className={`group relative w-14 h-14 sm:w-14 sm:h-14 flex items-center justify-center text-2xl sm:text-3xl rounded-xl transition-all duration-200 hover:scale-110 hover:shadow-lg ${
+                    className={`group relative w-14 h-14 sm:w-16 sm:h-16 flex-shrink-0 flex items-center justify-center text-2xl sm:text-3xl rounded-xl transition-all duration-200 hover:scale-110 hover:shadow-lg ${
                       selectedIcon === icon
                         ? "bg-blue-600 ring-3 ring-blue-400 shadow-xl scale-105"
                         : "bg-gray-50 hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-400 hover:shadow-md"
