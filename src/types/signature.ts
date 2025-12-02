@@ -39,5 +39,10 @@ export type TemplateType =
   | "universityProfessor"     // University Professor - Academic with university logo
   | "universityBanner"        // University Banner - Blue banner with profile photo
   | "creativePortfolio"       // Creative Portfolio - Design portfolio with Behance/Dribbble buttons
-  | "militaryProfessional";   // Military Professional - Military-style with structured layout
+  | "militaryProfessional"    // Military Professional - Military-style with structured layout
+  | "churchProfessional"      // Church Professional - Church signature with logo and teal accents
+  | "universityPresident"     // University President - Panel design with inspirational quote
+  | "pastorSignature"         // Pastor Signature - Two columns with circular logo and tagline
+  | "lawStudent"              // Law Student - Green banner with photo and environmental message
+  | "greenExecutive";         // Green Executive - Simple divided layout with environmental message
 

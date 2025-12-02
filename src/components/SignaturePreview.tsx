@@ -68,6 +68,16 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
         return renderCreativePortfolio();
       case "militaryProfessional":
         return renderMilitaryProfessional();
+      case "churchProfessional":
+        return renderChurchProfessional();
+      case "universityPresident":
+        return renderUniversityPresident();
+      case "pastorSignature":
+        return renderPastorSignature();
+      case "lawStudent":
+        return renderLawStudent();
+      case "greenExecutive":
+        return renderGreenExecutive();
       default:
         return renderClassicTemplate();
     }
@@ -3959,6 +3969,716 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                   )}
                 </tbody>
               </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderChurchProfessional = () => {
+    const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+    const website = redes.find((r) => {
+      const url = r.url.toLowerCase();
+      return (url.includes("www") || url.includes("http")) && !url.includes("linkedin") && !url.includes("github");
+    });
+    const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+    const twitter = redes.find((r) => r.nombre.toLowerCase().includes("twitter") || r.nombre.toLowerCase().includes("x.com"));
+    const facebook = redes.find((r) => r.nombre.toLowerCase().includes("facebook"));
+    const instagram = redes.find((r) => r.nombre.toLowerCase().includes("instagram"));
+    const youtube = redes.find((r) => r.nombre.toLowerCase().includes("youtube"));
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#1e293b",
+          lineHeight: "1.6",
+        }}
+      >
+        <tbody>
+          <tr>
+            <td style={{ paddingRight: "30px", verticalAlign: "top" }}>
+              <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ paddingBottom: "8px" }}>
+                      <div style={{ fontSize: "22px", fontWeight: "700", color: "#14b8a6", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                        {nombre}
+                      </div>
+                      <div style={{ fontSize: "12px", fontWeight: "600", color: "#64748b", textTransform: "uppercase", letterSpacing: "0.1em", marginTop: "4px" }}>
+                        {cargo}
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ borderTop: "2px solid #14b8a6", marginTop: "8px", marginBottom: "8px", paddingTop: "8px", paddingBottom: "8px" }}>
+                      {telefono && <div style={{ fontSize: "14px", color: "#1e293b", marginBottom: "4px" }}>Office: {telefono}</div>}
+                      {telefonoMovil && <div style={{ fontSize: "14px", color: "#1e293b", marginBottom: "4px" }}>Cell: {telefonoMovil}</div>}
+                      {email && (
+                        <div style={{ fontSize: "14px", color: "#1e293b" }}>
+                          Email:{" "}
+                          <a href={`mailto:${email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}`} style={{ color: "#1e293b", textDecoration: "none" }}>
+                            {email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}
+                          </a>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                  {(linkedin || twitter || facebook || instagram || youtube) && (
+                    <tr>
+                      <td style={{ borderTop: "2px solid #14b8a6", paddingTop: "8px", paddingBottom: "8px" }}>
+                        {linkedin && (
+                          <a
+                            href={linkedin.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              backgroundColor: "#64748b",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "12px",
+                            }}
+                          >
+                            in
+                          </a>
+                        )}
+                        {twitter && (
+                          <a
+                            href={twitter.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              backgroundColor: "#64748b",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "14px",
+                            }}
+                          >
+                            🐦
+                          </a>
+                        )}
+                        {facebook && (
+                          <a
+                            href={facebook.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              backgroundColor: "#64748b",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "16px",
+                            }}
+                          >
+                            f
+                          </a>
+                        )}
+                        {instagram && (
+                          <a
+                            href={instagram.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              backgroundColor: "#64748b",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "16px",
+                            }}
+                          >
+                            📷
+                          </a>
+                        )}
+                        {youtube && (
+                          <a
+                            href={youtube.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              backgroundColor: "#64748b",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "14px",
+                            }}
+                          >
+                            ▶
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                  {website && (
+                    <tr>
+                      <td style={{ paddingTop: "8px" }}>
+                        <a href={website.url} style={{ color: "#14b8a6", textDecoration: "none", fontSize: "14px", fontWeight: "600" }}>
+                          {website.url.replace(/^https?:\/\//, "").replace(/^www\./, "")}
+                        </a>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </td>
+            {logoEmpresa && (
+              <td style={{ verticalAlign: "top", textAlign: "right" }}>
+                <img src={logoEmpresa} alt="Church Logo" height={80} style={{ height: "80px", maxWidth: "200px", display: "block" }} />
+                <div style={{ fontSize: "16px", fontWeight: "700", color: "#14b8a6", textTransform: "uppercase", letterSpacing: "0.1em", marginTop: "8px", textAlign: "center" }}>
+                  CHURCH
+                </div>
+              </td>
+            )}
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderUniversityPresident = () => {
+    const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+    const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+    const twitter = redes.find((r) => r.nombre.toLowerCase().includes("twitter") || r.nombre.toLowerCase().includes("x.com"));
+    const facebook = redes.find((r) => r.nombre.toLowerCase().includes("facebook"));
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "Georgia, serif",
+          fontSize: "14px",
+          color: "#1e293b",
+          lineHeight: "1.7",
+          backgroundColor: "#ffffff",
+          borderRadius: "8px",
+          padding: "20px",
+        }}
+      >
+        <tbody>
+          <tr>
+            <td style={{ paddingBottom: "16px" }}>
+              <div style={{ fontSize: "24px", fontWeight: "700", color: "#7c2d12", fontFamily: "Georgia, serif" }}>{nombre}</div>
+              <div style={{ fontSize: "14px", color: "#64748b", fontFamily: "Georgia, serif", marginTop: "4px" }}>{cargo}</div>
+            </td>
+          </tr>
+          <tr>
+            <td style={{ paddingBottom: "12px", fontSize: "14px", color: "#1e293b" }}>
+              {telefono && (
+                <>
+                  Office: <span style={{ color: "#7c2d12" }}>{telefono}</span>
+                </>
+              )}
+              {telefono && telefonoMovil && <span style={{ color: "#cbd5e1" }}> • </span>}
+              {telefonoMovil && (
+                <>
+                  Mobile: <span style={{ color: "#7c2d12" }}>{telefonoMovil}</span>
+                </>
+              )}
+            </td>
+          </tr>
+          {email && (
+            <tr>
+              <td style={{ paddingBottom: "12px" }}>
+                <a href={`mailto:${email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}`} style={{ color: "#7c2d12", textDecoration: "none", fontSize: "14px" }}>
+                  {email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}
+                </a>
+              </td>
+            </tr>
+          )}
+          <tr>
+            <td style={{ paddingBottom: "16px", borderTop: "1px solid #e2e8f0", paddingTop: "16px" }}>
+              <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                <tbody>
+                  <tr>
+                    {logoEmpresa && (
+                      <td style={{ paddingRight: "16px", verticalAlign: "top" }}>
+                        <img src={logoEmpresa} alt="University Logo" width={60} height={60} style={{ width: "60px", height: "60px", display: "block" }} />
+                      </td>
+                    )}
+                    <td style={{ verticalAlign: "top" }}>
+                      <div style={{ fontSize: "16px", fontWeight: "700", color: "#1e293b", fontFamily: "Georgia, serif" }}>UNIVERSITY NAME</div>
+                      <div style={{ fontSize: "14px", color: "#64748b", fontFamily: "Georgia, serif" }}>Christian University</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          {(linkedin || twitter || facebook) && (
+            <tr>
+              <td style={{ paddingBottom: "16px", borderTop: "1px solid #e2e8f0", paddingTop: "16px" }}>
+                <div style={{ fontSize: "14px", color: "#7c2d12" }}>
+                  {linkedin && (
+                    <>
+                      <a href={linkedin.url} style={{ color: "#7c2d12", textDecoration: "none", marginRight: "8px" }}>
+                        LinkedIn
+                      </a>
+                    </>
+                  )}
+                  {linkedin && (twitter || facebook) && <span style={{ color: "#cbd5e1" }}>|</span>}
+                  {twitter && (
+                    <>
+                      <a href={twitter.url} style={{ color: "#7c2d12", textDecoration: "none", marginRight: "8px", marginLeft: "8px" }}>
+                        Twitter
+                      </a>
+                    </>
+                  )}
+                  {(linkedin || twitter) && facebook && <span style={{ color: "#cbd5e1" }}>|</span>}
+                  {facebook && (
+                    <>
+                      <a href={facebook.url} style={{ color: "#7c2d12", textDecoration: "none", marginLeft: "8px" }}>
+                        Facebook
+                      </a>
+                    </>
+                  )}
+                </div>
+              </td>
+            </tr>
+          )}
+          {textoAdicional && (
+            <tr>
+              <td style={{ paddingTop: "16px", borderTop: "1px solid #e2e8f0" }}>
+                <div style={{ fontSize: "13px", fontStyle: "italic", color: "#7c2d12", fontFamily: "Georgia, serif" }}>~ {textoAdicional}</div>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderPastorSignature = () => {
+    const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+    const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+    const twitter = redes.find((r) => r.nombre.toLowerCase().includes("twitter") || r.nombre.toLowerCase().includes("x.com"));
+    const facebook = redes.find((r) => r.nombre.toLowerCase().includes("facebook"));
+    const youtube = redes.find((r) => r.nombre.toLowerCase().includes("youtube"));
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#1e293b",
+          lineHeight: "1.6",
+        }}
+      >
+        <tbody>
+          <tr>
+            <td style={{ paddingRight: "30px", verticalAlign: "top", borderRight: "1px solid #cbd5e1" }}>
+              <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ paddingBottom: "12px" }}>
+                      <div style={{ fontSize: "20px", fontWeight: "700", color: "#14b8a6" }}>{nombre}</div>
+                      <div style={{ fontSize: "13px", color: "#64748b", marginTop: "4px" }}>{cargo}</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ paddingBottom: "8px", fontSize: "14px", color: "#64748b" }}>
+                      {telefono && <div>M. {telefono}</div>}
+                      {email && (
+                        <div>
+                          E.{" "}
+                          <a href={`mailto:${email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}`} style={{ color: "#64748b", textDecoration: "none" }}>
+                            {email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}
+                          </a>
+                        </div>
+                      )}
+                      {direccion && <div>A. {direccion}</div>}
+                    </td>
+                  </tr>
+                  {textoAdicional && (
+                    <tr>
+                      <td style={{ paddingTop: "12px", paddingBottom: "12px", fontStyle: "italic", color: "#14b8a6", fontSize: "14px" }}>
+                        {textoAdicional}
+                      </td>
+                    </tr>
+                  )}
+                  {(linkedin || twitter || facebook || youtube) && (
+                    <tr>
+                      <td style={{ paddingTop: "8px" }}>
+                        {linkedin && (
+                          <a
+                            href={linkedin.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              backgroundColor: "#64748b",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "12px",
+                            }}
+                          >
+                            in
+                          </a>
+                        )}
+                        {twitter && (
+                          <a
+                            href={twitter.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              backgroundColor: "#64748b",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "14px",
+                            }}
+                          >
+                            🐦
+                          </a>
+                        )}
+                        {facebook && (
+                          <a
+                            href={facebook.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              backgroundColor: "#64748b",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "16px",
+                            }}
+                          >
+                            f
+                          </a>
+                        )}
+                        {youtube && (
+                          <a
+                            href={youtube.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              backgroundColor: "#64748b",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "14px",
+                            }}
+                          >
+                            ▶
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </td>
+            <td style={{ paddingLeft: "30px", verticalAlign: "middle", textAlign: "center" }}>
+              {logoEmpresa && <img src={logoEmpresa} alt="Church Logo" width={80} height={80} style={{ width: "80px", height: "80px", borderRadius: "50%", display: "block", margin: "0 auto" }} />}
+              <div style={{ fontSize: "18px", fontWeight: "700", color: "#14b8a6", marginTop: "12px", textTransform: "uppercase" }}>CHURCH NAME</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderLawStudent = () => {
+    const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+    const website = redes.find((r) => {
+      const url = r.url.toLowerCase();
+      return (url.includes("www") || url.includes("http")) && !url.includes("linkedin") && !url.includes("github");
+    });
+    const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+    const instagram = redes.find((r) => r.nombre.toLowerCase().includes("instagram"));
+    const facebook = redes.find((r) => r.nombre.toLowerCase().includes("facebook"));
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#1e293b",
+          lineHeight: "1.6",
+        }}
+      >
+        <tbody>
+          <tr>
+            <td style={{ background: "linear-gradient(135deg, #059669 0%, #047857 100%)", padding: "20px" }}>
+              <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                <tbody>
+                  <tr>
+                    {foto && (
+                      <td style={{ paddingRight: "16px", verticalAlign: "middle" }}>
+                        <img
+                          src={foto}
+                          alt={nombre}
+                          width={70}
+                          height={70}
+                          style={{
+                            width: "70px",
+                            height: "70px",
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            display: "block",
+                            border: "3px solid rgba(255,255,255,0.3)",
+                          }}
+                        />
+                      </td>
+                    )}
+                    <td style={{ verticalAlign: "middle" }}>
+                      <div style={{ fontSize: "11px", fontWeight: "600", color: "#ffffff", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "4px" }}>
+                        {cargo}
+                      </div>
+                      <div style={{ fontSize: "22px", fontWeight: "700", color: "#ffffff", textTransform: "uppercase", letterSpacing: "0.05em" }}>{nombre}</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style={{ padding: "20px", backgroundColor: "#ffffff" }}>
+              <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                <tbody>
+                  {direccion && (
+                    <tr>
+                      <td style={{ paddingBottom: "6px", fontSize: "14px", color: "#059669" }}>
+                        <strong>A:</strong> <span style={{ color: "#1e293b" }}>{direccion}</span>
+                      </td>
+                    </tr>
+                  )}
+                  {telefonoMovil && (
+                    <tr>
+                      <td style={{ paddingBottom: "6px", fontSize: "14px", color: "#059669" }}>
+                        <strong>M:</strong> <span style={{ color: "#1e293b" }}>{telefonoMovil}</span>
+                      </td>
+                    </tr>
+                  )}
+                  {telefono && (
+                    <tr>
+                      <td style={{ paddingBottom: "6px", fontSize: "14px", color: "#059669" }}>
+                        <strong>T:</strong> <span style={{ color: "#1e293b" }}>{telefono}</span>
+                      </td>
+                    </tr>
+                  )}
+                  {email && (
+                    <tr>
+                      <td style={{ paddingBottom: "12px", fontSize: "14px", color: "#059669" }}>
+                        <strong>E:</strong>{" "}
+                        <a href={`mailto:${email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}`} style={{ color: "#1e293b", textDecoration: "none" }}>
+                          {email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}
+                        </a>
+                      </td>
+                    </tr>
+                  )}
+                  {website && (
+                    <tr>
+                      <td style={{ paddingBottom: "12px", fontSize: "14px" }}>
+                        <a href={website.url} style={{ color: "#059669", textDecoration: "none", fontWeight: "600" }}>
+                          {website.url.replace(/^https?:\/\//, "").replace(/^www\./, "")}
+                        </a>
+                      </td>
+                    </tr>
+                  )}
+                  {(linkedin || instagram || facebook) && (
+                    <tr>
+                      <td style={{ paddingTop: "8px", paddingBottom: "12px" }}>
+                        {linkedin && (
+                          <a
+                            href={linkedin.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              background: "#059669",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "12px",
+                            }}
+                          >
+                            in
+                          </a>
+                        )}
+                        {instagram && (
+                          <a
+                            href={instagram.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              background: "#059669",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "16px",
+                            }}
+                          >
+                            📷
+                          </a>
+                        )}
+                        {facebook && (
+                          <a
+                            href={facebook.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              background: "#059669",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "16px",
+                            }}
+                          >
+                            f
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                  {textoAdicional && (
+                    <tr>
+                      <td style={{ paddingTop: "12px", borderTop: "1px solid #e2e8f0", fontSize: "12px", color: "#059669", lineHeight: "1.6" }}>
+                        🌳 {textoAdicional}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderGreenExecutive = () => {
+    const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+    const website = redes.find((r) => {
+      const url = r.url.toLowerCase();
+      return (url.includes("www") || url.includes("http")) && !url.includes("linkedin") && !url.includes("github");
+    });
+
+    const nombreParts = nombre.split(" ");
+    const firstName = nombreParts[0] || nombre;
+    const lastName = nombreParts.slice(1).join(" ") || "";
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#1e293b",
+          lineHeight: "1.7",
+        }}
+      >
+        <tbody>
+          <tr>
+            <td style={{ paddingRight: "40px", verticalAlign: "top", borderRight: "1px solid #86efac" }}>
+              <div style={{ fontSize: "32px", fontWeight: "700", color: "#166534", textTransform: "uppercase", letterSpacing: "0.02em", marginBottom: "4px" }}>
+                {firstName}
+              </div>
+              {lastName && (
+                <div style={{ fontSize: "32px", fontWeight: "700", color: "#166534", textTransform: "uppercase", letterSpacing: "0.02em", marginBottom: "16px" }}>
+                  {lastName}
+                </div>
+              )}
+              {telefono && <div style={{ fontSize: "14px", color: "#86efac", marginBottom: "4px" }}>{telefono}</div>}
+              {email && (
+                <div style={{ fontSize: "14px", color: "#86efac", marginBottom: "4px" }}>
+                  <a href={`mailto:${email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}`} style={{ color: "#86efac", textDecoration: "none" }}>
+                    {email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}
+                  </a>
+                </div>
+              )}
+              {website && (
+                <div style={{ fontSize: "14px", color: "#86efac" }}>
+                  <a href={website.url} style={{ color: "#86efac", textDecoration: "none" }}>
+                    {website.url.replace(/^https?:\/\//, "").replace(/^www\./, "")}
+                  </a>
+                </div>
+              )}
+            </td>
+            <td style={{ paddingLeft: "40px", verticalAlign: "top" }}>
+              <div style={{ fontSize: "16px", fontWeight: "600", color: "#86efac", marginBottom: "8px" }}>{cargo}</div>
+              <div style={{ fontSize: "14px", color: "#86efac", marginBottom: "16px" }}>B2B Marketing</div>
+              <div style={{ fontSize: "20px", color: "#166534", marginBottom: "16px" }}>🌳</div>
+              {textoAdicional && (
+                <div style={{ fontSize: "12px", color: "#86efac", lineHeight: "1.6" }}>{textoAdicional}</div>
+              )}
             </td>
           </tr>
         </tbody>

@@ -56,6 +56,21 @@ export async function generateSignatureHTML(
     case "militaryProfessional":
       baseHTML = generateMilitaryProfessionalHTML(nombre, cargo, telefono, redes, direccion);
       break;
+    case "churchProfessional":
+      baseHTML = generateChurchProfessionalHTML(nombre, cargo, logoEmpresa, telefono, telefonoMovil, redes);
+      break;
+    case "universityPresident":
+      baseHTML = generateUniversityPresidentHTML(nombre, cargo, logoEmpresa, telefono, telefonoMovil, redes, direccion, textoAdicional);
+      break;
+    case "pastorSignature":
+      baseHTML = generatePastorSignatureHTML(nombre, cargo, foto, logoEmpresa, telefono, redes, direccion, textoAdicional);
+      break;
+    case "lawStudent":
+      baseHTML = generateLawStudentHTML(nombre, cargo, foto, telefono, telefonoMovil, redes, direccion, textoAdicional);
+      break;
+    case "greenExecutive":
+      baseHTML = generateGreenExecutiveHTML(nombre, cargo, telefono, redes, textoAdicional);
+      break;
     default:
       baseHTML = generateClassicHTML(nombre, cargo, foto, telefono, redes);
   }
@@ -102,6 +117,16 @@ export function getBaseSignatureHTML(
       return generateCreativePortfolioHTML(nombre, cargo, foto, telefono, redes);
     case "militaryProfessional":
       return generateMilitaryProfessionalHTML(nombre, cargo, telefono, redes, direccion);
+    case "churchProfessional":
+      return generateChurchProfessionalHTML(nombre, cargo, logoEmpresa, telefono, telefonoMovil, redes);
+    case "universityPresident":
+      return generateUniversityPresidentHTML(nombre, cargo, logoEmpresa, telefono, telefonoMovil, redes, direccion, textoAdicional);
+    case "pastorSignature":
+      return generatePastorSignatureHTML(nombre, cargo, foto, logoEmpresa, telefono, redes, direccion, textoAdicional);
+    case "lawStudent":
+      return generateLawStudentHTML(nombre, cargo, foto, telefono, telefonoMovil, redes, direccion, textoAdicional);
+    case "greenExecutive":
+      return generateGreenExecutiveHTML(nombre, cargo, telefono, redes, textoAdicional);
     default:
       return generateClassicHTML(nombre, cargo, foto, telefono, redes);
   }
@@ -1976,6 +2001,334 @@ function generateMilitaryProfessionalHTML(
             </tr>` : ""}
           </tbody>
         </table>
+      </td>
+    </tr>
+  </tbody>
+</table>`;
+}
+
+function generateChurchProfessionalHTML(
+  nombre: string,
+  cargo: string,
+  logoEmpresa?: string,
+  telefono?: string,
+  telefonoMovil?: string,
+  redes: RedSocial[] = []
+): string {
+  const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+  const website = redes.find((r) => {
+    const url = r.url.toLowerCase();
+    return (url.includes("www") || url.includes("http")) && !url.includes("linkedin") && !url.includes("github");
+  });
+  const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+  const twitter = redes.find((r) => r.nombre.toLowerCase().includes("twitter") || r.nombre.toLowerCase().includes("x.com"));
+  const facebook = redes.find((r) => r.nombre.toLowerCase().includes("facebook"));
+  const instagram = redes.find((r) => r.nombre.toLowerCase().includes("instagram"));
+  const youtube = redes.find((r) => r.nombre.toLowerCase().includes("youtube"));
+
+  return `
+<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #1e293b; line-height: 1.6;">
+  <tbody>
+    <tr>
+      <td style="padding-right: 30px; vertical-align: top;">
+        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+          <tbody>
+            <tr>
+              <td style="padding-bottom: 8px;">
+                <div style="font-size: 22px; font-weight: 700; color: #14b8a6; text-transform: uppercase; letter-spacing: 0.05em;">${escapeHtml(nombre)}</div>
+                <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;">${escapeHtml(cargo)}</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="border-top: 2px solid #14b8a6; margin-top: 8px; margin-bottom: 8px; padding-top: 8px; padding-bottom: 8px;">
+                ${telefono ? `<div style="font-size: 14px; color: #1e293b; margin-bottom: 4px;">Office: ${escapeHtml(telefono)}</div>` : ""}
+                ${telefonoMovil ? `<div style="font-size: 14px; color: #1e293b; margin-bottom: 4px;">Cell: ${escapeHtml(telefonoMovil)}</div>` : ""}
+                ${email ? `<div style="font-size: 14px; color: #1e293b;">Email: <a href="mailto:${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}" style="color: #1e293b; text-decoration: none;">${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}</a></div>` : ""}
+              </td>
+            </tr>
+            ${(linkedin || twitter || facebook || instagram || youtube) ? `<tr>
+              <td style="border-top: 2px solid #14b8a6; padding-top: 8px; padding-bottom: 8px;">
+                ${linkedin ? `<a href="${escapeHtml(linkedin.url)}" style="display: inline-block; width: 32px; height: 32px; border-radius: 50%; background-color: #64748b; color: white; text-align: center; line-height: 32px; margin-right: 6px; text-decoration: none; font-weight: 700; font-size: 12px;">in</a>` : ""}
+                ${twitter ? `<a href="${escapeHtml(twitter.url)}" style="display: inline-block; width: 32px; height: 32px; border-radius: 50%; background-color: #64748b; color: white; text-align: center; line-height: 32px; margin-right: 6px; text-decoration: none; font-weight: 700; font-size: 14px;">🐦</a>` : ""}
+                ${facebook ? `<a href="${escapeHtml(facebook.url)}" style="display: inline-block; width: 32px; height: 32px; border-radius: 50%; background-color: #64748b; color: white; text-align: center; line-height: 32px; margin-right: 6px; text-decoration: none; font-weight: 700; font-size: 16px;">f</a>` : ""}
+                ${instagram ? `<a href="${escapeHtml(instagram.url)}" style="display: inline-block; width: 32px; height: 32px; border-radius: 50%; background-color: #64748b; color: white; text-align: center; line-height: 32px; margin-right: 6px; text-decoration: none; font-weight: 700; font-size: 16px;">📷</a>` : ""}
+                ${youtube ? `<a href="${escapeHtml(youtube.url)}" style="display: inline-block; width: 32px; height: 32px; border-radius: 50%; background-color: #64748b; color: white; text-align: center; line-height: 32px; margin-right: 6px; text-decoration: none; font-weight: 700; font-size: 14px;">▶</a>` : ""}
+              </td>
+            </tr>` : ""}
+            ${website ? `<tr>
+              <td style="padding-top: 8px;">
+                <a href="${escapeHtml(website.url)}" style="color: #14b8a6; text-decoration: none; font-size: 14px; font-weight: 600;">${escapeHtml(website.url.replace(/^https?:\/\//, "").replace(/^www\./, ""))}</a>
+              </td>
+            </tr>` : ""}
+          </tbody>
+        </table>
+      </td>
+      ${logoEmpresa ? `<td style="vertical-align: top; text-align: right;">
+        <img src="${escapeHtml(logoEmpresa)}" alt="Church Logo" height="80" style="height: 80px; max-width: 200px; display: block;" />
+        <div style="font-size: 16px; font-weight: 700; color: #14b8a6; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 8px; text-align: center;">CHURCH</div>
+      </td>` : ""}
+    </tr>
+  </tbody>
+</table>`;
+}
+
+function generateUniversityPresidentHTML(
+  nombre: string,
+  cargo: string,
+  logoEmpresa?: string,
+  telefono?: string,
+  telefonoMovil?: string,
+  redes: RedSocial[] = [],
+  direccion?: string,
+  textoAdicional?: string
+): string {
+  const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+  const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+  const twitter = redes.find((r) => r.nombre.toLowerCase().includes("twitter") || r.nombre.toLowerCase().includes("x.com"));
+  const facebook = redes.find((r) => r.nombre.toLowerCase().includes("facebook"));
+
+  return `
+<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: Georgia, serif; font-size: 14px; color: #1e293b; line-height: 1.7; background-color: #ffffff; border-radius: 8px; padding: 20px;">
+  <tbody>
+    <tr>
+      <td style="padding-bottom: 16px;">
+        <div style="font-size: 24px; font-weight: 700; color: #7c2d12; font-family: Georgia, serif;">${escapeHtml(nombre)}</div>
+        <div style="font-size: 14px; color: #64748b; font-family: Georgia, serif; margin-top: 4px;">${escapeHtml(cargo)}</div>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding-bottom: 12px; font-size: 14px; color: #1e293b;">
+        ${telefono ? `Office: <span style="color: #7c2d12;">${escapeHtml(telefono)}</span>` : ""}
+        ${telefono && telefonoMovil ? ` <span style="color: #cbd5e1;">•</span> ` : ""}
+        ${telefonoMovil ? `Mobile: <span style="color: #7c2d12;">${escapeHtml(telefonoMovil)}</span>` : ""}
+      </td>
+    </tr>
+    <tr>
+      <td style="padding-bottom: 12px;">
+        ${email ? `<a href="mailto:${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}" style="color: #7c2d12; text-decoration: none; font-size: 14px;">${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}</a>` : ""}
+      </td>
+    </tr>
+    <tr>
+      <td style="padding-bottom: 16px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+          <tbody>
+            <tr>
+              ${logoEmpresa ? `<td style="padding-right: 16px; vertical-align: top;">
+                <img src="${escapeHtml(logoEmpresa)}" alt="University Logo" width="60" height="60" style="width: 60px; height: 60px; display: block;" />
+              </td>` : ""}
+              <td style="vertical-align: top;">
+                <div style="font-size: 16px; font-weight: 700; color: #1e293b; font-family: Georgia, serif;">UNIVERSITY NAME</div>
+                <div style="font-size: 14px; color: #64748b; font-family: Georgia, serif;">Christian University</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    ${(linkedin || twitter || facebook) ? `<tr>
+      <td style="padding-bottom: 16px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+        <div style="font-size: 14px; color: #7c2d12;">
+          ${linkedin ? `<a href="${escapeHtml(linkedin.url)}" style="color: #7c2d12; text-decoration: none; margin-right: 8px;">LinkedIn</a>` : ""}
+          ${linkedin && (twitter || facebook) ? `<span style="color: #cbd5e1;">|</span>` : ""}
+          ${twitter ? `<a href="${escapeHtml(twitter.url)}" style="color: #7c2d12; text-decoration: none; margin-right: 8px; margin-left: 8px;">Twitter</a>` : ""}
+          ${(linkedin || twitter) && facebook ? `<span style="color: #cbd5e1;">|</span>` : ""}
+          ${facebook ? `<a href="${escapeHtml(facebook.url)}" style="color: #7c2d12; text-decoration: none; margin-left: 8px;">Facebook</a>` : ""}
+        </div>
+      </td>
+    </tr>` : ""}
+    ${textoAdicional ? `<tr>
+      <td style="padding-top: 16px; border-top: 1px solid #e2e8f0;">
+        <div style="font-size: 13px; font-style: italic; color: #7c2d12; font-family: Georgia, serif;">~ ${escapeHtml(textoAdicional)}</div>
+      </td>
+    </tr>` : ""}
+  </tbody>
+</table>`;
+}
+
+function generatePastorSignatureHTML(
+  nombre: string,
+  cargo: string,
+  foto?: string,
+  logoEmpresa?: string,
+  telefono?: string,
+  redes: RedSocial[] = [],
+  direccion?: string,
+  textoAdicional?: string
+): string {
+  const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+  const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+  const twitter = redes.find((r) => r.nombre.toLowerCase().includes("twitter") || r.nombre.toLowerCase().includes("x.com"));
+  const facebook = redes.find((r) => r.nombre.toLowerCase().includes("facebook"));
+  const youtube = redes.find((r) => r.nombre.toLowerCase().includes("youtube"));
+
+  return `
+<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #1e293b; line-height: 1.6;">
+  <tbody>
+    <tr>
+      <td style="padding-right: 30px; vertical-align: top; border-right: 1px solid #cbd5e1;">
+        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+          <tbody>
+            <tr>
+              <td style="padding-bottom: 12px;">
+                <div style="font-size: 20px; font-weight: 700; color: #14b8a6;">${escapeHtml(nombre)}</div>
+                <div style="font-size: 13px; color: #64748b; margin-top: 4px;">${escapeHtml(cargo)}</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-bottom: 8px; font-size: 14px; color: #64748b;">
+                ${telefono ? `<div>M. ${escapeHtml(telefono)}</div>` : ""}
+                ${email ? `<div>E. <a href="mailto:${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}" style="color: #64748b; text-decoration: none;">${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}</a></div>` : ""}
+                ${direccion ? `<div>A. ${escapeHtml(direccion)}</div>` : ""}
+              </td>
+            </tr>
+            ${textoAdicional ? `<tr>
+              <td style="padding-top: 12px; padding-bottom: 12px; font-style: italic; color: #14b8a6; font-size: 14px;">
+                ${escapeHtml(textoAdicional)}
+              </td>
+            </tr>` : ""}
+            ${(linkedin || twitter || facebook || youtube) ? `<tr>
+              <td style="padding-top: 8px;">
+                ${linkedin ? `<a href="${escapeHtml(linkedin.url)}" style="display: inline-block; width: 32px; height: 32px; border-radius: 50%; background-color: #64748b; color: white; text-align: center; line-height: 32px; margin-right: 6px; text-decoration: none; font-weight: 700; font-size: 12px;">in</a>` : ""}
+                ${twitter ? `<a href="${escapeHtml(twitter.url)}" style="display: inline-block; width: 32px; height: 32px; border-radius: 50%; background-color: #64748b; color: white; text-align: center; line-height: 32px; margin-right: 6px; text-decoration: none; font-weight: 700; font-size: 14px;">🐦</a>` : ""}
+                ${facebook ? `<a href="${escapeHtml(facebook.url)}" style="display: inline-block; width: 32px; height: 32px; border-radius: 50%; background-color: #64748b; color: white; text-align: center; line-height: 32px; margin-right: 6px; text-decoration: none; font-weight: 700; font-size: 16px;">f</a>` : ""}
+                ${youtube ? `<a href="${escapeHtml(youtube.url)}" style="display: inline-block; width: 32px; height: 32px; border-radius: 50%; background-color: #64748b; color: white; text-align: center; line-height: 32px; margin-right: 6px; text-decoration: none; font-weight: 700; font-size: 14px;">▶</a>` : ""}
+              </td>
+            </tr>` : ""}
+          </tbody>
+        </table>
+      </td>
+      <td style="padding-left: 30px; vertical-align: middle; text-align: center;">
+        ${logoEmpresa ? `<img src="${escapeHtml(logoEmpresa)}" alt="Church Logo" width="80" height="80" style="width: 80px; height: 80px; border-radius: 50%; display: block; margin: 0 auto;" />` : ""}
+        <div style="font-size: 18px; font-weight: 700; color: #14b8a6; margin-top: 12px; text-transform: uppercase;">CHURCH NAME</div>
+      </td>
+    </tr>
+  </tbody>
+</table>`;
+}
+
+function generateLawStudentHTML(
+  nombre: string,
+  cargo: string,
+  foto?: string,
+  telefono?: string,
+  telefonoMovil?: string,
+  redes: RedSocial[] = [],
+  direccion?: string,
+  textoAdicional?: string
+): string {
+  const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+  const website = redes.find((r) => {
+    const url = r.url.toLowerCase();
+    return (url.includes("www") || url.includes("http")) && !url.includes("linkedin") && !url.includes("github");
+  });
+  const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+  const instagram = redes.find((r) => r.nombre.toLowerCase().includes("instagram"));
+  const facebook = redes.find((r) => r.nombre.toLowerCase().includes("facebook"));
+
+  return `
+<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #1e293b; line-height: 1.6;">
+  <tbody>
+    <tr>
+      <td style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 20px;">
+        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+          <tbody>
+            <tr>
+              ${foto ? `<td style="padding-right: 16px; vertical-align: middle;">
+                <img src="${escapeHtml(foto)}" alt="${escapeHtml(nombre)}" width="70" height="70" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; display: block; border: 3px solid rgba(255,255,255,0.3);" />
+              </td>` : ""}
+              <td style="vertical-align: middle;">
+                <div style="font-size: 11px; font-weight: 600; color: #ffffff; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px;">${escapeHtml(cargo)}</div>
+                <div style="font-size: 22px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 0.05em;">${escapeHtml(nombre)}</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 20px; background-color: #ffffff;">
+        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+          <tbody>
+            ${direccion ? `<tr>
+              <td style="padding-bottom: 6px; font-size: 14px; color: #059669;">
+                <strong>A:</strong> <span style="color: #1e293b;">${escapeHtml(direccion)}</span>
+              </td>
+            </tr>` : ""}
+            ${telefonoMovil ? `<tr>
+              <td style="padding-bottom: 6px; font-size: 14px; color: #059669;">
+                <strong>M:</strong> <span style="color: #1e293b;">${escapeHtml(telefonoMovil)}</span>
+              </td>
+            </tr>` : ""}
+            ${telefono ? `<tr>
+              <td style="padding-bottom: 6px; font-size: 14px; color: #059669;">
+                <strong>T:</strong> <span style="color: #1e293b;">${escapeHtml(telefono)}</span>
+              </td>
+            </tr>` : ""}
+            ${email ? `<tr>
+              <td style="padding-bottom: 12px; font-size: 14px; color: #059669;">
+                <strong>E:</strong> <a href="mailto:${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}" style="color: #1e293b; text-decoration: none;">${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}</a>
+              </td>
+            </tr>` : ""}
+            ${website ? `<tr>
+              <td style="padding-bottom: 12px; font-size: 14px;">
+                <a href="${escapeHtml(website.url)}" style="color: #059669; text-decoration: none; font-weight: 600;">${escapeHtml(website.url.replace(/^https?:\/\//, "").replace(/^www\./, ""))}</a>
+              </td>
+            </tr>` : ""}
+            ${(linkedin || instagram || facebook) ? `<tr>
+              <td style="padding-top: 8px; padding-bottom: 12px;">
+                ${linkedin ? `<a href="${escapeHtml(linkedin.url)}" style="display: inline-block; width: 32px; height: 32px; background-color: #059669; color: white; text-align: center; line-height: 32px; margin-right: 6px; text-decoration: none; font-weight: 700; font-size: 12px;">in</a>` : ""}
+                ${instagram ? `<a href="${escapeHtml(instagram.url)}" style="display: inline-block; width: 32px; height: 32px; background-color: #059669; color: white; text-align: center; line-height: 32px; margin-right: 6px; text-decoration: none; font-weight: 700; font-size: 16px;">📷</a>` : ""}
+                ${facebook ? `<a href="${escapeHtml(facebook.url)}" style="display: inline-block; width: 32px; height: 32px; background-color: #059669; color: white; text-align: center; line-height: 32px; margin-right: 6px; text-decoration: none; font-weight: 700; font-size: 16px;">f</a>` : ""}
+              </td>
+            </tr>` : ""}
+            ${textoAdicional ? `<tr>
+              <td style="padding-top: 12px; border-top: 1px solid #e2e8f0; font-size: 12px; color: #059669; line-height: 1.6;">
+                🌳 ${escapeHtml(textoAdicional)}
+              </td>
+            </tr>` : ""}
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>`;
+}
+
+function generateGreenExecutiveHTML(
+  nombre: string,
+  cargo: string,
+  telefono?: string,
+  redes: RedSocial[] = [],
+  textoAdicional?: string
+): string {
+  const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+  const website = redes.find((r) => {
+    const url = r.url.toLowerCase();
+    return (url.includes("www") || url.includes("http")) && !url.includes("linkedin") && !url.includes("github");
+  });
+
+  return `
+<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #1e293b; line-height: 1.7;">
+  <tbody>
+    <tr>
+      <td style="padding-right: 40px; vertical-align: top; border-right: 1px solid #86efac;">
+        <div style="font-size: 32px; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 4px;">${escapeHtml(nombre.split(" ")[0] || nombre)}</div>
+        <div style="font-size: 32px; font-weight: 700; color: #166534; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 16px;">${escapeHtml(nombre.split(" ").slice(1).join(" ") || "")}</div>
+        ${telefono ? `<div style="font-size: 14px; color: #86efac; margin-bottom: 4px;">${escapeHtml(telefono)}</div>` : ""}
+        ${email ? `<div style="font-size: 14px; color: #86efac; margin-bottom: 4px;">
+          <a href="mailto:${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}" style="color: #86efac; text-decoration: none;">${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}</a>
+        </div>` : ""}
+        ${website ? `<div style="font-size: 14px; color: #86efac;">
+          <a href="${escapeHtml(website.url)}" style="color: #86efac; text-decoration: none;">${escapeHtml(website.url.replace(/^https?:\/\//, "").replace(/^www\./, ""))}</a>
+        </div>` : ""}
+      </td>
+      <td style="padding-left: 40px; vertical-align: top;">
+        <div style="font-size: 16px; font-weight: 600; color: #86efac; margin-bottom: 8px;">${escapeHtml(cargo)}</div>
+        <div style="font-size: 14px; color: #86efac; margin-bottom: 16px;">B2B Marketing</div>
+        <div style="font-size: 20px; color: #166534; margin-bottom: 16px;">🌳</div>
+        ${textoAdicional ? `<div style="font-size: 12px; color: #86efac; line-height: 1.6;">
+          ${escapeHtml(textoAdicional)}
+        </div>` : ""}
       </td>
     </tr>
   </tbody>
