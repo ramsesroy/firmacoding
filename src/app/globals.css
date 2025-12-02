@@ -45,5 +45,33 @@ body {
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
   }
+
+  /* Horizontal scrollbar - more visible */
+  .custom-scrollbar-horizontal {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #94a3b8 #f1f5f9;
+  }
+
+  .custom-scrollbar-horizontal::-webkit-scrollbar {
+    height: 10px;
+  }
+
+  .custom-scrollbar-horizontal::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+    margin: 0 4px;
+  }
+
+  .custom-scrollbar-horizontal::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 10px;
+    border: 2px solid #f1f5f9;
+    transition: background 0.2s;
+  }
+
+  .custom-scrollbar-horizontal::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+  }
 }
 
