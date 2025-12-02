@@ -11,7 +11,7 @@ export default function Footer() {
               Signature<span className="text-blue-400">For Me</span>
             </Link>
             <p className="text-sm text-gray-400 mb-4">
-              Crea firmas digitales profesionales en minutos. La herramienta más fácil para gestionar tu identidad profesional.
+              Create professional email signatures in minutes. The easiest way to manage your professional identity.
             </p>
             <div className="flex space-x-4">
               <a
@@ -46,21 +46,21 @@ export default function Footer() {
 
           {/* Product */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Producto</h3>
+            <h3 className="text-white font-semibold mb-4">Product</h3>
             <ul className="space-y-3">
               <li>
                 <Link href="#features" className="text-sm hover:text-white transition-colors">
-                  Características
+                  Features
                 </Link>
               </li>
               <li>
                 <Link href="#how-it-works" className="text-sm hover:text-white transition-colors">
-                  Cómo Funciona
+                  How It Works
                 </Link>
               </li>
               <li>
                 <Link href="/dashboard" className="text-sm hover:text-white transition-colors">
-                  Precios
+                  Pricing
                 </Link>
               </li>
               <li>
@@ -73,26 +73,26 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Empresa</h3>
+            <h3 className="text-white font-semibold mb-4">Company</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="#" className="text-sm hover:text-white transition-colors">
-                  Sobre Nosotros
+                <Link href="/about" className="text-sm hover:text-white transition-colors">
+                  About Us
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-sm hover:text-white transition-colors">
+                <Link href="/blog" className="text-sm hover:text-white transition-colors">
                   Blog
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-sm hover:text-white transition-colors">
-                  Carreras
+                <Link href="/careers" className="text-sm hover:text-white transition-colors">
+                  Careers
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-sm hover:text-white transition-colors">
-                  Contacto
+                <Link href="/contact" className="text-sm hover:text-white transition-colors">
+                  Contact
                 </Link>
               </li>
             </ul>
@@ -103,13 +103,13 @@ export default function Footer() {
             <h3 className="text-white font-semibold mb-4">Legal</h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/legal/privacidad" className="text-sm hover:text-white transition-colors">
-                  Privacidad
+                <Link href="/legal/privacy" className="text-sm hover:text-white transition-colors">
+                  Privacy
                 </Link>
               </li>
               <li>
-                <Link href="/legal/terminos" className="text-sm hover:text-white transition-colors">
-                  Términos
+                <Link href="/legal/terms" className="text-sm hover:text-white transition-colors">
+                  Terms
                 </Link>
               </li>
               <li>
@@ -118,8 +118,8 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/legal/licencia" className="text-sm hover:text-white transition-colors">
-                  Licencia
+                <Link href="/legal/license" className="text-sm hover:text-white transition-colors">
+                  License
                 </Link>
               </li>
             </ul>
@@ -129,14 +129,14 @@ export default function Footer() {
         <div className="mt-12 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-gray-400">
-              &copy; {new Date().getFullYear()} Signature For Me. Todos los derechos reservados.
+              &copy; {new Date().getFullYear()} Signature For Me. All rights reserved.
             </p>
             <div className="mt-4 md:mt-0 flex items-center space-x-6">
-              <Link href="/legal/privacidad" className="text-sm text-gray-400 hover:text-white transition-colors">
-                Política de Privacidad
+              <Link href="/legal/privacy" className="text-sm text-gray-400 hover:text-white transition-colors">
+                Privacy Policy
               </Link>
-              <Link href="/legal/terminos" className="text-sm text-gray-400 hover:text-white transition-colors">
-                Términos de Servicio
+              <Link href="/legal/terms" className="text-sm text-gray-400 hover:text-white transition-colors">
+                Terms of Service
               </Link>
             </div>
           </div>

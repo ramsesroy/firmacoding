@@ -24,32 +24,32 @@ export default function Header() {
               href="#features"
               className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
             >
-              Características
+              Features
             </Link>
             <Link
               href="#how-it-works"
               className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
             >
-              Cómo Funciona
+              How It Works
             </Link>
             <Link
               href="/dashboard"
               className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
             >
-              Precios
+              Pricing
             </Link>
             <div className="flex items-center space-x-4">
               <Link
                 href="/login"
                 className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
               >
-                Iniciar Sesión
+                Sign In
               </Link>
               <Link
                 href="/dashboard"
                 className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-500/30"
               >
-                Comenzar Gratis
+                Get Started Free
               </Link>
             </div>
           </div>
@@ -75,21 +75,21 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-base font-medium text-gray-700 hover:text-blue-600 transition-colors"
               >
-                Características
+                Features
               </Link>
               <Link
                 href="#how-it-works"
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-base font-medium text-gray-700 hover:text-blue-600 transition-colors"
               >
-                Cómo Funciona
+                How It Works
               </Link>
               <Link
                 href="/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-base font-medium text-gray-700 hover:text-blue-600 transition-colors"
               >
-                Precios
+                Pricing
               </Link>
               <div className="pt-4 border-t border-gray-100 space-y-3">
                 <Link
@@ -97,14 +97,14 @@ export default function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="block text-base font-medium text-gray-700 hover:text-blue-600 transition-colors"
                 >
-                  Iniciar Sesión
+                  Sign In
                 </Link>
                 <Link
                   href="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-3 rounded-lg text-base font-semibold text-center hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-500/30"
                 >
-                  Comenzar Gratis
+                  Get Started Free
                 </Link>
               </div>
             </div>

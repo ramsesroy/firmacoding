@@ -1,8 +1,13 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "Política de Cookies - Signature For Me",
-  description: "Política de cookies de Signature For Me. Conoce cómo utilizamos las cookies y tecnologías similares en nuestro sitio.",
+export const metadata: Metadata = {
+  title: "Cookie Policy - Signature For Me",
+  description: "Signature For Me cookie policy. Learn how we use cookies and similar technologies on our website.",
+  openGraph: {
+    title: "Cookie Policy - Signature For Me",
+    description: "Signature For Me cookie policy. Learn how we use cookies and similar technologies on our website.",
+  },
 };
 
 export default function CookiesPage() {
@@ -21,105 +26,104 @@ export default function CookiesPage() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 sm:p-12">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">
-            Política de Cookies
+            Cookie Policy
           </h1>
           
           <div className="prose prose-gray max-w-none space-y-6 text-gray-700">
             <p className="text-sm text-gray-500">
-              Última actualización: {new Date().toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" })}
+              Last updated: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
             </p>
 
             <section>
-              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">1. ¿Qué son las Cookies?</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">1. What Are Cookies?</h2>
               <p>
-                Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo cuando visitas un sitio web. 
-                Estas cookies permiten que el sitio web recuerde tus acciones y preferencias durante un período de tiempo, 
-                por lo que no tienes que volver a configurarlas cada vez que regresas al sitio o navegas de una página a otra.
+                Cookies are small text files that are stored on your device when you visit a website. 
+                These cookies allow the website to remember your actions and preferences over a period of time, 
+                so you don't have to reconfigure them every time you return to the site or navigate from one page to another.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">2. Cómo Utilizamos las Cookies</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">2. How We Use Cookies</h2>
               <p>
-                Signature For Me utiliza cookies y tecnologías similares para:
+                Signature For Me uses cookies and similar technologies to:
               </p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>
-                  <strong>Autenticación:</strong> Mantener tu sesión activa mientras utilizas el servicio
+                  <strong>Authentication:</strong> Keep your session active while using the service
                 </li>
                 <li>
-                  <strong>Preferencias:</strong> Recordar tus preferencias y configuraciones
+                  <strong>Preferences:</strong> Remember your preferences and settings
                 </li>
                 <li>
-                  <strong>Seguridad:</strong> Detectar y prevenir actividades fraudulentas o no autorizadas
+                  <strong>Security:</strong> Detect and prevent fraudulent or unauthorized activities
                 </li>
                 <li>
-                  <strong>Análisis:</strong> Entender cómo utilizas nuestro servicio para mejorarlo
+                  <strong>Analytics:</strong> Understand how you use our service to improve it
                 </li>
                 <li>
-                  <strong>Funcionalidad:</strong> Permitir que ciertas funciones del sitio operen correctamente
+                  <strong>Functionality:</strong> Allow certain site functions to operate correctly
                 </li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">3. Tipos de Cookies que Utilizamos</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">3. Types of Cookies We Use</h2>
               
-              <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">3.1 Cookies Esenciales</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">3.1 Essential Cookies</h3>
               <p>
-                Estas cookies son necesarias para que el sitio web funcione correctamente. Incluyen cookies de autenticación 
-                que mantienen tu sesión activa y cookies de seguridad. No puedes desactivar estas cookies sin afectar 
-                la funcionalidad del sitio.
+                These cookies are necessary for the website to function correctly. They include authentication cookies 
+                that keep your session active and security cookies. You cannot disable these cookies without affecting 
+                the site's functionality.
               </p>
 
-              <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">3.2 Cookies de Funcionalidad</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">3.2 Functionality Cookies</h3>
               <p>
-                Estas cookies permiten que el sitio web recuerde las elecciones que haces (como tu idioma preferido 
-                o la región en la que te encuentras) y proporcionan características mejoradas y personalizadas.
+                These cookies allow the website to remember choices you make (such as your preferred language 
+                or the region you are in) and provide enhanced, personalized features.
               </p>
 
-              <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">3.3 Cookies de Análisis</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">3.3 Analytics Cookies</h3>
               <p>
-                Estas cookies nos ayudan a entender cómo los visitantes interactúan con nuestro sitio web, 
-                proporcionando información sobre las áreas visitadas, el tiempo de permanencia y cualquier problema 
-                encontrado, como mensajes de error.
+                These cookies help us understand how visitors interact with our website, 
+                providing information about areas visited, time spent, and any issues encountered, such as error messages.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">4. Cookies de Terceros</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">4. Third-Party Cookies</h2>
               <p>
-                Utilizamos servicios de terceros que pueden establecer cookies en tu dispositivo:
+                We use third-party services that may set cookies on your device:
               </p>
               
               <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">4.1 Supabase</h3>
               <p>
-                Utilizamos Supabase para autenticación y almacenamiento de datos. Supabase puede utilizar cookies 
-                para gestionar sesiones y proporcionar sus servicios. Para más información, consulta la 
-                <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline"> política de privacidad de Supabase</a>.
+                We use Supabase for authentication and data storage. Supabase may use cookies 
+                to manage sessions and provide their services. For more information, see 
+                <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline"> Supabase's privacy policy</a>.
               </p>
 
               <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">4.2 Google OAuth</h3>
               <p>
-                Si eliges iniciar sesión con Google, Google puede establecer cookies según su política de privacidad. 
-                Para más información, consulta la 
-                <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline"> política de privacidad de Google</a>.
+                If you choose to sign in with Google, Google may set cookies according to their privacy policy. 
+                For more information, see 
+                <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline"> Google's privacy policy</a>.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">5. Gestión de Cookies</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">5. Cookie Management</h2>
               <p>
-                Puedes controlar y/o eliminar las cookies como desees. Puedes eliminar todas las cookies que ya están 
-                en tu dispositivo y puedes configurar la mayoría de los navegadores para evitar que se coloquen. 
-                Sin embargo, si haces esto, es posible que tengas que ajustar manualmente algunas preferencias cada vez 
-                que visites un sitio y algunos servicios y funcionalidades pueden no funcionar.
+                You can control and/or delete cookies as you wish. You can delete all cookies that are already 
+                on your device and you can set most browsers to prevent them from being placed. 
+                However, if you do this, you may have to manually adjust some preferences every time 
+                you visit a site and some services and functionalities may not work.
               </p>
               
-              <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">5.1 Cómo Eliminar o Bloquear Cookies</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-3">5.1 How to Delete or Block Cookies</h3>
               <p>
-                Puedes gestionar las cookies a través de la configuración de tu navegador. Aquí tienes enlaces 
-                a las instrucciones para los navegadores más populares:
+                You can manage cookies through your browser settings. Here are links 
+                to instructions for the most popular browsers:
               </p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>
@@ -128,17 +132,17 @@ export default function CookiesPage() {
                   </a>
                 </li>
                 <li>
-                  <a href="https://support.mozilla.org/es/kb/habilitar-y-deshabilitar-cookies-sitios-web-rastrear-preferencias" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                  <a href="https://support.mozilla.org/en-US/kb/enable-and-disable-cookies-website-preferences" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                     Mozilla Firefox
                   </a>
                 </li>
                 <li>
-                  <a href="https://support.apple.com/es-es/guide/safari/sfri11471/mac" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                  <a href="https://support.apple.com/en-us/guide/safari/sfri11471/mac" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                     Safari
                   </a>
                 </li>
                 <li>
-                  <a href="https://support.microsoft.com/es-es/microsoft-edge/eliminar-las-cookies-en-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                  <a href="https://support.microsoft.com/en-us/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                     Microsoft Edge
                   </a>
                 </li>
@@ -146,19 +150,19 @@ export default function CookiesPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">6. Cookies que Utilizamos Específicamente</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">6. Cookies We Use Specifically</h2>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Nombre
+                        Name
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Propósito
+                        Purpose
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Duración
+                        Duration
                       </th>
                     </tr>
                   </thead>
@@ -168,10 +172,10 @@ export default function CookiesPage() {
                         sb-access-token
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-700">
-                        Mantener la sesión de autenticación
+                        Maintain authentication session
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-700">
-                        Sesión
+                        Session
                       </td>
                     </tr>
                     <tr>
@@ -179,10 +183,10 @@ export default function CookiesPage() {
                         sb-refresh-token
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-700">
-                        Renovar la sesión de autenticación
+                        Refresh authentication session
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-700">
-                        30 días
+                        30 days
                       </td>
                     </tr>
                   </tbody>
@@ -191,29 +195,29 @@ export default function CookiesPage() {
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">7. Cambios a esta Política</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">7. Changes to this Policy</h2>
               <p>
-                Podemos actualizar esta Política de Cookies ocasionalmente. Te notificaremos sobre cambios importantes 
-                publicando la nueva política en esta página y actualizando la fecha de "Última actualización".
+                We may update this Cookie Policy occasionally. We will notify you of significant changes 
+                by posting the new policy on this page and updating the "Last updated" date.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">8. Más Información</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">8. More Information</h2>
               <p>
-                Para más información sobre cómo protegemos tu privacidad, consulta nuestra 
-                <Link href="/legal/privacidad" className="text-blue-600 hover:underline"> Política de Privacidad</Link>.
+                For more information about how we protect your privacy, see our 
+                <Link href="/legal/privacy" className="text-blue-600 hover:underline"> Privacy Policy</Link>.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">9. Contacto</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">9. Contact</h2>
               <p>
-                Si tienes preguntas sobre nuestra Política de Cookies, puedes contactarnos a través de:
+                If you have questions about our Cookie Policy, you can contact us at:
               </p>
               <ul className="list-disc pl-6 space-y-2">
-                <li>Email: contacto@signaturefor.me</li>
-                <li>Sitio web: <Link href="/" className="text-blue-600 hover:underline">http://signaturefor.me</Link></li>
+                <li>Email: contact@signaturefor.me</li>
+                <li>Website: <Link href="/" className="text-blue-600 hover:underline">https://signaturefor.me</Link></li>
               </ul>
             </section>
           </div>
@@ -224,7 +228,7 @@ export default function CookiesPage() {
               href="/"
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
-              ← Volver al inicio
+              ← Back to home
             </Link>
           </div>
         </div>
@@ -232,5 +236,3 @@ export default function CookiesPage() {
     </div>
   );
 }
-
-
