@@ -72,17 +72,17 @@ function DashboardContent() {
       // Interior Design: Needs a design/architecture style logo - horizontal format
       interiorDesign: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=400&h=120&fit=crop&auto=format&q=90",
       
-      // University Professor: 60x60px square/circular academic seal
-      universityProfessor: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=180&h=180&fit=crop&auto=format&q=90",
+      // University Professor: 60x60px square (1:1 ratio) - Academic seal
+      universityProfessor: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=120&h=120&fit=crop&crop=center&auto=format&q=90",
       
-      // University President: 60x60px square university logo/crest
-      universityPresident: "https://images.unsplash.com/photo-1580584126903-c17d41830450?w=180&h=180&fit=crop&auto=format&q=90",
+      // University President: 60x60px square (1:1 ratio) - University logo
+      universityPresident: "https://images.unsplash.com/photo-1580584126903-c17d41830450?w=120&h=120&fit=crop&crop=center&auto=format&q=90",
       
-      // Church Professional: 80px height, needs church/faith symbol - horizontal or square
-      churchProfessional: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=320&h=240&fit=crop&auto=format&q=90",
+      // Church Professional: height 80px, width flexible - Church logo (horizontal format)
+      churchProfessional: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=200&h=80&fit=crop&auto=format&q=90",
       
-      // Pastor Signature: 80x80px circular church logo (needs to work as circular)
-      pastorSignature: "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=240&h=240&fit=crop&auto=format&q=90",
+      // Pastor Signature: 80x80px square for circular crop (1:1 ratio)
+      pastorSignature: "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=160&h=160&fit=crop&crop=center&auto=format&q=90",
       
       // Default corporate logo (horizontal)
       default: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=360&h=120&fit=crop&auto=format&q=90",
