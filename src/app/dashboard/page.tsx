@@ -16,87 +16,76 @@ function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  // Example image URLs categorized by template type - Curated for each template style
+  // Example image URLs categorized by template type - Optimized for each template's specific dimensions and style
   const getExamplePhoto = (template: TemplateType): string => {
     const photoMap: Record<string, string> = {
-      // Professional/Corporate - Business formal attire
-      professional: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Professional male in suit
-      classic: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Professional male executive
-      modern: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Professional female executive
-      modernaSinBarra: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Professional businesswoman
-      qrProfesional: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Business professional
-      corporateConsultant: "", // No photo, uses logo only
+      // Classic: 80x80px square, professional business attire
+      classic: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=faces&auto=format&q=90",
       
-      // Developer/Tech - Casual professional, tech vibe
-      developerMinimal2025: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Casual tech developer
-      ultraMinimal: "", // No photo, text only
+      // Modern: 100x100px square with blue border, modern professional
+      modern: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=250&h=250&fit=crop&crop=faces&auto=format&q=90",
       
-      // Marketing/Business - Dynamic, approachable
-      growthMarketing: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Marketing professional woman
+      // ModernaSinBarra: 70x70px, clean modern professional
+      modernaSinBarra: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=faces&auto=format&q=90",
       
-      // Creative/Design - Artistic, creative vibe
-      freelanceDesigner: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Creative designer
-      creativePortfolio: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Creative woman artist
+      // QR Profesional: 80x80px, business professional
+      qrProfesional: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=faces&auto=format&q=90",
       
-      // Interior Design - Elegant, sophisticated
-      interiorDesign: "https://images.unsplash.com/photo-1554151228-14d9def656e4?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Elegant professional woman
+      // Developer Minimal: 80x80px rounded (12px), casual tech/dev style
+      developerMinimal2025: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&h=200&fit=crop&crop=faces&auto=format&q=90",
       
-      // University/Academic - Scholarly, formal
-      universityProfessor: "", // No photo, uses logo only
-      universityBanner: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Academic professional woman
-      universityPresident: "", // No photo, uses logo only
-      lawStudent: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Law student/professional
+      // Growth Marketing: 72x72px circular, professional business woman with purple accents
+      growthMarketing: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200&h=200&fit=crop&crop=faces&auto=format&q=90",
       
-      // Church/Religious - Friendly, approachable, trustworthy
-      churchProfessional: "", // No photo, uses logo only
-      pastorSignature: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Friendly pastor
+      // Freelance Designer: 70x70px rounded (14px), creative/artistic vibe
+      freelanceDesigner: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop&crop=faces&auto=format&q=90",
       
-      // Military - Professional, disciplined
-      militaryProfessional: "", // No photo, structured layout
+      // Creative Portfolio: 90x90px rounded square (8px), creative professional
+      creativePortfolio: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=250&h=250&fit=crop&crop=faces&auto=format&q=90",
       
-      // Green/Eco - Natural, approachable
-      greenExecutive: "", // No photo, minimal design
+      // Interior Design: 80x80px circular, elegant professional woman
+      interiorDesign: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=faces&auto=format&q=90",
+      
+      // University Banner: 80x80px circular with blue banner background
+      universityBanner: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200&h=200&fit=crop&crop=faces&auto=format&q=90",
+      
+      // Law Student: 70x70px circular, young professional/student
+      lawStudent: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=200&h=200&fit=crop&crop=faces&auto=format&q=90",
+      
+      // Pastor Signature: 80x80px circular, friendly approachable pastor
+      pastorSignature: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop&crop=faces&auto=format&q=90",
       
       // Default professional fallback
-      default: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop&crop=faces&auto=format&q=80",
+      default: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=200&h=200&fit=crop&crop=faces&auto=format&q=90",
     };
     return photoMap[template] || photoMap.default;
   };
 
   const getExampleLogo = (template: TemplateType): string => {
     const logoMap: Record<string, string> = {
-      // Corporate/Business - Modern corporate logos
-      professional: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=150&fit=crop&auto=format&q=80", // Modern business logo
-      corporateConsultant: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80", // Corporate consulting logo
+      // Professional: 120x40px horizontal corporate logo (needs wide horizontal format)
+      professional: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=360&h=120&fit=crop&auto=format&q=90",
       
-      // Design/Interior - Creative, artistic logos
-      interiorDesign: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=400&h=150&fit=crop&auto=format&q=80", // Design/architecture logo
+      // Corporate Consultant: 140x45px horizontal business logo
+      corporateConsultant: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=420&h=135&fit=crop&auto=format&q=90",
       
-      // University/Academic - Traditional, scholarly logos
-      universityProfessor: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=400&h=150&fit=crop&auto=format&q=80", // University seal/academic logo
-      universityPresident: "https://images.unsplash.com/photo-1580584126903-c17d41830450?w=400&h=150&fit=crop&auto=format&q=80", // University crest/logo
+      // Interior Design: Needs a design/architecture style logo - horizontal format
+      interiorDesign: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=400&h=120&fit=crop&auto=format&q=90",
       
-      // Church/Religious - Faith-based, spiritual logos
-      churchProfessional: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=150&fit=crop&auto=format&q=80", // Church cross/faith logo
-      pastorSignature: "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=400&h=150&fit=crop&auto=format&q=80", // Religious symbol/circular logo
+      // University Professor: 60x60px square/circular academic seal
+      universityProfessor: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=180&h=180&fit=crop&auto=format&q=90",
       
-      // Templates that don't use logos
-      classic: "",
-      modern: "",
-      modernaSinBarra: "",
-      qrProfesional: "",
-      developerMinimal2025: "",
-      ultraMinimal: "",
-      growthMarketing: "",
-      freelanceDesigner: "",
-      creativePortfolio: "",
-      universityBanner: "",
-      lawStudent: "",
-      militaryProfessional: "",
-      greenExecutive: "",
+      // University President: 60x60px square university logo/crest
+      universityPresident: "https://images.unsplash.com/photo-1580584126903-c17d41830450?w=180&h=180&fit=crop&auto=format&q=90",
       
-      // Default corporate logo
-      default: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80",
+      // Church Professional: 80px height, needs church/faith symbol - horizontal or square
+      churchProfessional: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=320&h=240&fit=crop&auto=format&q=90",
+      
+      // Pastor Signature: 80x80px circular church logo (needs to work as circular)
+      pastorSignature: "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=240&h=240&fit=crop&auto=format&q=90",
+      
+      // Default corporate logo (horizontal)
+      default: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=360&h=120&fit=crop&auto=format&q=90",
     };
     return logoMap[template] || logoMap.default;
   };
@@ -222,18 +211,12 @@ function DashboardContent() {
       
       // Add example photo if template requires it and no photo exists
       if (templatesWithPhoto.includes(template) && !prev.foto) {
-        const examplePhoto = getExamplePhoto(template);
-        if (examplePhoto) {
-          updates.foto = examplePhoto;
-        }
+        updates.foto = getExamplePhoto(template);
       }
       
       // Add example logo if template requires it and no logo exists
       if (templatesWithLogo.includes(template) && !prev.logoEmpresa) {
-        const exampleLogo = getExampleLogo(template);
-        if (exampleLogo) {
-          updates.logoEmpresa = exampleLogo;
-        }
+        updates.logoEmpresa = getExampleLogo(template);
       }
       
       return Object.keys(updates).length > 0 ? { ...prev, ...updates } : prev;
