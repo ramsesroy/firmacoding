@@ -8,7 +8,8 @@ import { TemplateType, RedSocial } from "@/types/signature";
 import { copyToClipboard } from "@/lib/signatureUtils";
 import { uploadImage } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
-import { exportToPNG, exportToPDF, ExportSize, getSizeLabel } from "@/lib/exportUtils";
+import { exportToPNG, exportToPDF, exportToPNGHQ, exportToPDFHQ, exportSignaturePack, ExportSize, getSizeLabel } from "@/lib/exportUtils";
+import { ExportLoadingModal } from "@/components/ExportLoadingModal";
 
 // Force dynamic rendering for this page to support search params
 export const dynamic = "force-dynamic";
@@ -59,6 +60,8 @@ function DashboardContent() {
   const [exportSize, setExportSize] = useState<ExportSize>("auto");
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
+  const [exportMessage, setExportMessage] = useState("Generating your signature in high quality...");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
@@ -250,6 +253,9 @@ function DashboardContent() {
 
     try {
       setExporting(true);
+      setExportProgress(0);
+      setExportMessage("Generating PNG in ultra-high quality...");
+      
       // Find the actual signature element - it could be a table or any container with the signature
       const signatureElement = previewRef.current.querySelector("table") as HTMLElement || 
                                previewRef.current.querySelector("div > table") as HTMLElement ||
@@ -258,10 +264,12 @@ function DashboardContent() {
       const elementToExport = signatureElement || previewRef.current;
 
       const filename = `${signatureData.nombre.replace(/\s+/g, "_")}_signature.png`;
-      await exportToPNG(elementToExport, filename, {
+      await exportToPNGHQ(elementToExport, filename, {
         size: exportSize,
         margin: 20,
-        quality: 1,
+        onProgress: (progress) => {
+          setExportProgress(progress);
+        },
       });
       setShowExportMenu(false);
     } catch (error) {
@@ -269,6 +277,7 @@ function DashboardContent() {
       alert(error instanceof Error ? error.message : "Error exporting to PNG");
     } finally {
       setExporting(false);
+      setExportProgress(0);
     }
   };
 
@@ -280,6 +289,9 @@ function DashboardContent() {
 
     try {
       setExporting(true);
+      setExportProgress(0);
+      setExportMessage("Generating PDF in ultra-high quality...");
+      
       // Find the actual signature element - it could be a table or any container with the signature
       const signatureElement = previewRef.current.querySelector("table") as HTMLElement || 
                                previewRef.current.querySelector("div > table") as HTMLElement ||
@@ -288,10 +300,12 @@ function DashboardContent() {
       const elementToExport = signatureElement || previewRef.current;
 
       const filename = `${signatureData.nombre.replace(/\s+/g, "_")}_signature.pdf`;
-      await exportToPDF(elementToExport, filename, {
+      await exportToPDFHQ(elementToExport, filename, {
         size: exportSize,
         margin: 20,
-        quality: 1,
+        onProgress: (progress) => {
+          setExportProgress(progress);
+        },
       });
       setShowExportMenu(false);
     } catch (error) {
@@ -299,6 +313,7 @@ function DashboardContent() {
       alert(error instanceof Error ? error.message : "Error exporting to PDF");
     } finally {
       setExporting(false);
+      setExportProgress(0);
     }
   };
 
@@ -1239,7 +1254,7 @@ function DashboardContent() {
                     className="group px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 via-purple-700 to-purple-600 text-white hover:from-purple-700 hover:via-purple-800 hover:to-purple-700 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <span className="material-symbols-outlined text-lg">image</span>
-                    <span>{exporting ? "Exporting..." : "Export PNG"}</span>
+                    <span>Export PNG (HQ)</span>
                   </button>
                   <button
                     onClick={handleExportPDF}
@@ -1247,6 +1262,7 @@ function DashboardContent() {
                     className="group px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 via-red-700 to-red-600 text-white hover:from-red-700 hover:via-red-800 hover:to-red-700 shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <span className="material-symbols-outlined text-lg">picture_as_pdf</span>
+                    <span>Export PDF (HQ)</span>
                     <span>{exporting ? "Exporting..." : "Export PDF"}</span>
                   </button>
                 </div>
@@ -1324,6 +1340,13 @@ function DashboardContent() {
           </div>
         </div>
       </div>
+
+      {/* Export Loading Modal */}
+      <ExportLoadingModal
+        isOpen={exporting}
+        message={exportMessage}
+        progress={exportProgress}
+      />
     </div>
   );
 }

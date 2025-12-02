@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabaseClient";
 import SignaturePreview from "@/components/SignaturePreview";
 import { TemplateType, RedSocial } from "@/types/signature";
 import { copyToClipboard } from "@/lib/signatureUtils";
-import { exportToPNG, exportToPDF, ExportSize, getSizeLabel } from "@/lib/exportUtils";
+import { exportToPNG, exportToPDF, exportToPNGHQ, exportToPDFHQ, ExportSize, getSizeLabel } from "@/lib/exportUtils";
 
 interface SignatureRecord {
   id: string;
@@ -157,10 +157,9 @@ export default function SignaturesPage() {
       const elementToExport = signatureElement || previewRef;
 
       const filename = `${signature.name.replace(/\s+/g, "_")}_signature.png`;
-      await exportToPNG(elementToExport, filename, {
+      await exportToPNGHQ(elementToExport, filename, {
         size: exportSize,
         margin: 20,
-        quality: 1,
       });
       setShowExportMenu(null);
     } catch (error) {
@@ -188,10 +187,9 @@ export default function SignaturesPage() {
       const elementToExport = signatureElement || previewRef;
 
       const filename = `${signature.name.replace(/\s+/g, "_")}_signature.pdf`;
-      await exportToPDF(elementToExport, filename, {
+      await exportToPDFHQ(elementToExport, filename, {
         size: exportSize,
         margin: 20,
-        quality: 1,
       });
       setShowExportMenu(null);
     } catch (error) {
