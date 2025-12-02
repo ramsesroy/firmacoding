@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import SignaturePreview from "@/components/SignaturePreview";
 import { TemplateType, RedSocial } from "@/types/signature";
 import { copyToClipboard } from "@/lib/signatureUtils";
+import { exportToPNG, exportToPDF, ExportSize, getSizeLabel } from "@/lib/exportUtils";
 
 interface SignatureRecord {
   id: string;
@@ -25,7 +26,11 @@ export default function SignaturesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [exportSize, setExportSize] = useState<ExportSize>("auto");
+  const [showExportMenu, setShowExportMenu] = useState<string | null>(null);
+  const [exporting, setExporting] = useState<string | null>(null);
   const router = useRouter();
+  const previewRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     fetchSignatures();
@@ -115,6 +120,68 @@ export default function SignaturesPage() {
     } catch (err) {
       console.error("Error copying signature:", err);
       alert("Error copying signature");
+    }
+  };
+
+  const handleExportPNG = async (signature: SignatureRecord) => {
+    const previewRef = previewRefs.current[signature.id];
+    if (!previewRef) {
+      alert("Preview not available");
+      return;
+    }
+
+    try {
+      setExporting(signature.id);
+      // Find the actual signature element - it could be a table or any container with the signature
+      const signatureElement = previewRef.querySelector("table") as HTMLElement || 
+                               previewRef.querySelector("div > table") as HTMLElement ||
+                               previewRef.querySelector("* > table") as HTMLElement ||
+                               previewRef.firstElementChild as HTMLElement;
+      const elementToExport = signatureElement || previewRef;
+
+      const filename = `${signature.name.replace(/\s+/g, "_")}_signature.png`;
+      await exportToPNG(elementToExport, filename, {
+        size: exportSize,
+        margin: 20,
+        quality: 1,
+      });
+      setShowExportMenu(null);
+    } catch (error) {
+      console.error("Error exporting PNG:", error);
+      alert(error instanceof Error ? error.message : "Error exporting to PNG");
+    } finally {
+      setExporting(null);
+    }
+  };
+
+  const handleExportPDF = async (signature: SignatureRecord) => {
+    const previewRef = previewRefs.current[signature.id];
+    if (!previewRef) {
+      alert("Preview not available");
+      return;
+    }
+
+    try {
+      setExporting(signature.id);
+      // Find the actual signature element - it could be a table or any container with the signature
+      const signatureElement = previewRef.querySelector("table") as HTMLElement || 
+                               previewRef.querySelector("div > table") as HTMLElement ||
+                               previewRef.querySelector("* > table") as HTMLElement ||
+                               previewRef.firstElementChild as HTMLElement;
+      const elementToExport = signatureElement || previewRef;
+
+      const filename = `${signature.name.replace(/\s+/g, "_")}_signature.pdf`;
+      await exportToPDF(elementToExport, filename, {
+        size: exportSize,
+        margin: 20,
+        quality: 1,
+      });
+      setShowExportMenu(null);
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+      alert(error instanceof Error ? error.message : "Error exporting to PDF");
+    } finally {
+      setExporting(null);
     }
   };
 
@@ -224,7 +291,10 @@ export default function SignaturesPage() {
                     <div className="text-xs text-gray-500 mb-2">
                       Template: <span className="font-medium">{signature.template_id}</span>
                     </div>
-                    <div className="overflow-x-auto">
+                    <div 
+                      ref={(el) => (previewRefs.current[signature.id] = el)}
+                      className="overflow-x-auto"
+                    >
                       <SignaturePreview
                         nombre={signature.name}
                         cargo={signature.role}
@@ -281,6 +351,67 @@ export default function SignaturesPage() {
                         >
                           Delete
                         </button>
+                      </div>
+                      
+                      {/* Export Options */}
+                      <div className="pt-2 border-t border-gray-200">
+                        <div className="mb-2">
+                          <label className="text-xs font-semibold text-gray-600 mb-1 block">
+                            Export Size:
+                          </label>
+                          <div className="relative">
+                            <button
+                              onClick={() => setShowExportMenu(showExportMenu === signature.id ? null : signature.id)}
+                              className="w-full flex items-center justify-between px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
+                              disabled={exporting === signature.id}
+                            >
+                              <span>{getSizeLabel(exportSize)}</span>
+                              <span className="material-symbols-outlined text-sm">arrow_drop_down</span>
+                            </button>
+                            {showExportMenu === signature.id && (
+                              <>
+                                <div
+                                  className="fixed inset-0 z-10"
+                                  onClick={() => setShowExportMenu(null)}
+                                />
+                                <div className="absolute left-0 right-0 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 z-20 py-1">
+                                  {(["auto", "small", "medium", "large"] as ExportSize[]).map((size) => (
+                                    <button
+                                      key={size}
+                                      onClick={() => {
+                                        setExportSize(size);
+                                        setShowExportMenu(null);
+                                      }}
+                                      className={`w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 transition-colors ${
+                                        exportSize === size ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-700"
+                                      }`}
+                                    >
+                                      {getSizeLabel(size)}
+                                    </button>
+                                  ))}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            onClick={() => handleExportPNG(signature)}
+                            disabled={exporting === signature.id}
+                            className="px-3 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 transition-all shadow-md shadow-purple-500/30 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+                          >
+                            <span className="material-symbols-outlined text-sm">image</span>
+                            <span>{exporting === signature.id ? "..." : "PNG"}</span>
+                          </button>
+                          <button
+                            onClick={() => handleExportPDF(signature)}
+                            disabled={exporting === signature.id}
+                            className="px-3 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 transition-all shadow-md shadow-red-500/30 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+                          >
+                            <span className="material-symbols-outlined text-sm">picture_as_pdf</span>
+                            <span>{exporting === signature.id ? "..." : "PDF"}</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

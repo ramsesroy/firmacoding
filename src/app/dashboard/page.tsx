@@ -8,6 +8,7 @@ import { TemplateType, RedSocial } from "@/types/signature";
 import { copyToClipboard } from "@/lib/signatureUtils";
 import { uploadImage } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
+import { exportToPNG, exportToPDF, ExportSize, getSizeLabel } from "@/lib/exportUtils";
 
 // Force dynamic rendering for this page to support search params
 export const dynamic = "force-dynamic";
@@ -55,8 +56,12 @@ function DashboardContent() {
   const [editRedForm, setEditRedForm] = useState({ nombre: "", url: "", icono: "" });
   const [editingSignatureId, setEditingSignatureId] = useState<string | null>(null);
   const [loadingSignature, setLoadingSignature] = useState(false);
+  const [exportSize, setExportSize] = useState<ExportSize>("auto");
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   // Load signature for editing if edit query parameter exists
   useEffect(() => {
@@ -235,6 +240,66 @@ function DashboardContent() {
   const handleCancelEditRed = () => {
     setEditingRed(null);
     setEditRedForm({ nombre: "", url: "", icono: "" });
+  };
+
+  const handleExportPNG = async () => {
+    if (!previewRef.current) {
+      alert("Preview not available");
+      return;
+    }
+
+    try {
+      setExporting(true);
+      // Find the actual signature element - it could be a table or any container with the signature
+      const signatureElement = previewRef.current.querySelector("table") as HTMLElement || 
+                               previewRef.current.querySelector("div > table") as HTMLElement ||
+                               previewRef.current.querySelector("* > table") as HTMLElement ||
+                               previewRef.current.firstElementChild as HTMLElement;
+      const elementToExport = signatureElement || previewRef.current;
+
+      const filename = `${signatureData.nombre.replace(/\s+/g, "_")}_signature.png`;
+      await exportToPNG(elementToExport, filename, {
+        size: exportSize,
+        margin: 20,
+        quality: 1,
+      });
+      setShowExportMenu(false);
+    } catch (error) {
+      console.error("Error exporting PNG:", error);
+      alert(error instanceof Error ? error.message : "Error exporting to PNG");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    if (!previewRef.current) {
+      alert("Preview not available");
+      return;
+    }
+
+    try {
+      setExporting(true);
+      // Find the actual signature element - it could be a table or any container with the signature
+      const signatureElement = previewRef.current.querySelector("table") as HTMLElement || 
+                               previewRef.current.querySelector("div > table") as HTMLElement ||
+                               previewRef.current.querySelector("* > table") as HTMLElement ||
+                               previewRef.current.firstElementChild as HTMLElement;
+      const elementToExport = signatureElement || previewRef.current;
+
+      const filename = `${signatureData.nombre.replace(/\s+/g, "_")}_signature.pdf`;
+      await exportToPDF(elementToExport, filename, {
+        size: exportSize,
+        margin: 20,
+        quality: 1,
+      });
+      setShowExportMenu(false);
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+      alert(error instanceof Error ? error.message : "Error exporting to PDF");
+    } finally {
+      setExporting(false);
+    }
   };
 
   const handleSave = async () => {
@@ -1098,7 +1163,7 @@ function DashboardContent() {
               backgroundSize: '30px 30px',
               backgroundPosition: '0 0, 15px 15px'
             }}>
-              <div className="flex items-center justify-center min-h-[350px] bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+              <div ref={previewRef} className="flex items-center justify-center min-h-[350px] bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                 <SignaturePreview
                   nombre={signatureData.nombre}
                   cargo={signatureData.cargo}
@@ -1123,37 +1188,102 @@ function DashboardContent() {
 
             {/* Action Buttons */}
             <div className="mt-auto pt-6 border-t-2 border-gray-100">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button
-                  onClick={handleCopyToClipboard}
-                  className={`group flex-1 px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 ${
-                    copied
-                      ? "bg-gradient-to-r from-green-500 via-green-600 to-green-500 text-white shadow-xl shadow-green-500/40 transform scale-105"
-                      : "bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white hover:from-gray-800 hover:via-gray-700 hover:to-gray-800 shadow-xl shadow-gray-900/25 hover:shadow-2xl hover:shadow-gray-900/35 hover:scale-[1.02]"
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-xl">
-                    {copied ? "check_circle" : "content_copy"}
-                  </span>
-                  <span>{copied ? "Copied to Clipboard!" : "Copy HTML"}</span>
-                  {!copied && (
-                    <span className="text-xs opacity-75 group-hover:opacity-100">Ctrl+C</span>
-                  )}
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className={`group flex-1 px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 ${
-                    saving
-                      ? "bg-gray-400 text-white cursor-not-allowed shadow-md"
-                      : "bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 text-white hover:from-blue-700 hover:via-blue-800 hover:to-blue-700 shadow-xl shadow-blue-500/40 hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.02]"
-                  }`}
-                >
-                  <span className={`material-symbols-outlined text-xl ${saving ? "animate-spin" : ""}`}>
-                    {saving ? "hourglass_empty" : "save"}
-                  </span>
-                  <span>{saving ? "Saving..." : editingSignatureId ? "Update Signature" : "Save Signature"}</span>
-                </button>
+              <div className="flex flex-col gap-4">
+                {/* Export Options */}
+                <div className="flex items-center justify-between gap-3 pb-3 border-b border-gray-200">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-gray-600">download</span>
+                    <span className="text-sm font-semibold text-gray-700">Export Size:</span>
+                  </div>
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowExportMenu(!showExportMenu)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 transition-colors"
+                      disabled={exporting}
+                    >
+                      <span>{getSizeLabel(exportSize)}</span>
+                      <span className="material-symbols-outlined text-base">arrow_drop_down</span>
+                    </button>
+                    {showExportMenu && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-10"
+                          onClick={() => setShowExportMenu(false)}
+                        />
+                        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-20 py-2">
+                          {(["auto", "small", "medium", "large"] as ExportSize[]).map((size) => (
+                            <button
+                              key={size}
+                              onClick={() => {
+                                setExportSize(size);
+                                setShowExportMenu(false);
+                              }}
+                              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                                exportSize === size ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-700"
+                              }`}
+                            >
+                              {getSizeLabel(size)}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Export Buttons */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={handleExportPNG}
+                    disabled={exporting}
+                    className="group px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 via-purple-700 to-purple-600 text-white hover:from-purple-700 hover:via-purple-800 hover:to-purple-700 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span className="material-symbols-outlined text-lg">image</span>
+                    <span>{exporting ? "Exporting..." : "Export PNG"}</span>
+                  </button>
+                  <button
+                    onClick={handleExportPDF}
+                    disabled={exporting}
+                    className="group px-4 py-3 rounded-xl transition-all duration-300 font-semibold text-sm flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 via-red-700 to-red-600 text-white hover:from-red-700 hover:via-red-800 hover:to-red-700 shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <span className="material-symbols-outlined text-lg">picture_as_pdf</span>
+                    <span>{exporting ? "Exporting..." : "Export PDF"}</span>
+                  </button>
+                </div>
+
+                {/* Main Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                  <button
+                    onClick={handleCopyToClipboard}
+                    className={`group flex-1 px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 ${
+                      copied
+                        ? "bg-gradient-to-r from-green-500 via-green-600 to-green-500 text-white shadow-xl shadow-green-500/40 transform scale-105"
+                        : "bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white hover:from-gray-800 hover:via-gray-700 hover:to-gray-800 shadow-xl shadow-gray-900/25 hover:shadow-2xl hover:shadow-gray-900/35 hover:scale-[1.02]"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-xl">
+                      {copied ? "check_circle" : "content_copy"}
+                    </span>
+                    <span>{copied ? "Copied to Clipboard!" : "Copy HTML"}</span>
+                    {!copied && (
+                      <span className="text-xs opacity-75 group-hover:opacity-100">Ctrl+C</span>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className={`group flex-1 px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 ${
+                      saving
+                        ? "bg-gray-400 text-white cursor-not-allowed shadow-md"
+                        : "bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 text-white hover:from-blue-700 hover:via-blue-800 hover:to-blue-700 shadow-xl shadow-blue-500/40 hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.02]"
+                    }`}
+                  >
+                    <span className={`material-symbols-outlined text-xl ${saving ? "animate-spin" : ""}`}>
+                      {saving ? "hourglass_empty" : "save"}
+                    </span>
+                    <span>{saving ? "Saving..." : editingSignatureId ? "Update Signature" : "Save Signature"}</span>
+                  </button>
+                </div>
               </div>
               {copied && (
                 <p className="text-sm text-green-600 mt-3 text-center font-medium">
