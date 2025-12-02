@@ -9,6 +9,7 @@ import { TemplateType, RedSocial } from "@/types/signature";
 import { copyToClipboard } from "@/lib/signatureUtils";
 import { exportToPNG, exportToPDF, exportToPNGHQ, exportToPDFHQ, ExportSize, getSizeLabel } from "@/lib/exportUtils";
 import { useToast } from "@/components/Toast";
+import { MetadataHead } from "@/components/MetadataHead";
 
 interface SignatureRecord {
   id: string;

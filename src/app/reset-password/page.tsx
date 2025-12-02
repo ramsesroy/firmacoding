@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { MetadataHead } from "@/components/MetadataHead";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -69,7 +70,13 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+    <>
+      <MetadataHead
+        title="Reset Password - Signature For Me"
+        description="Reset your password for Signature For Me account."
+        keywords={["reset password", "change password", "account"]}
+      />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Link href="/" className="inline-block">

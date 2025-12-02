@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/components/Toast";
+import { MetadataHead } from "@/components/MetadataHead";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -141,7 +142,13 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <>
+        <MetadataHead
+          title="Settings - Signature For Me"
+          description="Manage your Signature For Me account settings and preferences."
+          keywords={["settings", "account", "preferences"]}
+        />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         <div className="mb-4 sm:mb-8">
           <div className="flex items-center gap-3 mb-2">
             <span className="material-symbols-outlined text-3xl text-blue-600">settings</span>

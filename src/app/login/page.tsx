@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { MetadataHead } from "@/components/MetadataHead";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -149,7 +150,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+    <>
+      <MetadataHead
+        title="Sign In - Signature For Me"
+        description="Sign in to your Signature For Me account to create and manage your professional email signatures."
+        keywords={["sign in", "login", "email signature", "account"]}
+      />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
