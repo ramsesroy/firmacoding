@@ -15,11 +15,64 @@ export const dynamic = "force-dynamic";
 function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  // Example image URLs (professional images from Unsplash)
-  // Professional profile photo - high quality corporate portrait
-  const EXAMPLE_PHOTO_URL: string = "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
-  // Company logo example - minimalist corporate design
-  const EXAMPLE_LOGO_URL: string = "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80";
+  
+  // Example image URLs categorized by template type
+  const getExamplePhoto = (template: TemplateType): string => {
+    const photoMap: Record<string, string> = {
+      // Professional/Corporate photos
+      classic: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Professional male
+      modern: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Professional female
+      modernaSinBarra: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Professional woman
+      qrProfesional: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Business professional
+      
+      // Developer/Tech photos
+      developerMinimal2025: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Casual tech
+      
+      // Marketing/Business photos
+      growthMarketing: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Business woman
+      
+      // Creative/Design photos
+      freelanceDesigner: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Creative person
+      creativePortfolio: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Creative woman
+      
+      // Interior Design
+      interiorDesign: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Professional woman
+      
+      // University/Academic photos
+      universityBanner: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Academic professional
+      lawStudent: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Student/professional
+      
+      // Church/Religious photos
+      pastorSignature: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80", // Friendly professional
+      
+      // Default professional
+      default: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop&crop=faces&auto=format&q=80",
+    };
+    return photoMap[template] || photoMap.default;
+  };
+
+  const getExampleLogo = (template: TemplateType): string => {
+    const logoMap: Record<string, string> = {
+      // Corporate logos
+      professional: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80", // Corporate logo
+      corporateConsultant: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=400&h=150&fit=crop&auto=format&q=80", // Business logo
+      
+      // Design/Interior logos
+      interiorDesign: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=400&h=150&fit=crop&auto=format&q=80", // Design logo
+      
+      // University logos
+      universityProfessor: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=400&h=150&fit=crop&auto=format&q=80", // Academic seal
+      universityPresident: "https://images.unsplash.com/photo-1580584126903-c17d41830450?w=400&h=150&fit=crop&auto=format&q=80", // University logo
+      
+      // Church logos
+      churchProfessional: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=150&fit=crop&auto=format&q=80", // Church/faith logo
+      pastorSignature: "https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=400&h=150&fit=crop&auto=format&q=80", // Religious symbol
+      
+      // Default corporate
+      default: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80",
+    };
+    return logoMap[template] || logoMap.default;
+  };
 
   const [signatureData, setSignatureData] = useState({
     nombre: "Alex Johnson",
@@ -35,7 +88,7 @@ function DashboardContent() {
     textoAdicional: "",
     colorPersonalizado: "",
     qrLink: "",
-    logoEmpresa: "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80", // Example logo for professional template
+    logoEmpresa: "", // Will be set based on template type
     ctaTexto: "",
     telefonoMovil: "",
     direccion: "",
@@ -440,13 +493,13 @@ function DashboardContent() {
                         // Add example photo if template uses photo and no photo exists
                         const templatesWithPhoto = ["classic", "modern", "modernaSinBarra", "qrProfesional", "developerMinimal2025", "growthMarketing", "freelanceDesigner", "interiorDesign", "universityBanner", "creativePortfolio", "pastorSignature", "lawStudent"];
                         if (templatesWithPhoto.includes(newTemplate) && !signatureData.foto) {
-                          setSignatureData({ ...signatureData, foto: EXAMPLE_PHOTO_URL });
+                          setSignatureData({ ...signatureData, foto: getExamplePhoto(newTemplate) });
                         }
                         
                         // Add example logo if template uses logo and no logo exists
                         const templatesWithLogo = ["professional", "corporateConsultant", "interiorDesign", "universityProfessor", "churchProfessional", "universityPresident", "pastorSignature"];
                         if (templatesWithLogo.includes(newTemplate) && !signatureData.logoEmpresa) {
-                          setSignatureData({ ...signatureData, logoEmpresa: EXAMPLE_LOGO_URL });
+                          setSignatureData({ ...signatureData, logoEmpresa: getExampleLogo(newTemplate) });
                         }
                       }}
                       className={`group relative px-4 py-4 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden ${
