@@ -46,32 +46,49 @@ body {
     background: #94a3b8;
   }
 
-  /* Horizontal scrollbar - more visible */
+  /* Horizontal scrollbar - more visible and Chrome compatible */
   .custom-scrollbar-horizontal {
     overflow-x: auto;
+    overflow-y: hidden;
     scrollbar-width: thin;
-    scrollbar-color: #94a3b8 #f1f5f9;
+    scrollbar-color: #64748b #f1f5f9;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable;
   }
 
+  /* Force scrollbar visibility in Chrome */
   .custom-scrollbar-horizontal::-webkit-scrollbar {
-    height: 10px;
+    height: 12px;
+    -webkit-appearance: none;
+    display: block;
   }
 
   .custom-scrollbar-horizontal::-webkit-scrollbar-track {
     background: #f1f5f9;
-    border-radius: 10px;
-    margin: 0 4px;
+    border-radius: 12px;
+    margin: 0 2px;
+    border: 1px solid #e2e8f0;
   }
 
   .custom-scrollbar-horizontal::-webkit-scrollbar-thumb {
-    background: #94a3b8;
-    border-radius: 10px;
+    background: #64748b;
+    border-radius: 12px;
     border: 2px solid #f1f5f9;
-    transition: background 0.2s;
+    min-width: 40px;
+    transition: background 0.2s ease;
   }
 
   .custom-scrollbar-horizontal::-webkit-scrollbar-thumb:hover {
-    background: #64748b;
+    background: #475569;
+  }
+
+  .custom-scrollbar-horizontal::-webkit-scrollbar-thumb:active {
+    background: #334155;
+  }
+
+  /* Force scrollbar to always show in Chrome */
+  .custom-scrollbar-horizontal::-webkit-scrollbar:horizontal {
+    display: block;
   }
 }
 

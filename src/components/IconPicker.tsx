@@ -95,8 +95,15 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
               </button>
             </div>
 
-            {/* Categories with visible horizontal scrollbar */}
-            <div className="flex gap-2.5 mb-4 overflow-x-auto pb-3 custom-scrollbar-horizontal flex-shrink-0">
+            {/* Categories with visible horizontal scrollbar - Chrome optimized */}
+            <div 
+              className="flex gap-2.5 mb-4 overflow-x-auto overflow-y-hidden pb-4 custom-scrollbar-horizontal flex-shrink-0"
+              style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#64748b #f1f5f9',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
               {categories.map((cat) => (
                 <button
                   key={cat}
