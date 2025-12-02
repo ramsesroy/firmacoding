@@ -10,6 +10,7 @@ import { copyToClipboard } from "@/lib/signatureUtils";
 import { exportToPNG, exportToPDF, exportToPNGHQ, exportToPDFHQ, ExportSize, getSizeLabel } from "@/lib/exportUtils";
 import { useToast } from "@/components/Toast";
 import { MetadataHead } from "@/components/MetadataHead";
+import { SkeletonCard } from "@/components/Skeleton";
 
 interface SignatureRecord {
   id: string;
@@ -218,9 +219,10 @@ export default function SignaturesPage() {
             Manage all your saved signatures
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-8 text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Loading signatures...</p>
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <SkeletonCard key={i} />
+          ))}
         </div>
       </div>
     );

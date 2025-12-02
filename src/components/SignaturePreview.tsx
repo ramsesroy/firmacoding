@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { SignatureProps, TemplateType } from "@/types/signature";
 import { generateQRCodeURL } from "@/lib/qrUtils";
 
@@ -17,7 +17,7 @@ interface SignaturePreviewProps extends SignatureProps {
   iconoDireccion?: string;
 }
 
-const SignaturePreview: React.FC<SignaturePreviewProps> = ({
+const SignaturePreview: React.FC<SignaturePreviewProps> = memo(({
   nombre,
   cargo,
   foto,
@@ -4689,6 +4689,8 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
   };
 
   return <div style={{ display: "inline-block" }}>{renderTemplate()}</div>;
-};
+});
+
+SignaturePreview.displayName = "SignaturePreview";
 
 export default SignaturePreview;

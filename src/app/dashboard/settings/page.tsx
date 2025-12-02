@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/components/Toast";
 import { MetadataHead } from "@/components/MetadataHead";
+import { SkeletonForm } from "@/components/Skeleton";
 
 export default function SettingsPage() {
   const router = useRouter();

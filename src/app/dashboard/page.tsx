@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useRef, useEffect, Suspense } from "react";
+import React, { useState, useRef, useEffect, Suspense, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import SignaturePreview from "@/components/SignaturePreview";
 import IconPicker from "@/components/IconPicker";
 import { TemplateType, RedSocial } from "@/types/signature";
@@ -10,6 +11,7 @@ import { uploadImage } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/components/Toast";
 import { MetadataHead } from "@/components/MetadataHead";
+import { SkeletonForm, SkeletonSignaturePreview } from "@/components/Skeleton";
 
 // Force dynamic rendering for this page to support search params
 export const dynamic = "force-dynamic";
@@ -422,10 +424,20 @@ function DashboardContent() {
 
   if (loadingSignature) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600">Loading signature...</p>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100 p-4 sm:p-6 lg:p-8">
+        <div className="max-w-[1920px] mx-auto">
+          <div className="mb-8">
+            <div className="h-10 w-64 bg-gray-200 rounded-lg animate-pulse mb-2"></div>
+            <div className="h-6 w-96 bg-gray-200 rounded-lg animate-pulse"></div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+            <div className="lg:col-span-5 bg-white rounded-2xl border border-gray-200/80 shadow-lg p-6 sm:p-8">
+              <SkeletonForm />
+            </div>
+            <div className="lg:col-span-7 bg-white rounded-2xl border border-gray-200/80 shadow-lg p-6 sm:p-8">
+              <SkeletonSignaturePreview />
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -700,10 +712,14 @@ function DashboardContent() {
                 <div className="relative group">
                   <div className="border-2 border-gray-200 rounded-xl p-5 bg-gradient-to-br from-gray-50 to-gray-50/50 hover:border-blue-300 transition-all duration-200">
                     <div className="relative">
-                      <img
+                      <Image
                         src={signatureData.foto}
-                        alt="Preview"
+                        alt="Profile photo preview"
+                        width={300}
+                        height={176}
                         className="max-w-full h-44 object-contain mx-auto rounded-xl shadow-md"
+                        loading="lazy"
+                        unoptimized={signatureData.foto.startsWith("data:") || signatureData.foto.includes("drive.google.com")}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     </div>
@@ -787,10 +803,14 @@ function DashboardContent() {
                   <div className="space-y-3">
                     <div className="border-2 border-gray-200 rounded-xl p-5 bg-gradient-to-br from-gray-50 to-gray-50/50 hover:border-blue-300 transition-all duration-200 group">
                       <div className="relative">
-                        <img
+                        <Image
                           src={signatureData.logoEmpresa}
-                          alt="Logo preview"
+                          alt="Company logo preview"
+                          width={400}
+                          height={128}
                           className="max-w-full h-32 object-contain mx-auto rounded-xl shadow-md"
+                          loading="lazy"
+                          unoptimized={signatureData.logoEmpresa.startsWith("data:") || signatureData.logoEmpresa.includes("drive.google.com")}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, memo, useMemo } from "react";
 
 interface IconPickerProps {
   selectedIcon?: string;
@@ -17,14 +17,16 @@ const ICON_CATEGORIES = {
 
 const ALL_ICONS = Object.values(ICON_CATEGORIES).flat();
 
-export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPickerProps) {
+const IconPicker = memo(function IconPicker({ selectedIcon, onSelectIcon, label }: IconPickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
-  const categories = ["All", ...Object.keys(ICON_CATEGORIES)];
-  const displayIcons = selectedCategory === "All" 
-    ? ALL_ICONS 
-    : ICON_CATEGORIES[selectedCategory as keyof typeof ICON_CATEGORIES] || [];
+  const categories = useMemo(() => ["All", ...Object.keys(ICON_CATEGORIES)], []);
+  const displayIcons = useMemo(() => {
+    return selectedCategory === "All" 
+      ? ALL_ICONS 
+      : ICON_CATEGORIES[selectedCategory as keyof typeof ICON_CATEGORIES] || [];
+  }, [selectedCategory]);
 
   return (
     <div className="relative w-full sm:w-auto">
@@ -157,6 +159,10 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
       )}
     </div>
   );
-}
+});
+
+IconPicker.displayName = "IconPicker";
+
+export default IconPicker;
 
 
