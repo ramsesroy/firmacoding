@@ -445,7 +445,7 @@ function DashboardContent() {
                       className={`group relative px-4 py-4 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden ${
                         template === tpl.id
                           ? "bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white shadow-2xl shadow-blue-500/40 ring-2 ring-blue-400 ring-offset-2 ring-offset-white transform scale-[1.02]"
-                          : "bg-white text-gray-700 hover:bg-gradient-to-br hover:from-gray-50 hover:to-gray-100 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10"
+                          : "bg-white text-gray-700 hover:bg-gradient-to-br hover:from-gray-50 hover:to-gray-100 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10 hover:scale-105 active:scale-95"
                       }`}
                       style={template === tpl.id ? {
                         boxShadow: '0 20px 25px -5px rgba(59, 130, 246, 0.4), 0 10px 10px -5px rgba(59, 130, 246, 0.2)'
@@ -472,7 +472,7 @@ function DashboardContent() {
                           </div>
                         ) : (
                           <div 
-                            className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200 flex items-center justify-center shadow-lg border-2 border-gray-200/50 group-hover:shadow-xl group-hover:scale-110 group-hover:-translate-y-1 transition-all duration-300"
+                            className="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200 flex items-center justify-center shadow-lg border-2 border-gray-200/50 group-hover:shadow-xl group-hover:scale-125 group-hover:-translate-y-2 group-hover:rotate-3 transition-all duration-300 ease-out"
                             style={{
                               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
                             }}

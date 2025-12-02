@@ -162,6 +162,118 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Premium Features Teaser */}
+      <section className="py-20 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-purple-50 to-blue-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
+              <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
+              Premium Features
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-light text-gray-900 mb-4 tracking-tight">
+              Take Your Signatures to the Next Level
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto font-light">
+              Unlock powerful features designed for professionals who want more
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-4xl mx-auto">
+            {/* AI Enhancer Feature */}
+            <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 group">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: '"FILL" 1, "wght" 600' }}>
+                    auto_awesome
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">AI Signature Enhancer</h3>
+                  <p className="text-gray-600 leading-relaxed font-light text-sm mb-4">
+                    Get intelligent design suggestions powered by AI. Automatically optimize your signature based on your role, industry, and best practices.
+                  </p>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      <span>Smart layout recommendations</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      <span>Industry-specific optimizations</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      <span>Color scheme suggestions</span>
+                    </li>
+                  </ul>
+                  <Link
+                    href="#pricing"
+                    className="inline-flex items-center gap-2 mt-4 text-blue-600 hover:text-blue-700 font-medium text-sm group-hover:gap-3 transition-all"
+                  >
+                    Upgrade to Premium
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Analytics Feature */}
+            <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 group">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: '"FILL" 1, "wght" 600' }}>
+                    analytics
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Link Click Analytics</h3>
+                  <p className="text-gray-600 leading-relaxed font-light text-sm mb-4">
+                    Track which links in your signature get the most clicks. Understand your audience and optimize your signature for maximum engagement.
+                  </p>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      <span>Real-time click tracking</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      <span>Performance dashboard</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      <span>Social media engagement insights</span>
+                    </li>
+                  </ul>
+                  <Link
+                    href="#pricing"
+                    className="inline-flex items-center gap-2 mt-4 text-blue-600 hover:text-blue-700 font-medium text-sm group-hover:gap-3 transition-all"
+                  >
+                    Upgrade to Premium
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              href="#pricing"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg shadow-blue-500/30 hover:shadow-xl"
+            >
+              View All Premium Features
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works Section */}
       <section id="how-it-works" className="py-24 sm:py-32 lg:py-40 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
