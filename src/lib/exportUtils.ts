@@ -30,13 +30,15 @@ export async function exportToPNG(
   try {
     let width: number;
     let height: number;
-    let scale = 2; // Higher scale for better quality (2x = retina)
+    let scale = 4; // Higher scale for better quality (4x = ultra high quality)
 
     if (size === "auto") {
       // Auto-size: capture the element's natural size with margins
       const rect = element.getBoundingClientRect();
       width = rect.width + margin * 2;
       height = rect.height + margin * 2;
+      // Use maximum scale for auto size to ensure highest quality
+      scale = 4;
     } else {
       // Use preset sizes
       const preset = SIZE_PRESETS[size];
@@ -46,7 +48,8 @@ export async function exportToPNG(
       const rect = element.getBoundingClientRect();
       const scaleX = (width - margin * 2) / rect.width;
       const scaleY = (height - margin * 2) / rect.height;
-      scale = Math.min(scaleX, scaleY, 2); // Don't scale up more than 2x
+      // Use at least 3x scale, up to 4x for best quality
+      scale = Math.max(3, Math.min(scaleX, scaleY, 4));
     }
 
     // Configure html2canvas options (only valid options)
@@ -56,7 +59,7 @@ export async function exportToPNG(
       allowTaint: false,
     });
 
-    // Scale the canvas manually for high quality
+    // Scale the canvas manually for ultra high quality
     let scaledCanvas = canvas;
     if (scale !== 1) {
       scaledCanvas = document.createElement("canvas");
@@ -66,6 +69,7 @@ export async function exportToPNG(
       if (ctx) {
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = "high";
+        // Draw at full scale for maximum quality
         ctx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
       }
     }
@@ -151,12 +155,14 @@ export async function exportToPDF(
   try {
     let width: number;
     let height: number;
-    let scale = 2; // Higher scale for better quality
+    let scale = 4; // Higher scale for better quality (4x = ultra high quality)
 
     if (size === "auto") {
       const rect = element.getBoundingClientRect();
       width = rect.width + margin * 2;
       height = rect.height + margin * 2;
+      // Use maximum scale for auto size to ensure highest quality
+      scale = 4;
     } else {
       const preset = SIZE_PRESETS[size];
       width = preset.width;
@@ -164,7 +170,8 @@ export async function exportToPDF(
       const rect = element.getBoundingClientRect();
       const scaleX = (width - margin * 2) / rect.width;
       const scaleY = (height - margin * 2) / rect.height;
-      scale = Math.min(scaleX, scaleY, 2);
+      // Use at least 3x scale, up to 4x for best quality
+      scale = Math.max(3, Math.min(scaleX, scaleY, 4));
     }
 
     // Capture element to canvas (only valid options)
@@ -174,7 +181,7 @@ export async function exportToPDF(
       allowTaint: false,
     });
 
-    // Scale the canvas manually for high quality
+    // Scale the canvas manually for ultra high quality
     let scaledCanvas = canvas;
     if (scale !== 1) {
       scaledCanvas = document.createElement("canvas");
@@ -184,6 +191,7 @@ export async function exportToPDF(
       if (ctx) {
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = "high";
+        // Draw at full scale for maximum quality
         ctx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
       }
     }
