@@ -287,18 +287,18 @@ export default function DashboardPage() {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
                   {[
-                    { id: "professional", name: "Professional", badge: "Most Popular", icon: "🎨" },
-                    { id: "classic", name: "Classic", icon: "📄" },
-                    { id: "modern", name: "Modern", icon: "✨" },
-                    { id: "minimal", name: "Minimal", icon: "⚡" },
-                    { id: "minimalCorporate", name: "Corporate", icon: "💼" },
-                    { id: "modernaSinBarra", name: "Modern 2", icon: "🔷" },
-                    { id: "enterpriseVintage", name: "Enterprise", icon: "🏢" },
-                    { id: "modern2", name: "Modern 3", icon: "🔶" },
-                    { id: "qrProfesional", name: "QR Pro", icon: "📱" },
-                    { id: "modern3", name: "Modern 4", icon: "💎" },
-                    { id: "modern4", name: "Modern 5", icon: "🌟" },
-                    { id: "qrCorporated", name: "QR Corp", icon: "📲" },
+                    { id: "professional", name: "Professional", badge: "Most Popular", icon: "palette", color: "from-purple-500 to-indigo-600" },
+                    { id: "classic", name: "Classic", icon: "description", color: "from-gray-500 to-gray-700" },
+                    { id: "modern", name: "Modern", icon: "auto_awesome", color: "from-pink-500 to-rose-600" },
+                    { id: "minimal", name: "Minimal", icon: "bolt", color: "from-yellow-500 to-orange-600" },
+                    { id: "minimalCorporate", name: "Corporate", icon: "business_center", color: "from-blue-500 to-cyan-600" },
+                    { id: "modernaSinBarra", name: "Modern 2", icon: "diamond", color: "from-cyan-500 to-blue-600" },
+                    { id: "enterpriseVintage", name: "Enterprise", icon: "apartment", color: "from-slate-500 to-gray-700" },
+                    { id: "modern2", name: "Modern 3", icon: "workspace_premium", color: "from-amber-500 to-orange-600" },
+                    { id: "qrProfesional", name: "QR Pro", icon: "qr_code_scanner", color: "from-green-500 to-emerald-600" },
+                    { id: "modern3", name: "Modern 4", icon: "stars", color: "from-violet-500 to-purple-600" },
+                    { id: "modern4", name: "Modern 5", icon: "flash_on", color: "from-blue-400 to-indigo-600" },
+                    { id: "qrCorporated", name: "QR Corp", icon: "qr_code_2", color: "from-teal-500 to-cyan-600" },
                   ].map((tpl) => (
                     <button
                       key={tpl.id}
@@ -318,14 +318,22 @@ export default function DashboardPage() {
                           setSignatureData({ ...signatureData, logoEmpresa: EXAMPLE_LOGO_URL });
                         }
                       }}
-                      className={`group relative px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                      className={`group relative px-4 py-4 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden ${
                         template === tpl.id
                           ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30 ring-2 ring-blue-500 ring-offset-2 transform scale-[1.02]"
                           : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-2 border-gray-200 hover:border-gray-300 hover:shadow-md"
                       }`}
                     >
-                      <div className="flex flex-col items-center gap-1.5">
-                        <span className="text-lg">{tpl.icon}</span>
+                      <div className="flex flex-col items-center gap-2 relative z-10">
+                        {template === tpl.id ? (
+                          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${tpl.color} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                            <span className="material-symbols-outlined text-2xl text-white" style={{ fontVariationSettings: '"FILL" 1, "wght" 400, "GRAD" 0, "opsz" 48 }}>{tpl.icon}</span>
+                          </div>
+                        ) : (
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:scale-110">
+                            <span className="material-symbols-outlined text-2xl text-gray-600" style={{ fontVariationSettings: '"FILL" 0, "wght" 500, "GRAD" 0, "opsz" 48 }}>{tpl.icon}</span>
+                          </div>
+                        )}
                         <span className="text-xs">{tpl.name}</span>
                         {tpl.badge && template === tpl.id && (
                           <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 bg-amber-400 text-gray-900 text-[9px] font-bold rounded-full shadow-md animate-bounce">
@@ -333,6 +341,9 @@ export default function DashboardPage() {
                           </span>
                         )}
                       </div>
+                      {template === tpl.id && (
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50"></div>
+                      )}
                     </button>
                   ))}
                 </div>
