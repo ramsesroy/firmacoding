@@ -72,11 +72,11 @@ function DashboardContent() {
       // Interior Design: Needs a design/architecture style logo - horizontal format
       interiorDesign: "https://images.unsplash.com/photo-1611262588024-d12430b98920?w=400&h=120&fit=crop&auto=format&q=90",
       
-      // University Professor: 60x60px square (1:1 ratio) - Academic seal
-      universityProfessor: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=120&h=120&fit=crop&crop=center&auto=format&q=90",
+      // University Professor: 60x60px square (1:1 ratio) - Academic shield logo (High School Education style)
+      universityProfessor: "https://images.unsplash.com/photo-1580584126903-c17d41830450?w=240&h=240&fit=crop&crop=center&auto=format&q=90", // Academic shield with laurels
       
-      // University President: 60x60px square (1:1 ratio) - University logo
-      universityPresident: "https://images.unsplash.com/photo-1580584126903-c17d41830450?w=120&h=120&fit=crop&crop=center&auto=format&q=90",
+      // University President: 60x60px square (1:1 ratio) - Academic shield logo (High School Education style)
+      universityPresident: "https://images.unsplash.com/photo-1580584126903-c17d41830450?w=240&h=240&fit=crop&crop=center&auto=format&q=90", // Academic shield with laurels
       
       // Church Professional: height 80px, width flexible - Church logo (horizontal format)
       churchProfessional: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=200&h=80&fit=crop&auto=format&q=90",
