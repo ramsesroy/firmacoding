@@ -76,9 +76,9 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
             onClick={() => setIsOpen(false)}
           />
           
-          {/* Icon selection panel - Minimal compact design that always fits */}
+          {/* Icon selection panel - Opens upward to always fit in viewport */}
           <div 
-            className="fixed sm:absolute inset-x-1.5 sm:inset-x-auto top-auto sm:top-full bottom-1.5 sm:bottom-auto left-0 right-0 sm:left-0 sm:right-auto sm:mt-2 z-[9999] bg-white border border-gray-300 rounded-lg shadow-xl p-1.5 sm:p-2 w-auto sm:w-full max-w-full sm:max-w-xs h-auto max-h-[35vh] sm:max-h-[240px] overflow-hidden flex flex-col"
+            className="fixed sm:absolute inset-x-1.5 sm:inset-x-auto top-auto sm:bottom-full bottom-1.5 sm:top-auto left-0 right-0 sm:left-0 sm:right-auto sm:mb-2 z-[9999] bg-white border border-gray-300 rounded-lg shadow-xl p-1.5 sm:p-2 w-auto sm:w-full max-w-full sm:max-w-xs h-auto max-h-[40vh] sm:max-h-[280px] overflow-hidden flex flex-col"
             style={{
               boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
             }}
