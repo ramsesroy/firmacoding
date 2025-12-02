@@ -15,9 +15,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const post = getPostBySlug(params.slug);
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
 
   if (!post) {
     return {
@@ -45,8 +46,9 @@ export async function generateMetadata({
   };
 }
 
-export default function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = getPostBySlug(params.slug);
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
 
   if (!post) {
     notFound();
@@ -126,13 +128,13 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
       <div className="pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <div className="prose prose-lg prose-gray max-w-none">
-            {params.slug === "how-to-create-professional-email-signature-gmail-outlook-2026" ? (
+            {slug === "how-to-create-professional-email-signature-gmail-outlook-2026" ? (
               <PostContent />
-            ) : params.slug === "how-to-create-professional-email-signature-5-minutes-2026" ? (
+            ) : slug === "how-to-create-professional-email-signature-5-minutes-2026" ? (
               <PostContent5Minutes />
-            ) : params.slug === "free-email-signature-create-professional-signature-30-seconds-2025" ? (
+            ) : slug === "free-email-signature-create-professional-signature-30-seconds-2025" ? (
               <PostContentFreeSignature />
-            ) : params.slug === "email-signature-best-practices-10-mistakes-costing-opportunities-2026" ? (
+            ) : slug === "email-signature-best-practices-10-mistakes-costing-opportunities-2026" ? (
               <PostContentBestPractices />
             ) : (
               <p>Content coming soon...</p>
