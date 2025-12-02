@@ -47,6 +47,9 @@ export async function generateSignatureHTML(
     case "qrCorporated":
       baseHTML = generateTemplate10HTML(nombre, cargo, telefono, redes, qrLink);
       break;
+    case "developerMinimal2025":
+      baseHTML = generateDeveloperMinimal2025HTML(nombre, cargo, foto, telefono, redes);
+      break;
     default:
       baseHTML = generateClassicHTML(nombre, cargo, foto, telefono, redes);
   }
