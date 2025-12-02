@@ -9,21 +9,21 @@ import { uploadImage } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function DashboardPage() {
-  // URLs de imágenes de ejemplo (imágenes reales profesionales de Unsplash)
-  // Foto de perfil profesional - retrato empresarial de calidad
-  const EXAMPLE_PHOTO_URL: string = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
-  // Logo de empresa de ejemplo - diseño minimalista corporativo
+  // Example image URLs (professional images from Unsplash)
+  // Professional profile photo - high quality corporate portrait
+  const EXAMPLE_PHOTO_URL: string = "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
+  // Company logo example - minimalist corporate design
   const EXAMPLE_LOGO_URL: string = "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80";
 
   const [signatureData, setSignatureData] = useState({
-    nombre: "Juan Pérez",
-    cargo: "Desarrollador Full Stack",
+    nombre: "Alex Johnson",
+    cargo: "Full Stack Developer",
     foto: "",
     telefono: "+1 (555) 123-4567",
     redes: [
-      { nombre: "LinkedIn", url: "https://linkedin.com/in/juanperez", icono: "💼" },
-      { nombre: "X (Twitter)", url: "https://twitter.com/juanperez", icono: "🐦" },
-      { nombre: "GitHub", url: "https://github.com/juanperez", icono: "💻" },
+      { nombre: "LinkedIn", url: "https://linkedin.com/in/alexjohnson", icono: "💼" },
+      { nombre: "X (Twitter)", url: "https://twitter.com/alexjohnson", icono: "🐦" },
+      { nombre: "GitHub", url: "https://github.com/alexjohnson", icono: "💻" },
     ] as RedSocial[],
     horario: "",
     textoAdicional: "",
@@ -50,25 +50,25 @@ export default function DashboardPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
 
-  // Agregar imágenes de ejemplo según el template cuando cambia
+  // Add example images based on template when it changes
   useEffect(() => {
-    // Templates que usan foto
+    // Templates that use photo
     const templatesWithPhoto = ["classic", "modern", "minimal", "modernaSinBarra", "modern2", "modern3", "modern4"];
-    // Templates que usan logo
+    // Templates that use logo
     const templatesWithLogo = ["professional", "enterpriseVintage"];
     
-    const photoUrl = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
+    const photoUrl = "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
     const logoUrl = "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80";
     
     setSignatureData((prev) => {
       const updates: any = {};
       
-      // Agregar foto de ejemplo si el template la requiere y no hay foto
+      // Add example photo if template requires it and no photo exists
       if (templatesWithPhoto.includes(template) && !prev.foto) {
         updates.foto = photoUrl;
       }
       
-      // Agregar logo de ejemplo si el template lo requiere y no hay logo
+      // Add example logo if template requires it and no logo exists
       if (templatesWithLogo.includes(template) && !prev.logoEmpresa) {
         updates.logoEmpresa = logoUrl;
       }
@@ -78,12 +78,12 @@ export default function DashboardPage() {
   }, [template]);
 
   const handleCopyToClipboard = async () => {
-    const success = await copyToClipboard(signatureData, template, signatureData.nombre || "Usuario");
+    const success = await copyToClipboard(signatureData, template, signatureData.nombre || "User");
     if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } else {
-      alert("Error al copiar al portapapeles. Por favor, inténtalo de nuevo.");
+      alert("Error copying to clipboard. Please try again.");
     }
   };
 
@@ -96,7 +96,7 @@ export default function DashboardPage() {
       const imageURL = await uploadImage(file);
       setSignatureData({ ...signatureData, foto: imageURL });
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Error al cargar la imagen");
+      alert(error instanceof Error ? error.message : "Error uploading image");
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -121,7 +121,7 @@ export default function DashboardPage() {
       const imageURL = await uploadImage(file);
       setSignatureData({ ...signatureData, logoEmpresa: imageURL });
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Error al cargar el logo");
+      alert(error instanceof Error ? error.message : "Error uploading logo");
       if (logoFileInputRef.current) {
         logoFileInputRef.current.value = "";
       }
@@ -159,11 +159,11 @@ export default function DashboardPage() {
   };
 
   const handleSave = async () => {
-    // Validar que los campos requeridos estén completos
+    // Validate that required fields are completed
     if (!signatureData.nombre || !signatureData.cargo) {
       setSaveMessage({
         type: "error",
-        text: "Por favor completa al menos el nombre y el cargo",
+        text: "Please complete at least the name and title",
       });
       setTimeout(() => setSaveMessage(null), 3000);
       return;
@@ -173,19 +173,19 @@ export default function DashboardPage() {
     setSaveMessage(null);
 
     try {
-      // Obtener el usuario autenticado
+      // Get authenticated user
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
-        throw new Error(`Error de autenticación: ${sessionError.message}`);
+        throw new Error(`Authentication error: ${sessionError.message}`);
       }
 
       if (!session?.user) {
-        throw new Error("No estás autenticado. Por favor inicia sesión nuevamente.");
+        throw new Error("You are not authenticated. Please log in again.");
       }
 
-      // Preparar los datos para insertar
-      // Asegurar que las propiedades coincidan exactamente con la estructura de la base de datos
+      // Prepare data for insertion
+      // Ensure properties match exactly with the database structure
       const signatureRecord: any = {
         name: signatureData.nombre,
         role: signatureData.cargo,
@@ -193,10 +193,10 @@ export default function DashboardPage() {
         image_url: signatureData.foto || null,
         social_links: signatureData.redes.length > 0 ? signatureData.redes : null,
         template_id: template,
-        user_id: session.user.id, // Asociar la firma al usuario autenticado
+        user_id: session.user.id, // Associate signature with authenticated user
       };
 
-      // Insertar en la tabla signatures
+      // Insert into signatures table
       const { data, error } = await supabase
         .from("signatures")
         .insert([signatureRecord])
@@ -204,17 +204,17 @@ export default function DashboardPage() {
         .single();
 
       if (error) {
-        // Mostrar un mensaje más descriptivo según el tipo de error
+        // Show a more descriptive message based on error type
         let errorMessage = error.message;
         
         if (error.code === "23505") {
-          errorMessage = "Ya existe una firma con estos datos. Por favor modifica algunos campos.";
+          errorMessage = "A signature with this data already exists. Please modify some fields.";
         } else if (error.code === "42501") {
-          errorMessage = "No tienes permiso para realizar esta acción. Verifica tu autenticación.";
+          errorMessage = "You don't have permission to perform this action. Verify your authentication.";
         } else if (error.code === "42P01") {
-          errorMessage = "La tabla 'signatures' no existe en la base de datos. Por favor crea la tabla primero.";
+          errorMessage = "The 'signatures' table does not exist in the database. Please create the table first.";
         } else if (error.message.includes("permission denied") || error.message.includes("RLS")) {
-          errorMessage = "Error de permisos. Verifica las políticas de seguridad (RLS) en Supabase.";
+          errorMessage = "Permission error. Verify security policies (RLS) in Supabase.";
         }
         
         throw new Error(errorMessage);
@@ -222,15 +222,15 @@ export default function DashboardPage() {
 
       setSaveMessage({
         type: "success",
-        text: "¡Firma guardada exitosamente!",
+        text: "Signature saved successfully!",
       });
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (error) {
-      console.error("Error al guardar la firma:", error);
+      console.error("Error saving signature:", error);
       
       setSaveMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Error al guardar la firma. Por favor intenta nuevamente.",
+        text: error instanceof Error ? error.message : "Error saving signature. Please try again.",
       });
       setTimeout(() => setSaveMessage(null), 5000);
     } finally {
@@ -247,11 +247,11 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3 mb-3">
             <span className="material-symbols-outlined text-3xl sm:text-4xl text-blue-600">edit_document</span>
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
-              Editor de Firmas
+              Signature Editor
             </h1>
           </div>
           <p className="text-base sm:text-lg text-gray-600 ml-11">
-            Crea y personaliza tu firma digital profesional
+            Create and customize your professional email signature
           </p>
         </div>
 
@@ -262,7 +262,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-3 mb-6">
               <span className="material-symbols-outlined text-2xl text-blue-600">edit_document</span>
               <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                Información de la Firma
+                Signature Information
               </h2>
             </div>
 
@@ -270,7 +270,7 @@ export default function DashboardPage() {
               {/* Template Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Plantilla
+                  Template
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 max-h-64 overflow-y-auto pr-2">
                   {[
@@ -293,13 +293,13 @@ export default function DashboardPage() {
                         const newTemplate = tpl.id as TemplateType;
                         setTemplate(newTemplate);
                         
-                        // Agregar foto de ejemplo si el template usa foto y no hay foto
+                        // Add example photo if template uses photo and no photo exists
                         const templatesWithPhoto = ["classic", "modern", "minimal", "modernaSinBarra", "modern2", "modern3", "modern4"];
                         if (templatesWithPhoto.includes(newTemplate) && !signatureData.foto) {
                           setSignatureData({ ...signatureData, foto: EXAMPLE_PHOTO_URL });
                         }
                         
-                        // Agregar logo de ejemplo si el template usa logo y no hay logo
+                        // Add example logo if template uses logo and no logo exists
                         const templatesWithLogo = ["professional", "enterpriseVintage"];
                         if (templatesWithLogo.includes(newTemplate) && !signatureData.logoEmpresa) {
                           setSignatureData({ ...signatureData, logoEmpresa: EXAMPLE_LOGO_URL });
@@ -328,10 +328,10 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-            {/* Nombre */}
+            {/* Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nombre
+                Name
               </label>
               <input
                 type="text"
@@ -340,14 +340,14 @@ export default function DashboardPage() {
                   setSignatureData({ ...signatureData, nombre: e.target.value })
                 }
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                placeholder="Tu nombre completo"
+                placeholder="Your full name"
               />
             </div>
 
-            {/* Cargo */}
+            {/* Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Cargo / Título
+                Title / Position
               </label>
               <input
                 type="text"
@@ -356,14 +356,14 @@ export default function DashboardPage() {
                   setSignatureData({ ...signatureData, cargo: e.target.value })
                 }
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                placeholder="Tu cargo o título profesional"
+                placeholder="Your professional title"
               />
             </div>
 
-            {/* Foto - Input de Archivo */}
+            {/* Photo - File Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Foto de Perfil
+                Profile Photo
               </label>
               {!signatureData.foto ? (
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-200 cursor-pointer bg-gray-50/50">
@@ -394,10 +394,10 @@ export default function DashboardPage() {
                       />
                     </svg>
                     <span className="text-sm font-medium text-gray-700">
-                      {uploading ? "Subiendo..." : "Haz clic para subir una imagen"}
+                      {uploading ? "Uploading..." : "Click to upload an image"}
                     </span>
                     <p className="text-xs text-gray-500 mt-2">
-                      JPG, PNG o GIF (máx. 5MB)
+                      JPG, PNG or GIF (max. 5MB)
                     </p>
                   </label>
                 </div>
@@ -409,22 +409,22 @@ export default function DashboardPage() {
                       alt="Vista previa"
                       className="max-w-full h-40 object-contain mx-auto rounded-lg shadow-sm"
                     />
-                    <button
+                      <button
                       onClick={handleRemoveImage}
                       className="mt-3 w-full px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all duration-200 text-sm font-semibold border border-red-200"
                     >
-                      Eliminar Imagen
+                      Remove Image
                     </button>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Logo de Empresa (Professional) */}
+            {/* Company Logo (Professional) */}
             {(template === "professional") && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Logo de Empresa
+                  Company Logo
                 </label>
                 {!signatureData.logoEmpresa ? (
                   <div className="space-y-3">
@@ -456,10 +456,10 @@ export default function DashboardPage() {
                           />
                         </svg>
                         <span className="text-sm font-medium text-gray-700">
-                          {uploadingLogo ? "Subiendo logo..." : "Haz clic para subir un logo"}
+                          {uploadingLogo ? "Uploading logo..." : "Click to upload a logo"}
                         </span>
                         <p className="text-xs text-gray-500 mt-1">
-                          JPG, PNG o GIF (máx. 5MB)
+                          JPG, PNG or GIF (max. 5MB)
                         </p>
                       </label>
                     </div>
@@ -478,7 +478,7 @@ export default function DashboardPage() {
                         setSignatureData({ ...signatureData, logoEmpresa: e.target.value })
                       }
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                      placeholder="URL del logo (https://ejemplo.com/logo.png)"
+                      placeholder="Logo URL (https://example.com/logo.png)"
                     />
                   </div>
                 ) : (
@@ -493,7 +493,7 @@ export default function DashboardPage() {
                         onClick={handleRemoveLogo}
                         className="mt-3 w-full px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all duration-200 text-sm font-semibold border border-red-200"
                       >
-                        Eliminar Logo
+                        Remove Logo
                       </button>
                     </div>
                     <input
@@ -503,17 +503,17 @@ export default function DashboardPage() {
                         setSignatureData({ ...signatureData, logoEmpresa: e.target.value })
                       }
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                      placeholder="URL del logo (https://ejemplo.com/logo.png)"
+                      placeholder="Logo URL (https://example.com/logo.png)"
                     />
                   </div>
                 )}
               </div>
             )}
 
-            {/* Teléfono */}
+            {/* Phone */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Teléfono
+                Phone
               </label>
               <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
                 <input
@@ -535,11 +535,11 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Teléfono Móvil (Professional) */}
+            {/* Mobile Phone (Professional) */}
             {(template === "professional") && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Teléfono Móvil
+                  Mobile Phone
                 </label>
                 <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
                   <input
@@ -549,7 +549,7 @@ export default function DashboardPage() {
                       setSignatureData({ ...signatureData, telefonoMovil: e.target.value })
                     }
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                    placeholder="+34 614 19 54 89"
+                    placeholder="+1 (555) 987-6543"
                   />
                   <IconPicker
                     selectedIcon={signatureData.iconoTelefonoMovil}
@@ -562,11 +562,11 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Dirección (Professional) */}
+            {/* Address (Professional) */}
             {(template === "professional") && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Dirección
+                  Address
                 </label>
                 <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
                   <input
@@ -576,7 +576,7 @@ export default function DashboardPage() {
                       setSignatureData({ ...signatureData, direccion: e.target.value })
                     }
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                    placeholder="Calle Falsa 123, Ciudad"
+                    placeholder="123 Main Street, City"
                   />
                   <IconPicker
                     selectedIcon={signatureData.iconoDireccion}
@@ -589,11 +589,11 @@ export default function DashboardPage() {
               </div>
             )}
 
-            {/* Horario (Professional) */}
+            {/* Schedule (Professional) */}
             {(template === "professional") && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Horario
+                  Schedule
                 </label>
                 <input
                   type="text"
@@ -602,16 +602,16 @@ export default function DashboardPage() {
                     setSignatureData({ ...signatureData, horario: e.target.value })
                   }
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="Lun-Vie: 9:00-18:00"
+                  placeholder="Mon-Fri: 9:00 AM - 6:00 PM"
                 />
               </div>
             )}
 
-            {/* Texto Adicional (Professional) */}
+            {/* Additional Text (Professional) */}
             {(template === "professional") && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Texto Adicional
+                  Additional Text
                 </label>
                 <textarea
                   value={signatureData.textoAdicional}
@@ -620,16 +620,16 @@ export default function DashboardPage() {
                   }
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="Cualquier información extra relevante"
+                  placeholder="Any additional relevant information"
                 ></textarea>
               </div>
             )}
 
-            {/* Color Personalizado (Professional) */}
+            {/* Custom Color (Professional) */}
             {(template === "professional") && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Color Principal
+                  Primary Color
                 </label>
                 <input
                   type="color"
@@ -638,7 +638,7 @@ export default function DashboardPage() {
                     setSignatureData({ ...signatureData, colorPersonalizado: e.target.value })
                   }
                   className="w-full h-12 rounded-lg border border-gray-200 cursor-pointer"
-                  title="Elige un color"
+                  title="Choose a color"
                 />
               </div>
             )}
@@ -647,7 +647,7 @@ export default function DashboardPage() {
             {(template === "qrProfesional" || template === "qrCorporated") && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Enlace para Código QR
+                  QR Code Link
                 </label>
                 <input
                   type="text"
@@ -656,10 +656,10 @@ export default function DashboardPage() {
                     setSignatureData({ ...signatureData, qrLink: e.target.value })
                   }
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="https://tu-sitio.com"
+                  placeholder="https://your-site.com"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Este enlace se usará para generar el código QR en tu firma.
+                  This link will be used to generate the QR code in your signature.
                 </p>
               </div>
             )}
@@ -668,7 +668,7 @@ export default function DashboardPage() {
             {(template === "professional") && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Texto de Llamada a la Acción (CTA)
+                  Call to Action (CTA) Text
                 </label>
                 <input
                   type="text"
@@ -677,10 +677,10 @@ export default function DashboardPage() {
                     setSignatureData({ ...signatureData, ctaTexto: e.target.value })
                   }
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                  placeholder="Visita mi sitio web"
+                  placeholder="Visit my website"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  Un texto corto para un botón o enlace destacado.
+                  Short text for a button or highlighted link.
                 </p>
               </div>
             )}
@@ -689,7 +689,7 @@ export default function DashboardPage() {
             <div className="border-t border-gray-200 pt-6 mt-6">
               <div className="flex items-center gap-3 mb-4">
                 <span className="material-symbols-outlined text-2xl text-blue-600">share</span>
-                <h3 className="text-lg font-bold text-gray-900">Redes Sociales</h3>
+                <h3 className="text-lg font-bold text-gray-900">Social Media</h3>
               </div>
               <div className="space-y-4">
                 {signatureData.redes.map((red, index) => (
@@ -707,7 +707,7 @@ export default function DashboardPage() {
                               setEditRedForm({ ...editRedForm, nombre: e.target.value })
                             }
                             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                            placeholder="Nombre"
+                            placeholder="Name"
                           />
                           <input
                             type="text"
@@ -731,13 +731,13 @@ export default function DashboardPage() {
                             onClick={handleSaveEditRed}
                             className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 text-sm font-semibold shadow-sm"
                           >
-                            Guardar
+                            Save
                           </button>
                           <button
                             onClick={handleCancelEditRed}
                             className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 text-sm font-semibold border border-gray-200"
                           >
-                            Cancelar
+                            Cancel
                           </button>
                         </div>
                       </div>
@@ -758,7 +758,7 @@ export default function DashboardPage() {
                           <button
                             onClick={() => handleEditRed(index)}
                             className="px-2 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition text-sm font-medium"
-                            title="Editar"
+                            title="Edit"
                           >
                             ✏️
                           </button>
@@ -770,7 +770,7 @@ export default function DashboardPage() {
                               setSignatureData({ ...signatureData, redes: nuevasRedes });
                             }}
                             className="px-2 py-1 text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition text-sm font-medium"
-                            title="Eliminar"
+                            title="Delete"
                           >
                             🗑️
                           </button>
@@ -789,7 +789,7 @@ export default function DashboardPage() {
                       setNuevaRed({ ...nuevaRed, nombre: e.target.value })
                     }
                     className="flex-1 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white text-gray-900 placeholder:text-gray-400"
-                    placeholder="Nombre (ej: LinkedIn)"
+                    placeholder="Name (e.g., LinkedIn)"
                   />
                   <input
                     type="text"
@@ -808,7 +808,7 @@ export default function DashboardPage() {
                       onSelectIcon={(icon) =>
                         setNuevaRed({ ...nuevaRed, icono: icon })
                       }
-                      label="Icono (opcional)"
+                      label="Icon (optional)"
                     />
                   </div>
                   <button
@@ -823,7 +823,7 @@ export default function DashboardPage() {
                     }}
                     className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-semibold shadow-md shadow-blue-500/20 whitespace-nowrap"
                   >
-                    + Agregar
+                    + Add
                   </button>
                 </div>
               </div>
@@ -831,21 +831,21 @@ export default function DashboardPage() {
           </div>
           </div>
 
-          {/* Vista Previa - Card */}
+            {/* Preview - Card */}
           <div className="lg:col-span-7 bg-white rounded-xl border border-gray-200 shadow-sm p-6 sm:p-8 overflow-y-auto flex flex-col">
             <div className="flex items-center gap-3 mb-6">
               <span className="material-symbols-outlined text-2xl text-blue-600">preview</span>
               <div>
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-                  Vista Previa en Vivo
+                  Live Preview
                 </h2>
                 <p className="text-sm text-gray-500">
-                  Los cambios se actualizan automáticamente
+                  Changes update automatically
                 </p>
               </div>
             </div>
 
-            {/* Vista Previa Principal */}
+            {/* Main Preview */}
             <div className="flex-1 bg-gradient-to-br from-gray-50 via-gray-50/50 to-gray-100 rounded-xl p-6 sm:p-10 border border-gray-200 mb-6" style={{
               backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0)',
               backgroundSize: '20px 20px'
@@ -873,7 +873,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Botones de Acción */}
+            {/* Action Buttons */}
             <div className="mt-auto pt-6 border-t border-gray-200">
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
@@ -887,7 +887,7 @@ export default function DashboardPage() {
                   <span className="material-symbols-outlined text-lg">
                     {copied ? "check_circle" : "content_copy"}
                   </span>
-                  {copied ? "¡Copiado!" : "Copiar HTML"}
+                  {copied ? "Copied!" : "Copy HTML"}
                 </button>
                 <button
                   onClick={handleSave}
@@ -901,12 +901,12 @@ export default function DashboardPage() {
                   <span className="material-symbols-outlined text-lg">
                     {saving ? "hourglass_empty" : "save"}
                   </span>
-                  {saving ? "Guardando..." : "Guardar Firma"}
+                  {saving ? "Saving..." : "Save Signature"}
                 </button>
               </div>
               {copied && (
                 <p className="text-sm text-green-600 mt-3 text-center font-medium">
-                  ¡Firma copiada! Ya puedes pegarla en Gmail o tu cliente de correo.
+                  Signature copied! You can now paste it in Gmail or your email client.
                 </p>
               )}
               {saveMessage && (
