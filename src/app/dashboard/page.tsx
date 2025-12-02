@@ -829,6 +829,7 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+          </div>
 
           {/* Vista Previa - Card */}
           <div className="lg:col-span-7 bg-white rounded-xl border border-gray-200 shadow-sm p-6 sm:p-8 overflow-y-auto flex flex-col">
