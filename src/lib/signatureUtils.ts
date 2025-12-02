@@ -1142,6 +1142,115 @@ function generateTemplate10HTML(
 </table>`;
 }
 
+// Developer Minimal 2025: Minimal design for developers
+function generateDeveloperMinimal2025HTML(
+  nombre: string,
+  cargo: string,
+  foto?: string,
+  telefono?: string,
+  redes: RedSocial[] = []
+): string {
+  const email = redes.find((r) => r.url.includes("@"));
+  const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+  const github = redes.find((r) => r.nombre.toLowerCase().includes("github"));
+  const twitter = redes.find((r) => r.nombre.toLowerCase().includes("twitter") || r.nombre.toLowerCase().includes("x.com"));
+  const website = redes.find((r) => r.url.includes("www") && !r.url.includes("linkedin") && !r.url.includes("github") && !r.url.includes("twitter") && !r.url.includes("x.com"));
+
+  const fotoHTML = foto
+    ? `<td valign="top" style="padding-right: 16px; vertical-align: top;">
+        <img src="${escapeHtml(foto)}" alt="${escapeHtml(nombre)}" width="64" height="64" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; display: block; border: 2px solid #e5e7eb;" />
+      </td>`
+    : "";
+
+  const linksHTML = [];
+  if (telefono) {
+    linksHTML.push(`<td style="padding-right: 20px; padding-bottom: 2px;">
+      <a href="tel:${telefono.replace(/[^0-9+]/g, "")}" style="color: #374151; text-decoration: none; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        📞 ${escapeHtml(telefono)}
+      </a>
+    </td>`);
+  }
+  if (email) {
+    linksHTML.push(`<td style="padding-right: 20px; padding-bottom: 2px;">
+      <a href="mailto:${escapeHtml(email.url)}" style="color: #374151; text-decoration: none; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        ✉️ ${escapeHtml(email.url)}
+      </a>
+    </td>`);
+  }
+  if (linkedin) {
+    linksHTML.push(`<td style="padding-right: 20px; padding-bottom: 2px;">
+      <a href="${escapeHtml(linkedin.url)}" style="color: #374151; text-decoration: none; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        💼 LinkedIn
+      </a>
+    </td>`);
+  }
+  if (github) {
+    linksHTML.push(`<td style="padding-right: 20px; padding-bottom: 2px;">
+      <a href="${escapeHtml(github.url)}" style="color: #374151; text-decoration: none; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        💻 GitHub
+      </a>
+    </td>`);
+  }
+  if (twitter) {
+    linksHTML.push(`<td style="padding-right: 20px; padding-bottom: 2px;">
+      <a href="${escapeHtml(twitter.url)}" style="color: #374151; text-decoration: none; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        🐦 Twitter
+      </a>
+    </td>`);
+  }
+  if (website) {
+    linksHTML.push(`<td style="padding-right: 20px; padding-bottom: 2px;">
+      <a href="${escapeHtml(website.url)}" style="color: #374151; text-decoration: none; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+        🌐 ${escapeHtml(website.nombre || "Website")}
+      </a>
+    </td>`);
+  }
+
+  return `<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #333333; line-height: 1.5;">
+  <tbody>
+    <tr>
+      ${fotoHTML}
+      <td valign="top" style="vertical-align: top;">
+        <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+          <tbody>
+            <tr>
+              <td style="padding-bottom: 4px;">
+                <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+                  <tbody>
+                    <tr>
+                      <td style="font-size: 18px; font-weight: 600; color: #111827; padding-right: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                        ${escapeHtml(nombre)}
+                      </td>
+                      <td style="font-size: 18px; color: #9ca3af; padding-right: 12px;">
+                        |
+                      </td>
+                      <td style="font-size: 14px; font-weight: 500; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+                        ${escapeHtml(cargo)}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+            ${linksHTML.length > 0 ? `<tr>
+              <td style="padding-top: 4px;">
+                <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+                  <tbody>
+                    <tr>
+                      ${linksHTML.join("")}
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>` : ""}
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  </tbody>
+</table>`;
+}
+
 function escapeHtml(text: string): string {
   const map: { [key: string]: string } = {
     "&": "&amp;",
