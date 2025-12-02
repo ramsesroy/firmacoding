@@ -11,8 +11,8 @@ export default function Header() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3 group">
-            <span className="material-symbols-outlined text-3xl lg:text-4xl text-blue-600 group-hover:scale-110 transition-transform">draw</span>
+          <Link href="/" className="flex items-center space-x-3 group" aria-label="Signature For Me - Home">
+            <span className="material-symbols-outlined text-3xl lg:text-4xl text-blue-600 group-hover:scale-110 transition-transform" aria-hidden="true">draw</span>
             <div className="text-xl lg:text-2xl font-bold text-gray-900">
               Signature For Me
             </div>
@@ -23,18 +23,21 @@ export default function Header() {
             <Link
               href="#features"
               className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+              aria-label="Navigate to Features section"
             >
               Features
             </Link>
             <Link
               href="#how-it-works"
               className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+              aria-label="Navigate to How It Works section"
             >
               How It Works
             </Link>
             <Link
               href="#pricing"
               className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+              aria-label="Navigate to Pricing section"
             >
               Pricing
             </Link>
@@ -57,10 +60,11 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition"
-            aria-label="Toggle menu"
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileMenuOpen}
           >
-            <span className="material-symbols-outlined text-gray-700">
+            <span className="material-symbols-outlined text-gray-700" aria-hidden="true">
               {mobileMenuOpen ? "close" : "menu"}
             </span>
           </button>
@@ -68,7 +72,7 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100">
+          <div className="md:hidden py-4 border-t border-gray-100" role="menu" aria-label="Navigation menu">
             <div className="flex flex-col space-y-4">
               <Link
                 href="#features"

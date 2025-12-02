@@ -511,6 +511,9 @@ function DashboardContent() {
                   ].map((tpl) => (
                     <button
                       key={tpl.id}
+                      type="button"
+                      aria-label={`Select ${tpl.name} template`}
+                      aria-pressed={template === tpl.id}
                       onClick={() => {
                         const newTemplate = tpl.id as TemplateType;
                         setTemplate(newTemplate);
@@ -608,6 +611,9 @@ function DashboardContent() {
               </label>
               <input
                 type="text"
+                id="nombre-input"
+                aria-label="Full Name"
+                aria-required="true"
                 value={signatureData.nombre}
                 onChange={(e) =>
                   setSignatureData({ ...signatureData, nombre: e.target.value })
@@ -626,6 +632,9 @@ function DashboardContent() {
               </label>
               <input
                 type="text"
+                id="cargo-input"
+                aria-label="Job Title"
+                aria-required="true"
                 value={signatureData.cargo}
                 onChange={(e) =>
                   setSignatureData({ ...signatureData, cargo: e.target.value })
@@ -699,8 +708,10 @@ function DashboardContent() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     </div>
                     <button
+                      type="button"
                       onClick={handleRemoveImage}
-                      className="mt-4 w-full px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all duration-200 text-sm font-semibold border-2 border-red-200 hover:border-red-300 flex items-center justify-center gap-2"
+                      aria-label="Remove profile photo"
+                      className="mt-4 w-full px-4 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all duration-200 text-sm font-semibold border-2 border-red-200 hover:border-red-300 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                     >
                       <span className="material-symbols-outlined text-base">delete</span>
                       Remove Photo
@@ -1056,14 +1067,18 @@ function DashboardContent() {
                         />
                         <div className="flex gap-2 mt-3">
                           <button
+                            type="button"
                             onClick={handleSaveEditRed}
-                            className="flex-1 px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-200 text-sm font-semibold shadow-lg shadow-green-500/30 hover:shadow-xl"
+                            aria-label="Save social media link"
+                            className="flex-1 px-4 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-200 text-sm font-semibold shadow-lg shadow-green-500/30 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                           >
                             Save
                           </button>
                           <button
+                            type="button"
                             onClick={handleCancelEditRed}
-                            className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 text-sm font-semibold border-2 border-gray-200 hover:border-gray-300"
+                            aria-label="Cancel editing social media link"
+                            className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 text-sm font-semibold border-2 border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                           >
                             Cancel
                           </button>
@@ -1140,6 +1155,8 @@ function DashboardContent() {
                     />
                   </div>
                   <button
+                    type="button"
+                    aria-label="Add social media link"
                     onClick={() => {
                       if (nuevaRed.nombre && nuevaRed.url) {
                         setSignatureData({
@@ -1149,7 +1166,7 @@ function DashboardContent() {
                         setNuevaRed({ nombre: "", url: "", icono: "" });
                       }
                     }}
-                    className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-semibold shadow-md shadow-blue-500/20 whitespace-nowrap"
+                    className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-semibold shadow-md shadow-blue-500/20 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >
                     + Add
                   </button>
@@ -1214,8 +1231,11 @@ function DashboardContent() {
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <button
+                    type="button"
                     onClick={handleCopyToClipboard}
-                    className={`group flex-1 px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 ${
+                    aria-label={copied ? "Signature copied to clipboard" : "Copy signature HTML to clipboard"}
+                    aria-pressed={copied}
+                    className={`group flex-1 px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                       copied
                         ? "bg-gradient-to-r from-green-500 via-green-600 to-green-500 text-white shadow-xl shadow-green-500/40 transform scale-105"
                         : "bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white hover:from-gray-800 hover:via-gray-700 hover:to-gray-800 shadow-xl shadow-gray-900/25 hover:shadow-2xl hover:shadow-gray-900/35 hover:scale-[1.02]"
@@ -1230,9 +1250,12 @@ function DashboardContent() {
                     )}
                   </button>
                   <button
+                    type="button"
                     onClick={handleSave}
                     disabled={saving}
-                    className={`group flex-1 px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 ${
+                    aria-label={editingSignatureId ? "Update signature" : "Save signature"}
+                    aria-busy={saving}
+                    className={`group flex-1 px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:focus:ring-0 ${
                       saving
                         ? "bg-gray-400 text-white cursor-not-allowed shadow-md"
                         : "bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 text-white hover:from-blue-700 hover:via-blue-800 hover:to-blue-700 shadow-xl shadow-blue-500/40 hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.02]"
