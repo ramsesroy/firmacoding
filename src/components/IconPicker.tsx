@@ -78,36 +78,36 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
           
           {/* Icon selection panel - Opens upward to always fit in viewport */}
           <div 
-            className="fixed sm:absolute inset-x-1.5 sm:inset-x-auto top-auto sm:bottom-full bottom-1.5 sm:top-auto left-0 right-0 sm:left-0 sm:right-auto sm:mb-2 z-[9999] bg-white border border-gray-300 rounded-lg shadow-xl p-1.5 sm:p-2 w-auto sm:w-full max-w-full sm:max-w-xs h-auto max-h-[40vh] sm:max-h-[280px] overflow-hidden flex flex-col"
+            className="fixed sm:absolute inset-x-2 sm:inset-x-auto top-auto sm:bottom-full bottom-2 sm:top-auto left-0 right-0 sm:left-0 sm:right-auto sm:mb-2 z-[9999] bg-white border border-gray-300 rounded-lg shadow-xl p-2 sm:p-3 w-auto sm:w-full max-w-full sm:max-w-sm h-auto max-h-[50vh] sm:max-h-[320px] overflow-hidden flex flex-col"
             style={{
               boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Minimal Header */}
-            <div className="flex items-center justify-between mb-1 pb-1 border-b border-gray-200 flex-shrink-0">
-              <span className="text-[10px] sm:text-xs font-medium text-gray-600">Icons</span>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-200 flex-shrink-0">
+              <span className="text-xs sm:text-sm font-semibold text-gray-700">Select Icon</span>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-0.5 hover:bg-gray-100 rounded transition-colors touch-manipulation flex-shrink-0"
+                className="p-1 hover:bg-gray-100 rounded transition-colors touch-manipulation flex-shrink-0"
                 title="Close"
                 aria-label="Close"
               >
-                <span className="material-symbols-outlined text-gray-500 text-xs">close</span>
+                <span className="material-symbols-outlined text-gray-500 text-sm">close</span>
               </button>
             </div>
 
-            {/* Ultra Compact Categories */}
-            <div className="flex gap-0.5 mb-1 overflow-x-auto pb-0.5 custom-scrollbar flex-shrink-0">
+            {/* Categories */}
+            <div className="flex gap-1 mb-2 overflow-x-auto pb-1 custom-scrollbar flex-shrink-0">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-1.5 py-0.5 text-[9px] sm:text-[10px] font-medium rounded whitespace-nowrap transition-all duration-200 flex-shrink-0 ${
+                  className={`px-2.5 py-1 text-[10px] sm:text-xs font-medium rounded-md whitespace-nowrap transition-all duration-200 flex-shrink-0 ${
                     selectedCategory === cat
-                      ? "bg-blue-600 text-white"
+                      ? "bg-blue-600 text-white shadow-sm"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
@@ -116,9 +116,9 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
               ))}
             </div>
 
-            {/* Ultra Compact Icon grid - Maximum columns */}
-            <div className="overflow-y-auto flex-1 min-h-0 custom-scrollbar -mx-0.5 px-0.5">
-              <div className="grid grid-cols-10 sm:grid-cols-12 gap-0.5">
+            {/* Icon grid - Balanced size */}
+            <div className="overflow-y-auto flex-1 min-h-0 custom-scrollbar">
+              <div className="grid grid-cols-8 sm:grid-cols-10 gap-1.5">
                 {displayIcons.map((icon, index) => (
                   <button
                     key={index}
@@ -127,9 +127,9 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
                       onSelectIcon(icon);
                       setIsOpen(false);
                     }}
-                    className={`group relative w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-sm sm:text-base rounded transition-all duration-200 hover:scale-110 ${
+                    className={`group relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-base sm:text-lg rounded-md transition-all duration-200 hover:scale-110 ${
                       selectedIcon === icon
-                        ? "bg-blue-600 ring-1 ring-blue-400 shadow-sm scale-105"
+                        ? "bg-blue-600 ring-2 ring-blue-300 shadow-md scale-105"
                         : "bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300"
                     }`}
                     title={`Select ${icon}`}
