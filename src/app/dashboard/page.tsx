@@ -190,20 +190,17 @@ function DashboardContent() {
     // Templates that use logo
     const templatesWithLogo = ["professional", "corporateConsultant", "interiorDesign", "universityProfessor", "churchProfessional", "universityPresident", "pastorSignature"];
     
-    const photoUrl = "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
-    const logoUrl = "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80";
-    
     setSignatureData((prev) => {
       const updates: any = {};
       
       // Add example photo if template requires it and no photo exists
       if (templatesWithPhoto.includes(template) && !prev.foto) {
-        updates.foto = photoUrl;
+        updates.foto = getExamplePhoto(template);
       }
       
       // Add example logo if template requires it and no logo exists
       if (templatesWithLogo.includes(template) && !prev.logoEmpresa) {
-        updates.logoEmpresa = logoUrl;
+        updates.logoEmpresa = getExampleLogo(template);
       }
       
       return Object.keys(updates).length > 0 ? { ...prev, ...updates } : prev;
