@@ -58,6 +58,16 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
         return renderFreelanceDesigner();
       case "corporateConsultant":
         return renderCorporateConsultant();
+      case "interiorDesign":
+        return renderInteriorDesign();
+      case "universityProfessor":
+        return renderUniversityProfessor();
+      case "universityBanner":
+        return renderUniversityBanner();
+      case "creativePortfolio":
+        return renderCreativePortfolio();
+      case "militaryProfessional":
+        return renderMilitaryProfessional();
       default:
         return renderClassicTemplate();
     }
@@ -3202,6 +3212,748 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                     <tr>
                       <td style={{ paddingTop: "8px", fontSize: "10px", color: "#9ca3af" }}>
                         {textoAdicional}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderInteriorDesign = () => {
+    const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+    const website = redes.find((r) => {
+      const url = r.url.toLowerCase();
+      return (url.includes("www") || url.includes("http")) && !url.includes("linkedin") && !url.includes("github");
+    });
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#000000",
+          lineHeight: "1.6",
+        }}
+      >
+        <tbody>
+          <tr>
+            {foto && (
+              <td valign="top" style={{ paddingRight: "0", verticalAlign: "top", position: "relative" }}>
+                <img
+                  src={foto}
+                  alt={nombre}
+                  width={80}
+                  height={80}
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    display: "block",
+                    position: "relative",
+                    zIndex: 2,
+                  }}
+                />
+                <div style={{ position: "absolute", left: "40px", top: 0, bottom: 0, width: "2px", backgroundColor: "#000000", zIndex: 1 }}></div>
+              </td>
+            )}
+            <td valign="top" style={{ verticalAlign: "top", paddingLeft: "20px" }}>
+              <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse", width: "100%" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ paddingBottom: "8px" }}>
+                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#000000" }}>{nombre}</div>
+                      <div style={{ fontSize: "11px", fontWeight: "600", color: "#000000", textTransform: "uppercase", letterSpacing: "0.15em", marginTop: "4px" }}>
+                        {cargo}
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                        <tbody>
+                          {logoEmpresa && (
+                            <tr>
+                              <td style={{ paddingBottom: "12px" }}>
+                                <img src={logoEmpresa} alt="Company Logo" height={30} style={{ height: "30px", maxWidth: "200px", display: "block" }} />
+                              </td>
+                            </tr>
+                          )}
+                          {telefono && (
+                            <tr>
+                              <td style={{ paddingBottom: "6px", fontSize: "13px", color: "#000000" }}>
+                                📞 {telefono}
+                              </td>
+                            </tr>
+                          )}
+                          {website && (
+                            <tr>
+                              <td style={{ paddingBottom: "6px", fontSize: "13px", color: "#000000" }}>
+                                🌐 <a href={website.url} style={{ color: "#000000", textDecoration: "none" }}>
+                                  {website.url.replace(/^https?:\/\//, "").replace(/^www\./, "")}
+                                </a>
+                              </td>
+                            </tr>
+                          )}
+                          {email && (
+                            <tr>
+                              <td style={{ paddingBottom: "6px", fontSize: "13px", color: "#000000" }}>
+                                ✉️ <a href={`mailto:${email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}`} style={{ color: "#000000", textDecoration: "none" }}>
+                                  {email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}
+                                </a>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderUniversityProfessor = () => {
+    const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+    const website = redes.find((r) => {
+      const url = r.url.toLowerCase();
+      return (url.includes("www") || url.includes("http")) && !url.includes("linkedin") && !url.includes("github");
+    });
+    const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+    const twitter = redes.find((r) => r.nombre.toLowerCase().includes("twitter") || r.nombre.toLowerCase().includes("x.com"));
+    const facebook = redes.find((r) => r.nombre.toLowerCase().includes("facebook"));
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#1e293b",
+          lineHeight: "1.6",
+        }}
+      >
+        <tbody>
+          <tr>
+            <td style={{ paddingBottom: "12px" }}>
+              <div style={{ fontSize: "20px", fontWeight: "700", color: "#2563eb", textTransform: "uppercase", letterSpacing: "0.02em" }}>
+                {nombre}
+              </div>
+              <div style={{ fontSize: "12px", fontWeight: "400", color: "#64748b", textTransform: "uppercase", marginTop: "4px" }}>
+                {cargo}
+              </div>
+              <div style={{ borderTop: "1px solid #e2e8f0", marginTop: "12px", marginBottom: "12px" }}></div>
+            </td>
+          </tr>
+          {logoEmpresa && (
+            <tr>
+              <td style={{ paddingBottom: "12px" }}>
+                <img src={logoEmpresa} alt="University Logo" height={50} style={{ height: "50px", maxWidth: "250px", display: "block" }} />
+              </td>
+            </tr>
+          )}
+          <tr>
+            <td>
+              <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ paddingBottom: "8px", fontSize: "14px", color: "#1e293b" }}>
+                      {telefono && (
+                        <>
+                          <span style={{ color: "#2563eb", fontWeight: "600" }}>Office:</span> <span style={{ color: "#2563eb" }}>{telefono}</span>
+                        </>
+                      )}
+                      {telefono && (telefonoMovil || direccion) && <span style={{ color: "#cbd5e1", margin: "0 8px" }}>|</span>}
+                      {direccion && (
+                        <>
+                          <span style={{ color: "#64748b" }}>{direccion}</span>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                  {website && (
+                    <tr>
+                      <td style={{ paddingBottom: "8px", fontSize: "14px" }}>
+                        <a href={website.url} style={{ color: "#2563eb", textDecoration: "none", fontWeight: "700", textTransform: "uppercase" }}>
+                          {website.url.replace(/^https?:\/\//, "").replace(/^www\./, "").toUpperCase()}
+                        </a>
+                      </td>
+                    </tr>
+                  )}
+                  {email && (
+                    <tr>
+                      <td style={{ paddingBottom: "12px" }}>
+                        <a href={`mailto:${email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}`} style={{ color: "#2563eb", textDecoration: "none", fontSize: "14px" }}>
+                          {email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}
+                        </a>
+                      </td>
+                    </tr>
+                  )}
+                  {(linkedin || twitter || facebook) && (
+                    <tr>
+                      <td style={{ paddingTop: "12px", borderTop: "1px solid #e2e8f0" }}>
+                        {linkedin && (
+                          <a
+                            href={linkedin.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              backgroundColor: "#2563eb",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "8px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "12px",
+                            }}
+                          >
+                            in
+                          </a>
+                        )}
+                        {twitter && (
+                          <a
+                            href={twitter.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              backgroundColor: "#1e293b",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "8px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "14px",
+                            }}
+                          >
+                            X
+                          </a>
+                        )}
+                        {facebook && (
+                          <a
+                            href={facebook.url}
+                            style={{
+                              display: "inline-block",
+                              width: "32px",
+                              height: "32px",
+                              borderRadius: "50%",
+                              backgroundColor: "#2563eb",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "32px",
+                              marginRight: "8px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "16px",
+                            }}
+                          >
+                            f
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderUniversityBanner = () => {
+    const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+    const website = redes.find((r) => {
+      const url = r.url.toLowerCase();
+      return (url.includes("www") || url.includes("http")) && !url.includes("linkedin") && !url.includes("github");
+    });
+    const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+    const twitter = redes.find((r) => r.nombre.toLowerCase().includes("twitter") || r.nombre.toLowerCase().includes("x.com"));
+    const facebook = redes.find((r) => r.nombre.toLowerCase().includes("facebook"));
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#1e293b",
+          lineHeight: "1.6",
+        }}
+      >
+        <tbody>
+          <tr>
+            <td style={{ background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)", padding: "20px", textAlign: "right" }}>
+              {foto && (
+                <img
+                  src={foto}
+                  alt={nombre}
+                  width={80}
+                  height={80}
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    display: "inline-block",
+                    border: "3px solid rgba(255,255,255,0.3)",
+                  }}
+                />
+              )}
+              <div style={{ fontSize: "24px", fontWeight: "700", color: "#ffffff", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: "12px" }}>
+                {nombre}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style={{ padding: "20px", backgroundColor: "#ffffff" }}>
+              <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse", width: "100%" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ paddingBottom: "12px", fontSize: "14px", color: "#64748b" }}>
+                      {cargo}
+                      {textoAdicional && ` | ${textoAdicional}`}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ paddingBottom: "8px", fontSize: "14px", color: "#1e293b" }}>
+                      {telefono && <span style={{ color: "#2563eb", marginRight: "16px" }}>📞 {telefono}</span>}
+                      {telefonoMovil && <span style={{ color: "#2563eb" }}>📱 {telefonoMovil}</span>}
+                    </td>
+                  </tr>
+                  {direccion && (
+                    <tr>
+                      <td style={{ paddingBottom: "8px", fontSize: "14px", color: "#64748b" }}>{direccion}</td>
+                    </tr>
+                  )}
+                  {website && (
+                    <tr>
+                      <td style={{ paddingBottom: "12px", fontSize: "14px" }}>
+                        <a href={website.url} style={{ color: "#2563eb", textDecoration: "none", fontWeight: "700", textTransform: "uppercase" }}>
+                          {website.url.replace(/^https?:\/\//, "").replace(/^www\./, "").toUpperCase()}
+                        </a>
+                      </td>
+                    </tr>
+                  )}
+                  {email && (
+                    <tr>
+                      <td style={{ paddingBottom: "12px" }}>
+                        <a href={`mailto:${email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}`} style={{ color: "#2563eb", textDecoration: "none", fontSize: "14px" }}>
+                          {email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}
+                        </a>
+                      </td>
+                    </tr>
+                  )}
+                  {(linkedin || twitter || facebook) && (
+                    <tr>
+                      <td style={{ textAlign: "center", paddingTop: "12px" }}>
+                        {linkedin && (
+                          <a
+                            href={linkedin.url}
+                            style={{
+                              display: "inline-block",
+                              width: "36px",
+                              height: "36px",
+                              borderRadius: "50%",
+                              backgroundColor: "#2563eb",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "36px",
+                              margin: "0 6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "13px",
+                            }}
+                          >
+                            in
+                          </a>
+                        )}
+                        {twitter && (
+                          <a
+                            href={twitter.url}
+                            style={{
+                              display: "inline-block",
+                              width: "36px",
+                              height: "36px",
+                              borderRadius: "50%",
+                              backgroundColor: "#1e293b",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "36px",
+                              margin: "0 6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "16px",
+                            }}
+                          >
+                            X
+                          </a>
+                        )}
+                        {facebook && (
+                          <a
+                            href={facebook.url}
+                            style={{
+                              display: "inline-block",
+                              width: "36px",
+                              height: "36px",
+                              borderRadius: "50%",
+                              backgroundColor: "#2563eb",
+                              color: "white",
+                              textAlign: "center",
+                              lineHeight: "36px",
+                              margin: "0 6px",
+                              textDecoration: "none",
+                              fontWeight: "700",
+                              fontSize: "18px",
+                            }}
+                          >
+                            f
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderCreativePortfolio = () => {
+    const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+    const website = redes.find((r) => {
+      const url = r.url.toLowerCase();
+      return (url.includes("www") || url.includes("http")) && !url.includes("behance") && !url.includes("dribbble");
+    });
+    const behance = redes.find((r) => r.url.toLowerCase().includes("behance") || r.nombre.toLowerCase().includes("behance"));
+    const dribbble = redes.find((r) => r.url.toLowerCase().includes("dribbble") || r.nombre.toLowerCase().includes("dribbble"));
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#1e293b",
+          lineHeight: "1.6",
+        }}
+      >
+        <tbody>
+          <tr>
+            {foto && (
+              <td valign="top" style={{ paddingRight: "20px", verticalAlign: "top" }}>
+                <img
+                  src={foto}
+                  alt={nombre}
+                  width={90}
+                  height={90}
+                  style={{
+                    width: "90px",
+                    height: "90px",
+                    borderRadius: "8px",
+                    objectFit: "cover",
+                    display: "block",
+                    border: "1px solid #e2e8f0",
+                  }}
+                />
+              </td>
+            )}
+            <td valign="top" style={{ verticalAlign: "top" }}>
+              <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                <tbody>
+                  <tr>
+                    <td style={{ paddingBottom: "8px" }}>
+                      <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a" }}>{nombre}</div>
+                      <div style={{ borderLeft: "2px solid #cbd5e1", paddingLeft: "12px", marginTop: "4px", marginLeft: "0" }}>
+                        <span style={{ fontSize: "14px", color: "#64748b", fontWeight: "500" }}>{cargo}</span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ paddingBottom: "12px" }}>
+                      <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                        <tbody>
+                          {email && (
+                            <tr>
+                              <td style={{ paddingBottom: "6px", fontSize: "14px", color: "#64748b" }}>
+                                ✉️{" "}
+                                <a href={`mailto:${email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}`} style={{ color: "#64748b", textDecoration: "none" }}>
+                                  {email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}
+                                </a>
+                              </td>
+                            </tr>
+                          )}
+                          {telefono && (
+                            <tr>
+                              <td style={{ paddingBottom: "6px", fontSize: "14px", color: "#64748b" }}>📞 {telefono}</td>
+                            </tr>
+                          )}
+                          {website && (
+                            <tr>
+                              <td style={{ paddingBottom: "12px", fontSize: "14px", color: "#64748b" }}>
+                                🌐 <a href={website.url} style={{ color: "#64748b", textDecoration: "none" }}>
+                                  {website.url.replace(/^https?:\/\//, "").replace(/^www\./, "")}
+                                </a>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  {(behance || dribbble) && (
+                    <tr>
+                      <td>
+                        <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                          <tbody>
+                            <tr>
+                              {behance && (
+                                <td style={{ paddingRight: "8px" }}>
+                                  <a
+                                    href={behance.url}
+                                    style={{
+                                      display: "inline-block",
+                                      border: "1px solid #e2e8f0",
+                                      borderRadius: "4px",
+                                      padding: "8px 12px",
+                                      textDecoration: "none",
+                                      backgroundColor: "#ffffff",
+                                    }}
+                                  >
+                                    <span style={{ color: "#2563eb", fontWeight: "700", fontSize: "16px", marginRight: "8px" }}>Bē</span>
+                                    <span style={{ color: "#64748b", fontSize: "13px", borderLeft: "1px solid #e2e8f0", paddingLeft: "8px" }}>My Behance portfolio</span>
+                                  </a>
+                                </td>
+                              )}
+                              {dribbble && (
+                                <td>
+                                  <a
+                                    href={dribbble.url}
+                                    style={{
+                                      display: "inline-block",
+                                      border: "1px solid #e2e8f0",
+                                      borderRadius: "4px",
+                                      padding: "8px 12px",
+                                      textDecoration: "none",
+                                      backgroundColor: "#ffffff",
+                                    }}
+                                  >
+                                    <span style={{ color: "#ea4c89", fontSize: "18px", marginRight: "8px" }}>🏀</span>
+                                    <span style={{ color: "#64748b", fontSize: "13px", borderLeft: "1px solid #e2e8f0", paddingLeft: "8px" }}>My Dribbble shots</span>
+                                  </a>
+                                </td>
+                              )}
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderMilitaryProfessional = () => {
+    const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+    const website = redes.find((r) => {
+      const url = r.url.toLowerCase();
+      return (url.includes("www") || url.includes("http")) && !url.includes("linkedin") && !url.includes("github");
+    });
+    const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+    const twitter = redes.find((r) => r.nombre.toLowerCase().includes("twitter") || r.nombre.toLowerCase().includes("x.com"));
+    const facebook = redes.find((r) => r.nombre.toLowerCase().includes("facebook"));
+    const instagram = redes.find((r) => r.nombre.toLowerCase().includes("instagram"));
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#1e293b",
+          lineHeight: "1.6",
+        }}
+      >
+        <tbody>
+          <tr>
+            <td style={{ paddingBottom: "12px" }}>
+              <div style={{ fontSize: "20px", fontWeight: "700", color: "#365314", letterSpacing: "0.02em" }}>{nombre}</div>
+              <div style={{ fontSize: "14px", fontWeight: "600", color: "#1e293b", textTransform: "uppercase", marginTop: "4px" }}>{cargo}</div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                <tbody>
+                  {telefono && (
+                    <tr>
+                      <td style={{ paddingBottom: "6px", fontSize: "14px", color: "#1e293b" }}>
+                        <span style={{ color: "#365314", marginRight: "8px" }}>📞</span>
+                        {telefono}
+                      </td>
+                    </tr>
+                  )}
+                  {email && (
+                    <tr>
+                      <td style={{ paddingBottom: "6px", fontSize: "14px", color: "#1e293b" }}>
+                        <span style={{ color: "#365314", marginRight: "8px" }}>✉️</span>
+                        <a href={`mailto:${email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}`} style={{ color: "#1e293b", textDecoration: "none" }}>
+                          {email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "")}
+                        </a>
+                      </td>
+                    </tr>
+                  )}
+                  {website && (
+                    <tr>
+                      <td style={{ paddingBottom: "6px", fontSize: "14px", color: "#1e293b" }}>
+                        <span style={{ color: "#365314", marginRight: "8px" }}>🌐</span>
+                        <a href={website.url} style={{ color: "#1e293b", textDecoration: "none" }}>
+                          {website.url.replace(/^https?:\/\//, "").replace(/^www\./, "")}
+                        </a>
+                      </td>
+                    </tr>
+                  )}
+                  {direccion && (
+                    <tr>
+                      <td style={{ paddingBottom: "12px", fontSize: "14px", color: "#1e293b" }}>
+                        <span style={{ color: "#365314", marginRight: "8px" }}>📍</span>
+                        {direccion}
+                      </td>
+                    </tr>
+                  )}
+                  {(linkedin || twitter || facebook || instagram) && (
+                    <tr>
+                      <td style={{ paddingTop: "12px", borderTop: "1px solid #cbd5e1" }}>
+                        <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "8px" }}>Follow us</div>
+                        <table cellPadding="0" cellSpacing="0" border={0} style={{ borderCollapse: "collapse" }}>
+                          <tbody>
+                            <tr>
+                              {linkedin && (
+                                <td style={{ paddingRight: "8px" }}>
+                                  <a
+                                    href={linkedin.url}
+                                    style={{
+                                      display: "inline-block",
+                                      width: "32px",
+                                      height: "32px",
+                                      backgroundColor: "#365314",
+                                      color: "white",
+                                      textAlign: "center",
+                                      lineHeight: "32px",
+                                      textDecoration: "none",
+                                      fontWeight: "700",
+                                      fontSize: "12px",
+                                    }}
+                                  >
+                                    in
+                                  </a>
+                                </td>
+                              )}
+                              {twitter && (
+                                <td style={{ paddingRight: "8px" }}>
+                                  <a
+                                    href={twitter.url}
+                                    style={{
+                                      display: "inline-block",
+                                      width: "32px",
+                                      height: "32px",
+                                      backgroundColor: "#365314",
+                                      color: "white",
+                                      textAlign: "center",
+                                      lineHeight: "32px",
+                                      textDecoration: "none",
+                                      fontWeight: "700",
+                                      fontSize: "14px",
+                                    }}
+                                  >
+                                    🐦
+                                  </a>
+                                </td>
+                              )}
+                              {facebook && (
+                                <td style={{ paddingRight: "8px" }}>
+                                  <a
+                                    href={facebook.url}
+                                    style={{
+                                      display: "inline-block",
+                                      width: "32px",
+                                      height: "32px",
+                                      backgroundColor: "#365314",
+                                      color: "white",
+                                      textAlign: "center",
+                                      lineHeight: "32px",
+                                      textDecoration: "none",
+                                      fontWeight: "700",
+                                      fontSize: "16px",
+                                    }}
+                                  >
+                                    f
+                                  </a>
+                                </td>
+                              )}
+                              {instagram && (
+                                <td>
+                                  <a
+                                    href={instagram.url}
+                                    style={{
+                                      display: "inline-block",
+                                      width: "32px",
+                                      height: "32px",
+                                      backgroundColor: "#365314",
+                                      color: "white",
+                                      textAlign: "center",
+                                      lineHeight: "32px",
+                                      textDecoration: "none",
+                                      fontWeight: "700",
+                                      fontSize: "16px",
+                                    }}
+                                  >
+                                    📷
+                                  </a>
+                                </td>
+                              )}
+                            </tr>
+                          </tbody>
+                        </table>
                       </td>
                     </tr>
                   )}

@@ -34,5 +34,10 @@ export type TemplateType =
   | "ultraMinimal"            // Ultra Minimal - Premium text-only minimal design
   | "growthMarketing"         // Growth Marketing - Premium with CTA and promotions
   | "freelanceDesigner"       // Freelance Designer - Premium portfolio showcase
-  | "corporateConsultant";    // Corporate Consultant - Premium corporate with logo
+  | "corporateConsultant"     // Corporate Consultant - Premium corporate with logo
+  | "interiorDesign"          // Interior Design Pro - Vertical divider with company logo
+  | "universityProfessor"     // University Professor - Academic with university logo
+  | "universityBanner"        // University Banner - Blue banner with profile photo
+  | "creativePortfolio"       // Creative Portfolio - Design portfolio with Behance/Dribbble buttons
+  | "militaryProfessional";   // Military Professional - Military-style with structured layout
 

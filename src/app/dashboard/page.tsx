@@ -135,7 +135,7 @@ function DashboardContent() {
     // Templates that use photo
     const templatesWithPhoto = ["classic", "modern", "modernaSinBarra", "qrProfesional", "developerMinimal2025", "growthMarketing", "freelanceDesigner"];
     // Templates that use logo
-    const templatesWithLogo = ["professional", "corporateConsultant"];
+    const templatesWithLogo = ["professional", "corporateConsultant", "interiorDesign", "universityProfessor"];
     
     const photoUrl = "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
     const logoUrl = "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80";
@@ -420,6 +420,11 @@ function DashboardContent() {
                     { id: "growthMarketing", name: "Growth Marketing", icon: "trending_up", color: "from-purple-500 to-pink-600", badge: "Premium" },
                     { id: "freelanceDesigner", name: "Freelance Designer", icon: "brush", color: "from-orange-500 to-red-600", badge: "Premium" },
                     { id: "corporateConsultant", name: "Corporate Elite", icon: "business", color: "from-blue-600 to-indigo-700", badge: "Premium" },
+                    { id: "interiorDesign", name: "Interior Design", icon: "home", color: "from-amber-600 to-orange-700", badge: "New" },
+                    { id: "universityProfessor", name: "University Professor", icon: "school", color: "from-blue-500 to-blue-700", badge: "New" },
+                    { id: "universityBanner", name: "University Banner", icon: "account_balance", color: "from-blue-400 to-blue-600", badge: "New" },
+                    { id: "creativePortfolio", name: "Creative Portfolio", icon: "palette", color: "from-pink-500 to-purple-600", badge: "New" },
+                    { id: "militaryProfessional", name: "Military Professional", icon: "military_tech", color: "from-green-700 to-green-900", badge: "New" },
                   ].map((tpl) => (
                     <button
                       key={tpl.id}
@@ -428,13 +433,13 @@ function DashboardContent() {
                         setTemplate(newTemplate);
                         
                         // Add example photo if template uses photo and no photo exists
-                        const templatesWithPhoto = ["classic", "modern", "modernaSinBarra", "qrProfesional", "developerMinimal2025", "growthMarketing", "freelanceDesigner"];
+                        const templatesWithPhoto = ["classic", "modern", "modernaSinBarra", "qrProfesional", "developerMinimal2025", "growthMarketing", "freelanceDesigner", "interiorDesign", "universityBanner", "creativePortfolio"];
                         if (templatesWithPhoto.includes(newTemplate) && !signatureData.foto) {
                           setSignatureData({ ...signatureData, foto: EXAMPLE_PHOTO_URL });
                         }
                         
                         // Add example logo if template uses logo and no logo exists
-                        const templatesWithLogo = ["professional", "corporateConsultant"];
+                        const templatesWithLogo = ["professional", "corporateConsultant", "interiorDesign", "universityProfessor"];
                         if (templatesWithLogo.includes(newTemplate) && !signatureData.logoEmpresa) {
                           setSignatureData({ ...signatureData, logoEmpresa: EXAMPLE_LOGO_URL });
                         }
