@@ -64,6 +64,8 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
         return renderTemplate10();
       case "developerMinimal2025":
         return renderDeveloperMinimal2025();
+      case "ultraMinimal":
+        return renderUltraMinimal();
       default:
         return renderClassicTemplate();
     }
@@ -2841,6 +2843,105 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
                   </tr>
                 </tbody>
               </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  };
+
+  const renderUltraMinimal = () => {
+    const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+    const github = redes.find((r) => r.nombre.toLowerCase().includes("github"));
+    const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+    const website = redes.find((r) => {
+      const url = r.url.toLowerCase();
+      const name = r.nombre.toLowerCase();
+      return (url.includes("www") || url.includes("http")) && 
+             !url.includes("github") && 
+             !url.includes("linkedin") &&
+             !name.includes("github") &&
+             !name.includes("linkedin");
+    });
+
+    const links: JSX.Element[] = [];
+    
+    if (email) {
+      const emailUrl = email.url.includes("@") ? `mailto:${email.url}` : email.url;
+      const emailText = email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, "");
+      links.push(
+        <a key="email" href={emailUrl} style={{ color: "#374151", textDecoration: "none" }}>
+          {emailText}
+        </a>
+      );
+    }
+    
+    if (github) {
+      const githubUrl = github.url.includes("http") ? github.url : `https://${github.url}`;
+      const githubText = github.url.replace(/^https?:\/\//, "").replace(/^www\./, "");
+      links.push(
+        <React.Fragment key="github-sep">
+          <span style={{ color: "#9ca3af", margin: "0 10px" }}>•</span>
+          <a href={githubUrl} style={{ color: "#374151", textDecoration: "none" }}>
+            {githubText}
+          </a>
+        </React.Fragment>
+      );
+    }
+
+    if (linkedin) {
+      const linkedinUrl = linkedin.url.includes("http") ? linkedin.url : `https://${linkedin.url}`;
+      const linkedinText = linkedin.url.replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/in\//, "").replace(/\/$/, "");
+      links.push(
+        <React.Fragment key="linkedin-sep">
+          <span style={{ color: "#9ca3af", margin: "0 10px" }}>•</span>
+          <a href={linkedinUrl} style={{ color: "#374151", textDecoration: "none" }}>
+            {linkedinText}
+          </a>
+        </React.Fragment>
+      );
+    }
+
+    if (website) {
+      const websiteUrl = website.url.includes("http") ? website.url : `https://${website.url}`;
+      const websiteText = website.url.replace(/^https?:\/\//, "").replace(/^www\./, "");
+      links.push(
+        <React.Fragment key="website-sep">
+          <span style={{ color: "#9ca3af", margin: "0 10px" }}>•</span>
+          <a href={websiteUrl} style={{ color: "#374151", textDecoration: "none" }}>
+            {websiteText}
+          </a>
+        </React.Fragment>
+      );
+    }
+
+    return (
+      <table
+        cellPadding="0"
+        cellSpacing="0"
+        border={0}
+        style={{
+          borderCollapse: "collapse",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+          fontSize: "14px",
+          color: "#333333",
+          lineHeight: "1.5",
+        }}
+      >
+        <tbody>
+          <tr>
+            <td>
+              <strong style={{ fontSize: "16px", color: "#111827" }}>{nombre}</strong>
+              <span style={{ color: "#9ca3af", margin: "0 10px" }}>•</span>
+              <span style={{ fontSize: "13px", color: "#4b5563", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                {cargo}
+              </span>
+              {links.length > 0 && (
+                <>
+                  <br />
+                  {links}
+                </>
+              )}
             </td>
           </tr>
         </tbody>

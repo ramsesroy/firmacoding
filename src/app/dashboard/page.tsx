@@ -423,6 +423,7 @@ function DashboardContent() {
                     { id: "modern4", name: "Modern 5", icon: "flash_on", color: "from-blue-400 to-indigo-600" },
                     { id: "qrCorporated", name: "QR Corp", icon: "qr_code_2", color: "from-teal-500 to-cyan-600" },
                     { id: "developerMinimal2025", name: "Dev Minimal", icon: "code", color: "from-slate-700 to-gray-900", badge: "New" },
+                    { id: "ultraMinimal", name: "Ultra Minimal", icon: "minimize", color: "from-gray-600 to-gray-800", badge: "New" },
                   ].map((tpl) => (
                     <button
                       key={tpl.id}

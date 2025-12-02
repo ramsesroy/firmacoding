@@ -50,6 +50,9 @@ export async function generateSignatureHTML(
     case "developerMinimal2025":
       baseHTML = generateDeveloperMinimal2025HTML(nombre, cargo, foto, telefono, redes);
       break;
+    case "ultraMinimal":
+      baseHTML = generateUltraMinimalHTML(nombre, cargo, redes);
+      break;
     default:
       baseHTML = generateClassicHTML(nombre, cargo, foto, telefono, redes);
   }
@@ -92,6 +95,8 @@ export function getBaseSignatureHTML(
       return generateTemplate10HTML(nombre, cargo, telefono, redes, qrLink);
     case "developerMinimal2025":
       return generateDeveloperMinimal2025HTML(nombre, cargo, foto, telefono, redes);
+    case "ultraMinimal":
+      return generateUltraMinimalHTML(nombre, cargo, redes);
     default:
       return generateClassicHTML(nombre, cargo, foto, telefono, redes);
   }
@@ -1245,6 +1250,69 @@ function generateDeveloperMinimal2025HTML(
             </tr>` : ""}
           </tbody>
         </table>
+      </td>
+    </tr>
+  </tbody>
+</table>`;
+}
+
+function generateUltraMinimalHTML(
+  nombre: string,
+  cargo: string,
+  redes: RedSocial[] = []
+): string {
+  const email = redes.find((r) => r.url.includes("@") || r.nombre.toLowerCase().includes("email"));
+  const github = redes.find((r) => r.nombre.toLowerCase().includes("github"));
+  const linkedin = redes.find((r) => r.nombre.toLowerCase().includes("linkedin"));
+  const website = redes.find((r) => {
+    const url = r.url.toLowerCase();
+    const name = r.nombre.toLowerCase();
+    return (url.includes("www") || url.includes("http")) && 
+           !url.includes("github") && 
+           !url.includes("linkedin") &&
+           !name.includes("github") &&
+           !name.includes("linkedin");
+  });
+
+  // Construir los links
+  const links: string[] = [];
+  
+  if (email) {
+    const emailUrl = email.url.includes("@") ? `mailto:${email.url}` : email.url;
+    links.push(`<a href="${escapeHtml(emailUrl)}" style="color: #374151; text-decoration: none;">${escapeHtml(email.url.includes("@") ? email.url : email.url.replace(/^mailto:/, ""))}</a>`);
+  }
+  
+  if (github) {
+    const githubUrl = github.url.includes("http") ? github.url : `https://${github.url}`;
+    const githubText = github.url.replace(/^https?:\/\//, "").replace(/^www\./, "");
+    links.push(`<a href="${escapeHtml(githubUrl)}" style="color: #374151; text-decoration: none;">${escapeHtml(githubText)}</a>`);
+  }
+
+  if (linkedin) {
+    const linkedinUrl = linkedin.url.includes("http") ? linkedin.url : `https://${linkedin.url}`;
+    const linkedinText = linkedin.url.replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/in\//, "").replace(/\/$/, "");
+    links.push(`<a href="${escapeHtml(linkedinUrl)}" style="color: #374151; text-decoration: none;">${escapeHtml(linkedinText)}</a>`);
+  }
+
+  if (website) {
+    const websiteUrl = website.url.includes("http") ? website.url : `https://${website.url}`;
+    const websiteText = website.url.replace(/^https?:\/\//, "").replace(/^www\./, "");
+    links.push(`<a href="${escapeHtml(websiteUrl)}" style="color: #374151; text-decoration: none;">${escapeHtml(websiteText)}</a>`);
+  }
+
+  const linksHTML = links.length > 0 
+    ? links.join(`<span style="color: #9ca3af; margin: 0 10px;">•</span>`)
+    : "";
+
+  return `
+<table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; color: #333333; line-height: 1.5;">
+  <tbody>
+    <tr>
+      <td>
+        <strong style="font-size: 16px; color: #111827;">${escapeHtml(nombre)}</strong>
+        <span style="color: #9ca3af; margin: 0 10px;">•</span>
+        <span style="font-size: 13px; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em;">${escapeHtml(cargo)}</span>
+        ${linksHTML ? `<br>${linksHTML}` : ""}
       </td>
     </tr>
   </tbody>
