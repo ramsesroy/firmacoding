@@ -49,27 +49,38 @@ export async function exportToPNG(
       scale = Math.min(scaleX, scaleY, 2); // Don't scale up more than 2x
     }
 
-    // Configure html2canvas options
+    // Configure html2canvas options (only valid options)
     const canvas = await html2canvas(element, {
-      scale: scale,
       logging: false,
       useCORS: true,
       allowTaint: false,
-      windowWidth: size === "auto" ? element.scrollWidth : width,
-      windowHeight: size === "auto" ? element.scrollHeight : height,
     });
 
+    // Scale the canvas manually for high quality
+    let scaledCanvas = canvas;
+    if (scale !== 1) {
+      scaledCanvas = document.createElement("canvas");
+      scaledCanvas.width = canvas.width * scale;
+      scaledCanvas.height = canvas.height * scale;
+      const ctx = scaledCanvas.getContext("2d");
+      if (ctx) {
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+      }
+    }
+
     // Create a new canvas with margins if needed
-    let finalCanvas = canvas;
+    let finalCanvas = scaledCanvas;
     if (size === "auto" && margin > 0) {
       finalCanvas = document.createElement("canvas");
-      finalCanvas.width = canvas.width + margin * 2 * scale;
-      finalCanvas.height = canvas.height + margin * 2 * scale;
+      finalCanvas.width = scaledCanvas.width + margin * 2 * scale;
+      finalCanvas.height = scaledCanvas.height + margin * 2 * scale;
       const ctx = finalCanvas.getContext("2d");
       if (ctx) {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-        ctx.drawImage(canvas, margin * scale, margin * scale);
+        ctx.drawImage(scaledCanvas, margin * scale, margin * scale);
       }
     } else if (size !== "auto") {
       // Resize to preset dimensions
@@ -82,8 +93,8 @@ export async function exportToPNG(
         ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
         
         // Calculate dimensions to center the signature
-        const sourceWidth = canvas.width;
-        const sourceHeight = canvas.height;
+        const sourceWidth = scaledCanvas.width;
+        const sourceHeight = scaledCanvas.height;
         const targetWidth = (width - margin * 2) * scale;
         const targetHeight = (height - margin * 2) * scale;
         
@@ -100,7 +111,7 @@ export async function exportToPNG(
         const offsetX = (finalCanvas.width - drawWidth) / 2;
         const offsetY = (finalCanvas.height - drawHeight) / 2;
         
-        ctx.drawImage(canvas, offsetX, offsetY, drawWidth, drawHeight);
+        ctx.drawImage(scaledCanvas, offsetX, offsetY, drawWidth, drawHeight);
       }
     }
 
@@ -156,15 +167,26 @@ export async function exportToPDF(
       scale = Math.min(scaleX, scaleY, 2);
     }
 
-    // Capture element to canvas
+    // Capture element to canvas (only valid options)
     const canvas = await html2canvas(element, {
-      scale: scale,
       logging: false,
       useCORS: true,
       allowTaint: false,
-      windowWidth: size === "auto" ? element.scrollWidth : width,
-      windowHeight: size === "auto" ? element.scrollHeight : height,
     });
+
+    // Scale the canvas manually for high quality
+    let scaledCanvas = canvas;
+    if (scale !== 1) {
+      scaledCanvas = document.createElement("canvas");
+      scaledCanvas.width = canvas.width * scale;
+      scaledCanvas.height = canvas.height * scale;
+      const ctx = scaledCanvas.getContext("2d");
+      if (ctx) {
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+      }
+    }
 
     // Convert pixels to mm (1 inch = 25.4mm, assuming 96 DPI)
     const pxToMm = 25.4 / 96;
@@ -175,10 +197,10 @@ export async function exportToPDF(
 
     if (size === "auto") {
       // Auto-size: use canvas dimensions
-      pdfWidth = (canvas.width / scale) * pxToMm + (margin * 2 * pxToMm);
-      pdfHeight = (canvas.height / scale) * pxToMm + (margin * 2 * pxToMm);
-      imageWidth = (canvas.width / scale) * pxToMm;
-      imageHeight = (canvas.height / scale) * pxToMm;
+      pdfWidth = (scaledCanvas.width / scale) * pxToMm + (margin * 2 * pxToMm);
+      pdfHeight = (scaledCanvas.height / scale) * pxToMm + (margin * 2 * pxToMm);
+      imageWidth = (scaledCanvas.width / scale) * pxToMm;
+      imageHeight = (scaledCanvas.height / scale) * pxToMm;
     } else {
       // Use preset sizes
       pdfWidth = width * pxToMm;
@@ -206,7 +228,7 @@ export async function exportToPDF(
     });
 
     // Convert canvas to image data
-    const imgData = canvas.toDataURL("image/png", quality);
+    const imgData = scaledCanvas.toDataURL("image/png", quality);
 
     // Calculate position to center the image
     const x = (pdfWidth - imageWidth) / 2;
