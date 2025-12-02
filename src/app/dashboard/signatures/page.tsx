@@ -256,23 +256,32 @@ export default function SignaturesPage() {
                       </p>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-2 pt-2 border-t border-gray-200">
+                    <div className="flex flex-col gap-2 pt-2 border-t border-gray-200">
                       <button
-                        onClick={() => handleCopy(signature)}
-                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          copiedId === signature.id
-                            ? "bg-green-600 text-white"
-                            : "bg-blue-600 text-white hover:bg-blue-700"
-                        }`}
+                        onClick={() => router.push(`/dashboard?edit=${signature.id}`)}
+                        className="w-full px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
                       >
-                        {copiedId === signature.id ? "✓ Copied" : "Copy"}
+                        <span className="material-symbols-outlined text-base">edit</span>
+                        Edit
                       </button>
-                      <button
-                        onClick={() => handleDelete(signature.id)}
-                        className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
-                      >
-                        Delete
-                      </button>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <button
+                          onClick={() => handleCopy(signature)}
+                          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                            copiedId === signature.id
+                              ? "bg-green-600 text-white"
+                              : "bg-blue-600 text-white hover:bg-blue-700"
+                          }`}
+                        >
+                          {copiedId === signature.id ? "✓ Copied" : "Copy"}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(signature.id)}
+                          className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

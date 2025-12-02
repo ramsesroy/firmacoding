@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import SignaturePreview from "@/components/SignaturePreview";
 import IconPicker from "@/components/IconPicker";
 import { TemplateType, RedSocial } from "@/types/signature";
@@ -8,7 +9,12 @@ import { copyToClipboard } from "@/lib/signatureUtils";
 import { uploadImage } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
 
-export default function DashboardPage() {
+// Force dynamic rendering for this page to support search params
+export const dynamic = "force-dynamic";
+
+function DashboardContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   // Example image URLs (professional images from Unsplash)
   // Professional profile photo - high quality corporate portrait
   const EXAMPLE_PHOTO_URL: string = "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
@@ -47,11 +53,84 @@ export default function DashboardPage() {
   const [saveMessage, setSaveMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [editingRed, setEditingRed] = useState<number | null>(null);
   const [editRedForm, setEditRedForm] = useState({ nombre: "", url: "", icono: "" });
+  const [editingSignatureId, setEditingSignatureId] = useState<string | null>(null);
+  const [loadingSignature, setLoadingSignature] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
 
+  // Load signature for editing if edit query parameter exists
+  useEffect(() => {
+    const editId = searchParams.get("edit");
+    if (editId) {
+      loadSignatureForEditing(editId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  const loadSignatureForEditing = async (signatureId: string) => {
+    try {
+      setLoadingSignature(true);
+      setEditingSignatureId(signatureId);
+
+      // Check authentication
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        router.push("/login");
+        return;
+      }
+
+      // Fetch signature from database
+      const { data, error } = await supabase
+        .from("signatures")
+        .select("*")
+        .eq("id", signatureId)
+        .eq("user_id", session.user.id)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        // Load signature data into the form
+        setTemplate(data.template_id as TemplateType);
+        setSignatureData({
+          nombre: data.name,
+          cargo: data.role,
+          foto: data.image_url || "",
+          telefono: data.phone || "",
+          redes: (data.social_links as RedSocial[]) || [],
+          horario: "",
+          textoAdicional: "",
+          colorPersonalizado: "",
+          qrLink: "",
+          logoEmpresa: "",
+          ctaTexto: "",
+          telefonoMovil: "",
+          direccion: "",
+          iconoTelefono: "📞",
+          iconoTelefonoMovil: "📱",
+          iconoDireccion: "📍",
+        });
+
+        // Remove edit parameter from URL
+        router.replace("/dashboard", { scroll: false });
+      }
+    } catch (err: any) {
+      console.error("Error loading signature:", err);
+      alert(err.message || "Error loading signature. Please try again.");
+      router.replace("/dashboard", { scroll: false });
+    } finally {
+      setLoadingSignature(false);
+    }
+  };
+
   // Add example images based on template when it changes
   useEffect(() => {
+    // Skip if we're loading a signature for editing
+    if (loadingSignature || editingSignatureId) return;
+
     // Templates that use photo
     const templatesWithPhoto = ["classic", "modern", "minimal", "modernaSinBarra", "modern2", "modern3", "modern4"];
     // Templates that use logo
@@ -75,7 +154,7 @@ export default function DashboardPage() {
       
       return Object.keys(updates).length > 0 ? { ...prev, ...updates } : prev;
     });
-  }, [template]);
+  }, [template, loadingSignature, editingSignatureId]);
 
   const handleCopyToClipboard = async () => {
     const success = await copyToClipboard(signatureData, template, signatureData.nombre || "User");
@@ -184,7 +263,7 @@ export default function DashboardPage() {
         throw new Error("You are not authenticated. Please log in again.");
       }
 
-      // Prepare data for insertion
+      // Prepare data for insertion/update
       // Ensure properties match exactly with the database structure
       const signatureRecord: any = {
         name: signatureData.nombre,
@@ -193,15 +272,36 @@ export default function DashboardPage() {
         image_url: signatureData.foto || null,
         social_links: signatureData.redes.length > 0 ? signatureData.redes : null,
         template_id: template,
-        user_id: session.user.id, // Associate signature with authenticated user
       };
 
-      // Insert into signatures table
-      const { data, error } = await supabase
-        .from("signatures")
-        .insert([signatureRecord])
-        .select()
-        .single();
+      let data, error;
+
+      // Update existing signature or insert new one
+      if (editingSignatureId) {
+        // Update existing signature
+        const { data: updateData, error: updateError } = await supabase
+          .from("signatures")
+          .update(signatureRecord)
+          .eq("id", editingSignatureId)
+          .eq("user_id", session.user.id)
+          .select()
+          .single();
+        
+        data = updateData;
+        error = updateError;
+      } else {
+        // Insert new signature
+        signatureRecord.user_id = session.user.id; // Associate signature with authenticated user
+        
+        const { data: insertData, error: insertError } = await supabase
+          .from("signatures")
+          .insert([signatureRecord])
+          .select()
+          .single();
+        
+        data = insertData;
+        error = insertError;
+      }
 
       if (error) {
         // Show a more descriptive message based on error type
@@ -222,8 +322,16 @@ export default function DashboardPage() {
 
       setSaveMessage({
         type: "success",
-        text: "Signature saved successfully!",
+        text: editingSignatureId 
+          ? "Signature updated successfully!" 
+          : "Signature saved successfully!",
       });
+      
+      // If we were editing, update the editing ID to the saved signature's ID
+      if (!editingSignatureId && data?.id) {
+        setEditingSignatureId(data.id);
+      }
+      
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (error) {
       console.error("Error saving signature:", error);
@@ -238,6 +346,17 @@ export default function DashboardPage() {
     }
   };
 
+  if (loadingSignature) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <p className="text-gray-600">Loading signature...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100">
       {/* Main Content */}
@@ -246,10 +365,12 @@ export default function DashboardPage() {
         <div className="mb-8 sm:mb-10">
           <div className="mb-3">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-              Signature Editor
+              {editingSignatureId ? "Edit Signature" : "Signature Editor"}
             </h1>
             <p className="text-base sm:text-lg text-gray-600 mt-2">
-              Create and customize your professional email signature in minutes
+              {editingSignatureId 
+                ? "Update your signature details and save changes"
+                : "Create and customize your professional email signature in minutes"}
             </p>
           </div>
         </div>
@@ -1031,7 +1152,7 @@ export default function DashboardPage() {
                   <span className={`material-symbols-outlined text-xl ${saving ? "animate-spin" : ""}`}>
                     {saving ? "hourglass_empty" : "save"}
                   </span>
-                  <span>{saving ? "Saving..." : "Save Signature"}</span>
+                  <span>{saving ? "Saving..." : editingSignatureId ? "Update Signature" : "Save Signature"}</span>
                 </button>
               </div>
               {copied && (
@@ -1074,5 +1195,20 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }
