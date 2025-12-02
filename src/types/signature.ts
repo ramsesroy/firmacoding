@@ -26,20 +26,13 @@ export interface SignatureProps {
 
 export type TemplateType = 
   | "professional"            // Most Popular - Professional Clean Design
-  | "classic" 
-  | "modern" 
-  | "minimal"
-  | "minimalCorporate"        // Minimal Corporate (template_01)
-  | "modernaSinBarra"         // Moderna sin barra (template_02)
-  | "enterpriseVintage"         // Enterprise Vintage (template_03)
-  | "modern2"                  // Modern 2 (template_05)
-  | "qrProfesional"            // QR Profesional (template_06)
-  | "modern3"                  // Modern 3 (template_08)
-  | "modern4"                  // Modern 4 (template_09)
-  | "qrCorporated"             // QR Corporated (template_10)
-  | "developerMinimal2025"     // Developer Minimal 2025 - Para desarrolladores
-  | "ultraMinimal"             // Ultra Minimal - Text-only minimal design
-  | "growthMarketing"          // Growth Marketing - With CTA button for promotions
-  | "freelanceDesigner"        // Freelance Designer - With portfolio links
-  | "corporateConsultant";     // Corporate Consultant - With company logo and disclaimer
+  | "classic"                 // Classic timeless design
+  | "modern"                  // Modern creative design
+  | "modernaSinBarra"         // Modern without bar (template_02)
+  | "qrProfesional"           // QR Professional (template_06)
+  | "developerMinimal2025"    // Developer Minimal 2025 - Premium developer template
+  | "ultraMinimal"            // Ultra Minimal - Premium text-only minimal design
+  | "growthMarketing"         // Growth Marketing - Premium with CTA and promotions
+  | "freelanceDesigner"       // Freelance Designer - Premium portfolio showcase
+  | "corporateConsultant";    // Corporate Consultant - Premium corporate with logo
 

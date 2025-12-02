@@ -44,24 +44,10 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = ({
         return renderClassicTemplate();
       case "modern":
         return renderModernTemplate();
-      case "minimal":
-        return renderMinimalTemplate();
-      case "minimalCorporate":
-        return renderTemplate01();
       case "modernaSinBarra":
         return renderTemplate02();
-      case "enterpriseVintage":
-        return renderTemplate03();
-      case "modern2":
-        return renderTemplate05();
       case "qrProfesional":
         return renderTemplate06();
-      case "modern3":
-        return renderTemplate08();
-      case "modern4":
-        return renderTemplate09();
-      case "qrCorporated":
-        return renderTemplate10();
       case "developerMinimal2025":
         return renderDeveloperMinimal2025();
       case "ultraMinimal":

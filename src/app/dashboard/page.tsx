@@ -133,9 +133,9 @@ function DashboardContent() {
     if (loadingSignature || editingSignatureId) return;
 
     // Templates that use photo
-    const templatesWithPhoto = ["classic", "modern", "minimal", "modernaSinBarra", "modern2", "modern3", "modern4"];
+    const templatesWithPhoto = ["classic", "modern", "modernaSinBarra", "qrProfesional", "developerMinimal2025", "growthMarketing", "freelanceDesigner"];
     // Templates that use logo
-    const templatesWithLogo = ["professional", "enterpriseVintage"];
+    const templatesWithLogo = ["professional", "corporateConsultant"];
     
     const photoUrl = "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=400&fit=crop&crop=faces&auto=format&q=80";
     const logoUrl = "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400&h=150&fit=crop&auto=format&q=80";
@@ -413,20 +413,13 @@ function DashboardContent() {
                     { id: "professional", name: "Professional", badge: "Most Popular", icon: "palette", color: "from-purple-500 to-indigo-600" },
                     { id: "classic", name: "Classic", icon: "description", color: "from-gray-500 to-gray-700" },
                     { id: "modern", name: "Modern", icon: "auto_awesome", color: "from-pink-500 to-rose-600" },
-                    { id: "minimal", name: "Minimal", icon: "bolt", color: "from-yellow-500 to-orange-600" },
-                    { id: "minimalCorporate", name: "Corporate", icon: "business_center", color: "from-blue-500 to-cyan-600" },
-                    { id: "modernaSinBarra", name: "Modern 2", icon: "diamond", color: "from-cyan-500 to-blue-600" },
-                    { id: "enterpriseVintage", name: "Enterprise", icon: "apartment", color: "from-slate-500 to-gray-700" },
-                    { id: "modern2", name: "Modern 3", icon: "workspace_premium", color: "from-amber-500 to-orange-600" },
-                    { id: "qrProfesional", name: "QR Pro", icon: "qr_code_scanner", color: "from-green-500 to-emerald-600" },
-                    { id: "modern3", name: "Modern 4", icon: "stars", color: "from-violet-500 to-purple-600" },
-                    { id: "modern4", name: "Modern 5", icon: "flash_on", color: "from-blue-400 to-indigo-600" },
-                    { id: "qrCorporated", name: "QR Corp", icon: "qr_code_2", color: "from-teal-500 to-cyan-600" },
-                    { id: "developerMinimal2025", name: "Dev Minimal", icon: "code", color: "from-slate-700 to-gray-900", badge: "New" },
-                    { id: "ultraMinimal", name: "Ultra Minimal", icon: "minimize", color: "from-gray-600 to-gray-800", badge: "New" },
-                    { id: "growthMarketing", name: "Growth Marketing", icon: "trending_up", color: "from-purple-500 to-pink-600", badge: "New" },
-                    { id: "freelanceDesigner", name: "Freelance Designer", icon: "brush", color: "from-orange-500 to-red-600", badge: "New" },
-                    { id: "corporateConsultant", name: "Corporate", icon: "business", color: "from-blue-600 to-indigo-700", badge: "New" },
+                    { id: "modernaSinBarra", name: "Modern Clean", icon: "diamond", color: "from-cyan-500 to-blue-600" },
+                    { id: "qrProfesional", name: "QR Professional", icon: "qr_code_scanner", color: "from-green-500 to-emerald-600" },
+                    { id: "developerMinimal2025", name: "Developer Pro", icon: "code", color: "from-slate-700 to-gray-900", badge: "Premium" },
+                    { id: "ultraMinimal", name: "Ultra Minimal", icon: "minimize", color: "from-gray-600 to-gray-800", badge: "Premium" },
+                    { id: "growthMarketing", name: "Growth Marketing", icon: "trending_up", color: "from-purple-500 to-pink-600", badge: "Premium" },
+                    { id: "freelanceDesigner", name: "Freelance Designer", icon: "brush", color: "from-orange-500 to-red-600", badge: "Premium" },
+                    { id: "corporateConsultant", name: "Corporate Elite", icon: "business", color: "from-blue-600 to-indigo-700", badge: "Premium" },
                   ].map((tpl) => (
                     <button
                       key={tpl.id}
@@ -435,13 +428,13 @@ function DashboardContent() {
                         setTemplate(newTemplate);
                         
                         // Add example photo if template uses photo and no photo exists
-                        const templatesWithPhoto = ["classic", "modern", "minimal", "modernaSinBarra", "modern2", "modern3", "modern4", "growthMarketing", "freelanceDesigner"];
+                        const templatesWithPhoto = ["classic", "modern", "modernaSinBarra", "qrProfesional", "developerMinimal2025", "growthMarketing", "freelanceDesigner"];
                         if (templatesWithPhoto.includes(newTemplate) && !signatureData.foto) {
                           setSignatureData({ ...signatureData, foto: EXAMPLE_PHOTO_URL });
                         }
                         
                         // Add example logo if template uses logo and no logo exists
-                        const templatesWithLogo = ["professional", "enterpriseVintage", "corporateConsultant"];
+                        const templatesWithLogo = ["professional", "corporateConsultant"];
                         if (templatesWithLogo.includes(newTemplate) && !signatureData.logoEmpresa) {
                           setSignatureData({ ...signatureData, logoEmpresa: EXAMPLE_LOGO_URL });
                         }
@@ -874,7 +867,7 @@ function DashboardContent() {
             )}
 
             {/* QR Link (Professional) */}
-            {(template === "qrProfesional" || template === "qrCorporated") && (
+            {template === "qrProfesional" && (
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2.5 flex items-center gap-2">
                   <span className="material-symbols-outlined text-base text-gray-400">qr_code</span>
