@@ -40,16 +40,16 @@ export default function DashboardLayout({
       active: pathname === "/dashboard",
     },
     {
-      href: "/dashboard/firmas",
+      href: "/dashboard/signatures",
       label: "My Signatures",
       icon: "badge",
-      active: pathname === "/dashboard/firmas",
+      active: pathname === "/dashboard/signatures",
     },
     {
-      href: "/dashboard/configuracion",
+      href: "/dashboard/settings",
       label: "Settings",
       icon: "settings",
-      active: pathname === "/dashboard/configuracion",
+      active: pathname === "/dashboard/settings",
     },
   ];
 
