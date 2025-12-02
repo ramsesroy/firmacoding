@@ -30,15 +30,15 @@ export async function exportToPNG(
   try {
     let width: number;
     let height: number;
-    let scale = 4; // Higher scale for better quality (4x = ultra high quality)
+    let scale = 6; // Maximum scale for ultra high quality (6x = print quality)
 
     if (size === "auto") {
       // Auto-size: capture the element's natural size with margins
       const rect = element.getBoundingClientRect();
       width = rect.width + margin * 2;
       height = rect.height + margin * 2;
-      // Use maximum scale for auto size to ensure highest quality
-      scale = 4;
+      // Use maximum scale for auto size to ensure highest quality (6x = print quality)
+      scale = 6;
     } else {
       // Use preset sizes
       const preset = SIZE_PRESETS[size];
@@ -48,8 +48,8 @@ export async function exportToPNG(
       const rect = element.getBoundingClientRect();
       const scaleX = (width - margin * 2) / rect.width;
       const scaleY = (height - margin * 2) / rect.height;
-      // Use at least 3x scale, up to 4x for best quality
-      scale = Math.max(3, Math.min(scaleX, scaleY, 4));
+      // Use at least 4x scale, up to 6x for best quality (print quality)
+      scale = Math.max(4, Math.min(scaleX, scaleY, 6));
     }
 
     // Configure html2canvas options (only valid options)
@@ -155,14 +155,14 @@ export async function exportToPDF(
   try {
     let width: number;
     let height: number;
-    let scale = 4; // Higher scale for better quality (4x = ultra high quality)
+    let scale = 6; // Maximum scale for ultra high quality (6x = print quality)
 
     if (size === "auto") {
       const rect = element.getBoundingClientRect();
       width = rect.width + margin * 2;
       height = rect.height + margin * 2;
-      // Use maximum scale for auto size to ensure highest quality
-      scale = 4;
+      // Use maximum scale for auto size to ensure highest quality (6x = print quality)
+      scale = 6;
     } else {
       const preset = SIZE_PRESETS[size];
       width = preset.width;
@@ -170,8 +170,8 @@ export async function exportToPDF(
       const rect = element.getBoundingClientRect();
       const scaleX = (width - margin * 2) / rect.width;
       const scaleY = (height - margin * 2) / rect.height;
-      // Use at least 3x scale, up to 4x for best quality
-      scale = Math.max(3, Math.min(scaleX, scaleY, 4));
+      // Use at least 4x scale, up to 6x for best quality (print quality)
+      scale = Math.max(4, Math.min(scaleX, scaleY, 6));
     }
 
     // Capture element to canvas (only valid options)
@@ -196,8 +196,10 @@ export async function exportToPDF(
       }
     }
 
-    // Convert pixels to mm (1 inch = 25.4mm, assuming 96 DPI)
-    const pxToMm = 25.4 / 96;
+    // Convert pixels to mm (1 inch = 25.4mm, using 300 DPI for print quality)
+    // Higher DPI = better quality in PDF
+    const dpi = 300;
+    const pxToMm = 25.4 / dpi;
     let pdfWidth: number;
     let pdfHeight: number;
     let imageWidth: number;
@@ -228,21 +230,24 @@ export async function exportToPDF(
       }
     }
 
-    // Create PDF
+    // Create PDF with high quality settings
     const pdf = new jsPDF({
       orientation: pdfWidth > pdfHeight ? "landscape" : "portrait",
       unit: "mm",
       format: [pdfWidth, pdfHeight],
+      compress: true, // Enable compression for smaller file size
     });
 
-    // Convert canvas to image data
-    const imgData = scaledCanvas.toDataURL("image/png", quality);
+    // Convert canvas to image data with maximum quality
+    // Using PNG format preserves quality better than JPEG
+    const imgData = scaledCanvas.toDataURL("image/png", 1.0); // Maximum quality
 
     // Calculate position to center the image
     const x = (pdfWidth - imageWidth) / 2;
     const y = (pdfHeight - imageHeight) / 2;
 
-    // Add image to PDF
+    // Add image to PDF with maximum quality
+    // Using the scaled canvas dimensions directly for best quality
     pdf.addImage(imgData, "PNG", x, y, imageWidth, imageHeight);
 
     // Save PDF
