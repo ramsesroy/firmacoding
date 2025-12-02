@@ -73,9 +73,9 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
             onClick={() => setIsOpen(false)}
           />
           
-          {/* Icon selection panel - Large size for better usability */}
+          {/* Icon selection panel - Optimized for Chrome compatibility */}
           <div 
-            className="fixed sm:absolute inset-x-3 sm:inset-x-auto top-auto sm:bottom-full bottom-3 sm:top-auto left-0 right-0 sm:left-0 sm:right-auto sm:mb-2 z-[9999] bg-white border-2 border-gray-300 rounded-xl shadow-2xl p-4 sm:p-5 w-auto sm:w-full max-w-full sm:max-w-md h-auto max-h-[65vh] sm:max-h-[480px] overflow-hidden flex flex-col"
+            className="fixed sm:absolute inset-x-3 sm:inset-x-auto top-auto sm:bottom-full bottom-3 sm:top-auto left-0 right-0 sm:left-0 sm:right-auto sm:mb-2 z-[9999] bg-white border-2 border-gray-300 rounded-xl shadow-2xl p-4 sm:p-5 w-auto sm:min-w-[500px] sm:w-[500px] max-w-full sm:max-w-none h-auto max-h-[65vh] sm:max-h-[480px] overflow-hidden flex flex-col"
             style={{
               boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
             }}
@@ -113,9 +113,9 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
               ))}
             </div>
 
-            {/* Icon grid - Large icons with good spacing */}
+            {/* Icon grid - Balanced size for visibility */}
             <div className="overflow-y-auto flex-1 min-h-0 custom-scrollbar">
-              <div className="grid grid-cols-5 sm:grid-cols-6 gap-3">
+              <div className="grid grid-cols-5 sm:grid-cols-6 gap-3 sm:gap-3.5">
                 {displayIcons.map((icon, index) => (
                   <button
                     key={index}
@@ -124,7 +124,7 @@ export default function IconPicker({ selectedIcon, onSelectIcon, label }: IconPi
                       onSelectIcon(icon);
                       setIsOpen(false);
                     }}
-                    className={`group relative w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center text-3xl sm:text-4xl rounded-xl transition-all duration-200 hover:scale-110 hover:shadow-lg ${
+                    className={`group relative w-14 h-14 sm:w-14 sm:h-14 flex items-center justify-center text-2xl sm:text-3xl rounded-xl transition-all duration-200 hover:scale-110 hover:shadow-lg ${
                       selectedIcon === icon
                         ? "bg-blue-600 ring-3 ring-blue-400 shadow-xl scale-105"
                         : "bg-gray-50 hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-400 hover:shadow-md"
