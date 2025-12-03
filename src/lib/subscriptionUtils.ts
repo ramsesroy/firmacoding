@@ -8,8 +8,10 @@ export interface Subscription {
   user_id: string;
   plan_type: PlanType;
   status: SubscriptionStatus;
-  stripe_subscription_id?: string | null;
-  stripe_customer_id?: string | null;
+  lemonsqueezy_subscription_id?: string | null;
+  lemonsqueezy_customer_id?: string | null;
+  lemonsqueezy_order_id?: string | null;
+  lemonsqueezy_variant_id?: string | null;
   current_period_start: string;
   current_period_end: string;
   cancel_at_period_end: boolean;

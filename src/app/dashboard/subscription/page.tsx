@@ -9,6 +9,7 @@ import { getUserLimits, getUserSubscription } from "@/lib/subscriptionUtils";
 import { useToast } from "@/components/Toast";
 import { MetadataHead } from "@/components/MetadataHead";
 import { SkeletonCard } from "@/components/Skeleton";
+import { createCheckout, getVariantIds } from "@/lib/lemonsqueezy";
 
 interface UserLimits {
   saved_signatures_count: number;
@@ -23,6 +24,7 @@ export default function SubscriptionPage() {
   const [limits, setLimits] = useState<UserLimits | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [upgrading, setUpgrading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,6 +61,41 @@ export default function SubscriptionPage() {
 
     fetchData();
   }, [router, showToast]);
+
+  const handleUpgrade = async () => {
+    try {
+      setUpgrading(true);
+      
+      // Obtener el token de sesión
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        showToast("Please log in to upgrade", "error");
+        return;
+      }
+
+      // Obtener el variant ID de Premium (mensual por defecto)
+      const variantIds = getVariantIds();
+      const premiumVariantId = variantIds.premium;
+
+      if (!premiumVariantId) {
+        showToast("Premium plan not configured. Please contact support.", "error");
+        return;
+      }
+
+      // Crear checkout
+      const { checkout_url } = await createCheckout(premiumVariantId, session.access_token);
+      
+      // Redirigir al checkout
+      window.location.href = checkout_url;
+    } catch (error) {
+      console.error("Upgrade error:", error);
+      showToast(
+        error instanceof Error ? error.message : "Failed to start checkout",
+        "error"
+      );
+      setUpgrading(false);
+    }
+  };
 
   if (loading || subscriptionLoading) {
     return (
@@ -324,15 +361,19 @@ export default function SubscriptionPage() {
                 <p className="text-blue-100 text-sm mb-4">
                   Unlock all premium templates, unlimited signatures, and export without watermarks.
                 </p>
+                <button
+                  onClick={handleUpgrade}
+                  disabled={upgrading}
+                  className="block w-full bg-white text-blue-600 font-bold py-3 px-4 rounded-xl text-center hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {upgrading ? "Processing..." : "Upgrade to Premium"}
+                </button>
                 <Link
                   href="/#pricing"
-                  className="block w-full bg-white text-blue-600 font-bold py-3 px-4 rounded-xl text-center hover:bg-gray-100 transition-colors"
+                  className="block w-full mt-3 text-blue-200 hover:text-white text-sm text-center underline"
                 >
-                  View Plans & Pricing
+                  View All Plans
                 </Link>
-                <p className="text-xs text-blue-200 mt-3 text-center">
-                  Payment integration coming soon
-                </p>
               </div>
             )}
 

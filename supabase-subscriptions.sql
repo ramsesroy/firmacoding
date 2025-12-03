@@ -20,8 +20,10 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     plan_type TEXT NOT NULL CHECK (plan_type IN ('free', 'premium', 'team', 'agency')),
     status TEXT NOT NULL CHECK (status IN ('active', 'canceled', 'past_due', 'trialing')),
-    stripe_subscription_id TEXT UNIQUE,
-    stripe_customer_id TEXT,
+    lemonsqueezy_subscription_id TEXT UNIQUE,
+    lemonsqueezy_customer_id TEXT,
+    lemonsqueezy_order_id TEXT,
+    lemonsqueezy_variant_id TEXT,
     current_period_start TIMESTAMP WITH TIME ZONE,
     current_period_end TIMESTAMP WITH TIME ZONE,
     cancel_at_period_end BOOLEAN DEFAULT FALSE,
@@ -33,7 +35,7 @@ CREATE TABLE IF NOT EXISTS public.subscriptions (
 
 -- Índices para suscripciones
 CREATE INDEX IF NOT EXISTS subscriptions_user_id_idx ON public.subscriptions(user_id);
-CREATE INDEX IF NOT EXISTS subscriptions_stripe_subscription_id_idx ON public.subscriptions(stripe_subscription_id);
+CREATE INDEX IF NOT EXISTS subscriptions_lemonsqueezy_subscription_id_idx ON public.subscriptions(lemonsqueezy_subscription_id);
 CREATE INDEX IF NOT EXISTS subscriptions_status_idx ON public.subscriptions(status);
 CREATE INDEX IF NOT EXISTS subscriptions_plan_type_idx ON public.subscriptions(plan_type);
 
