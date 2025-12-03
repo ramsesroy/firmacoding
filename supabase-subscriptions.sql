@@ -1,5 +1,16 @@
 -- Script SQL para crear las tablas de suscripciones y límites de usuario en Supabase
--- Ejecuta este script en el SQL Editor de tu proyecto Supabase después de crear la tabla signatures
+-- Ejecuta este script en el SQL Editor de tu proyecto Supabase
+
+-- ============================================
+-- FUNCIÓN BASE: handle_updated_at (si no existe)
+-- ============================================
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = TIMEZONE('utc', NOW());
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
 -- ============================================
 -- TABLA DE SUSCRIPCIONES
