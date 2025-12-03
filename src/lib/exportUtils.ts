@@ -9,6 +9,7 @@ export interface ExportOptions {
   margin?: number; // margin in pixels for auto size
   quality?: number; // 0-1 for image quality
   onProgress?: (progress: number) => void; // Progress callback 0-100
+  addWatermark?: boolean; // Add watermark for free users
 }
 
 // Size presets in pixels
@@ -113,6 +114,11 @@ export async function exportToPNGHQ(
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
     ctx.drawImage(scaledCanvas, offsetX, offsetY, finalDrawWidth, finalDrawHeight);
+
+    // Add watermark if needed
+    if (options.addWatermark) {
+      drawWatermark(ctx, finalCanvas.width, finalCanvas.height, scale);
+    }
 
     onProgress?.(90);
 
@@ -345,6 +351,11 @@ export async function exportToPDFHQ(
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = "high";
     ctx.drawImage(scaledCanvas, offsetX, offsetY, finalDrawWidth, finalDrawHeight);
+
+    // Add watermark if needed
+    if (options.addWatermark) {
+      drawWatermark(ctx, finalCanvas.width, finalCanvas.height, scale);
+    }
 
     onProgress?.(80);
 
@@ -611,4 +622,68 @@ export function getSizeLabel(size: ExportSize): string {
     large: "Large (800×400px)",
   };
   return labels[size];
+}
+
+/**
+ * Draw watermark on canvas for free users
+ */
+function drawWatermark(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  scale: number
+): void {
+  // Watermark settings
+  const fontSize = 14 * scale;
+  const opacity = 0.15;
+  const text = "Signature For Me";
+  const rotation = -25; // Degrees
+  
+  ctx.save();
+  ctx.globalAlpha = opacity;
+  ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+  ctx.fillStyle = "#333333";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  
+  // Calculate center
+  const centerX = width / 2;
+  const centerY = height / 2;
+  
+  // Rotate and draw watermark
+  ctx.translate(centerX, centerY);
+  ctx.rotate((rotation * Math.PI) / 180);
+  
+  // Draw text with shadow for better visibility
+  ctx.shadowColor = "rgba(0, 0, 0, 0.1)";
+  ctx.shadowBlur = 2;
+  ctx.fillText(text, 0, 0);
+  
+  // Draw smaller text below
+  const smallFontSize = fontSize * 0.6;
+  ctx.font = `${smallFontSize}px Arial, sans-serif`;
+  ctx.fillText("Free Version", 0, fontSize * 0.8);
+  
+  ctx.restore();
+  
+  // Draw repeating watermarks in corners
+  const cornerWatermarks = [
+    { x: width * 0.15, y: height * 0.15 },
+    { x: width * 0.85, y: height * 0.15 },
+    { x: width * 0.15, y: height * 0.85 },
+    { x: width * 0.85, y: height * 0.85 },
+  ];
+  
+  cornerWatermarks.forEach((pos) => {
+    ctx.save();
+    ctx.globalAlpha = opacity * 0.5;
+    ctx.font = `bold ${fontSize * 0.4}px Arial, sans-serif`;
+    ctx.fillStyle = "#666666";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.translate(pos.x, pos.y);
+    ctx.rotate((rotation * Math.PI) / 180);
+    ctx.fillText(text, 0, 0);
+    ctx.restore();
+  });
 }

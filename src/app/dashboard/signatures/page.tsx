@@ -11,6 +11,7 @@ import { exportToPNG, exportToPDF, exportToPNGHQ, exportToPDFHQ, ExportSize, get
 import { useToast } from "@/components/Toast";
 import { MetadataHead } from "@/components/MetadataHead";
 import { SkeletonCard } from "@/components/Skeleton";
+import { useSubscription } from "@/hooks/useSubscription";
 import { decrementSavedSignatures } from "@/lib/subscriptionUtils";
 
 interface SignatureRecord {
@@ -39,6 +40,7 @@ export default function SignaturesPage() {
   const router = useRouter();
   const previewRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { showToast } = useToast();
+  const { isPremium } = useSubscription();
 
   const fetchSignatures = useCallback(async () => {
     try {
@@ -176,6 +178,7 @@ export default function SignaturesPage() {
       await exportToPNGHQ(elementToExport, filename, {
         size: exportSize,
         margin: 20,
+        addWatermark: !isPremium, // Add watermark for free users
       });
       showToast("PNG exported successfully!", "success");
       setShowExportMenu(null);
@@ -207,6 +210,7 @@ export default function SignaturesPage() {
       await exportToPDFHQ(elementToExport, filename, {
         size: exportSize,
         margin: 20,
+        addWatermark: !isPremium, // Add watermark for free users
       });
       showToast("PDF exported successfully!", "success");
       setShowExportMenu(null);
