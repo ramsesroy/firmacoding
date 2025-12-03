@@ -552,12 +552,20 @@ function DashboardContent() {
                   <label className="block text-sm font-semibold text-gray-900 uppercase tracking-wide">
                     Choose Template
                   </label>
-                  {template === "professional" && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 border border-amber-200 rounded-full">
-                      <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
-                      <span className="text-xs font-semibold text-amber-900">Popular</span>
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {template === "professional" && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 border border-amber-200 rounded-full">
+                        <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+                        <span className="text-xs font-semibold text-amber-900">Popular</span>
+                      </span>
+                    )}
+                    {isPremium && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-md">
+                        <span className="material-symbols-outlined text-xs">stars</span>
+                        <span className="text-xs font-bold">Premium</span>
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
                   {[

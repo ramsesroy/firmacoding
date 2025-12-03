@@ -12,6 +12,7 @@ import { useToast } from "@/components/Toast";
 import { MetadataHead } from "@/components/MetadataHead";
 import { SkeletonCard } from "@/components/Skeleton";
 import { useSubscription } from "@/hooks/useSubscription";
+import { getUserLimits } from "@/lib/subscriptionUtils";
 import { decrementSavedSignatures } from "@/lib/subscriptionUtils";
 
 interface SignatureRecord {
@@ -40,7 +41,8 @@ export default function SignaturesPage() {
   const router = useRouter();
   const previewRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { showToast } = useToast();
-  const { isPremium } = useSubscription();
+  const { isPremium, subscription } = useSubscription();
+  const [limits, setLimits] = useState<{ remaining: number; limit: number } | null>(null);
 
   const fetchSignatures = useCallback(async () => {
     try {
@@ -79,6 +81,25 @@ export default function SignaturesPage() {
   useEffect(() => {
     fetchSignatures();
   }, [fetchSignatures]);
+
+  useEffect(() => {
+    const loadLimits = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const userLimits = await getUserLimits(session.user.id);
+        if (userLimits) {
+          const remaining = userLimits.max_saved_signatures === -1 
+            ? -1 
+            : Math.max(0, userLimits.max_saved_signatures - userLimits.saved_signatures_count);
+          setLimits({
+            remaining,
+            limit: userLimits.max_saved_signatures,
+          });
+        }
+      }
+    };
+    loadLimits();
+  }, [signatures.length]);
 
   const handleDeleteClick = (id: string) => {
     setDeleteConfirmId(id);
@@ -282,9 +303,22 @@ export default function SignaturesPage() {
           <span className="material-symbols-outlined text-3xl text-blue-600">badge</span>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Signatures</h1>
         </div>
-        <p className="text-sm sm:text-base text-gray-600 ml-11">
-          Manage all your saved signatures
-        </p>
+        <div className="flex items-center gap-3 ml-11">
+          <p className="text-sm sm:text-base text-gray-600">
+            Manage all your saved signatures
+          </p>
+          {isPremium && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs font-bold rounded-full">
+              <span className="material-symbols-outlined text-xs">stars</span>
+              Premium
+            </span>
+          )}
+          {!isPremium && limits && limits.limit !== -1 && (
+            <span className="text-xs text-gray-500">
+              ({limits.limit - limits.remaining} / {limits.limit} saved)
+            </span>
+          )}
+        </div>
       </div>
 
       {signatures.length === 0 ? (

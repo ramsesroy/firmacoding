@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { useSubscription } from "@/hooks/useSubscription";
 
 export default function DashboardLayout({
   children,
@@ -14,6 +15,7 @@ export default function DashboardLayout({
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const { isPremium, subscription } = useSubscription();
 
   useEffect(() => {
     checkUser();
@@ -141,14 +143,29 @@ export default function DashboardLayout({
           {user ? (
             <>
               <div className="flex items-center gap-3 px-2 py-2">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-blue-600 text-xl">person</span>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  isPremium ? "bg-gradient-to-br from-blue-500 to-purple-500" : "bg-blue-100"
+                }`}>
+                  <span className={`material-symbols-outlined text-xl ${
+                    isPremium ? "text-white" : "text-blue-600"
+                  }`}>person</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {user.user_metadata?.full_name || user.email?.split("@")[0] || "User"}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {user.user_metadata?.full_name || user.email?.split("@")[0] || "User"}
+                    </p>
+                    {isPremium && (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-[10px] font-bold rounded">
+                        <span className="w-1 h-1 bg-white rounded-full"></span>
+                        PRO
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                  {subscription && !isPremium && (
+                    <p className="text-xs text-gray-400 mt-0.5">Free Plan</p>
+                  )}
                 </div>
               </div>
               <button
