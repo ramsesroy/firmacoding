@@ -16,6 +16,7 @@ import { SkeletonForm, SkeletonSignaturePreview } from "@/components/Skeleton";
 import { Watermark } from "@/components/Watermark";
 import { useSubscription } from "@/hooks/useSubscription";
 import { canSaveSignature, incrementSavedSignatures, decrementSavedSignatures } from "@/lib/subscriptionUtils";
+import { analytics } from "@/lib/analytics";
 
 // Force dynamic rendering for this page to support search params
 export const dynamic = "force-dynamic";
@@ -294,6 +295,7 @@ function DashboardContent() {
     if (success) {
       setCopied(true);
       showToast("Signature copied to clipboard!", "success");
+      analytics.copySignature();
       setTimeout(() => setCopied(false), 2000);
     } else {
       showToast("Error copying to clipboard. Please try again.", "error");
@@ -632,6 +634,7 @@ function DashboardContent() {
 
                         const newTemplate = tpl.id as TemplateType;
                         setTemplate(newTemplate);
+                        analytics.viewTemplate(newTemplate);
                         
                         // Add example photo if template uses photo and no photo exists
                         const templatesWithPhoto = ["classic", "modern", "modernaSinBarra", "qrProfesional", "developerMinimal2025", "growthMarketing", "freelanceDesigner", "interiorDesign", "universityBanner", "creativePortfolio", "pastorSignature", "lawStudent"];

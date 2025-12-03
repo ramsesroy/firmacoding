@@ -3,6 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/Toast";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+import { isAnalyticsEnabled } from "@/lib/analytics";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -107,7 +110,10 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ErrorBoundary>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            {isAnalyticsEnabled() && <GoogleAnalytics />}
+            {children}
+          </ToastProvider>
         </ErrorBoundary>
       </body>
     </html>

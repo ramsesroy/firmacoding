@@ -10,6 +10,7 @@ import { useToast } from "@/components/Toast";
 import { MetadataHead } from "@/components/MetadataHead";
 import { SkeletonCard } from "@/components/Skeleton";
 import { createCheckout, getVariantIds } from "@/lib/lemonsqueezy";
+import { analytics } from "@/lib/analytics";
 
 // Force dynamic rendering to support search params
 export const dynamic = "force-dynamic";
@@ -99,6 +100,10 @@ function SubscriptionContent() {
 
       // Create checkout
       const { checkout_url } = await createCheckout(premiumVariantId, session.access_token);
+      
+      // Track checkout start
+      const planName = planParam || "premium";
+      analytics.startCheckout(planName);
       
       // Redirigir al checkout
       window.location.href = checkout_url;

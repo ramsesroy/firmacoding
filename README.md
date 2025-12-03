@@ -35,6 +35,10 @@ NEXT_PUBLIC_LEMONSQUEEZY_AGENCY_VARIANT_ID=variante_id_agency (opcional)
 # Application URL
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 # En producción: NEXT_PUBLIC_APP_URL=https://tu-dominio.com
+
+# Google Analytics (Optional)
+NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+# Get your Measurement ID from Google Analytics 4: https://analytics.google.com
 ```
 
 **Important Notes**: 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { MetadataHead } from "@/components/MetadataHead";
+import { analytics } from "@/lib/analytics";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -92,6 +93,7 @@ export default function LoginPage() {
         }
 
         if (data?.user) {
+          analytics.signUp("email");
           setMessage("Registration successful! Please verify your email before signing in.");
           // Clear form
           setEmail("");
@@ -109,6 +111,7 @@ export default function LoginPage() {
         }
 
         if (data?.user) {
+          analytics.signIn("email");
           // Redirect to specified path or default dashboard
           if (redirectTo) {
             const redirectUrl = plan ? `${redirectTo}?plan=${plan}` : redirectTo;

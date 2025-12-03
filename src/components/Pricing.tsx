@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/components/Toast";
+import { analytics } from "@/lib/analytics";
 
 interface Feature {
   text: string;
@@ -68,6 +69,8 @@ export default function Pricing() {
       }
 
       // If authenticated, go to subscription page
+      analytics.clickUpgrade(tier.name);
+      analytics.startCheckout(tier.name);
       router.push("/dashboard/subscription");
       setIsLoading(false);
     }
