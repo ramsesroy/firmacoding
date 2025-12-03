@@ -245,7 +245,7 @@ export default function SignaturesPage() {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <div className="max-w-6xl mx-auto">
         <div className="mb-4 sm:mb-8">
           <div className="flex items-center gap-3 mb-2">
             <span className="material-symbols-outlined text-3xl text-blue-600">badge</span>
@@ -266,7 +266,7 @@ export default function SignaturesPage() {
 
   if (error) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <div className="max-w-6xl mx-auto">
         <div className="mb-4 sm:mb-8">
           <div className="flex items-center gap-3 mb-2">
             <span className="material-symbols-outlined text-3xl text-blue-600">badge</span>

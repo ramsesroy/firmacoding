@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useSubscription } from "@/hooks/useSubscription";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function DashboardLayout({
   children,
@@ -189,7 +190,12 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="lg:ml-64 pt-16 lg:pt-0 min-h-screen">{children}</main>
+      <main className="lg:ml-64 pt-16 lg:pt-0 min-h-screen">
+        <div className="p-4 sm:p-6 lg:p-8 max-w-[1920px]">
+          <Breadcrumbs />
+          <div className="-mt-4">{children}</div>
+        </div>
+      </main>
     </div>
   );
 }

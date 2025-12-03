@@ -534,7 +534,7 @@ function DashboardContent() {
       />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100">
       {/* Main Content */}
-      <div className="p-4 sm:p-6 lg:p-8 max-w-[1920px] mx-auto">
+      <div className="max-w-[1920px] mx-auto">
         {/* Header */}
         <div className="mb-8 sm:mb-10">
           <div className="mb-3">

@@ -1,0 +1,42 @@
+{
+  "name": "Signature For Me - Professional Email Signature Generator",
+  "short_name": "Signature For Me",
+  "description": "Create and manage professional email signatures in minutes",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["productivity", "business"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Create Signature",
+      "short_name": "Create",
+      "description": "Create a new email signature",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "My Signatures",
+      "short_name": "Signatures",
+      "description": "View your saved signatures",
+      "url": "/dashboard/signatures",
+      "icons": [{ "src": "/icon.svg", "sizes": "any" }]
+    }
+  ]
+}
+

@@ -114,7 +114,7 @@ function SubscriptionContent() {
 
   if (loading || subscriptionLoading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <div className="max-w-6xl mx-auto">
         <div className="mb-6">
           <div className="h-8 w-64 bg-gray-200 rounded-lg animate-pulse mb-2"></div>
           <div className="h-4 w-96 bg-gray-200 rounded-lg animate-pulse"></div>
@@ -126,7 +126,7 @@ function SubscriptionContent() {
 
   if (!subscription) {
     return (
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <div className="max-w-6xl mx-auto">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">
           <p className="text-red-800">Unable to load subscription information.</p>
         </div>
@@ -209,7 +209,7 @@ function SubscriptionContent() {
         title="Subscription Management - Signature For Me"
         description="Manage your subscription plan and view your usage limits"
       />
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-3 mb-2">
@@ -452,7 +452,7 @@ function SubscriptionContent() {
 export default function SubscriptionPage() {
   return (
     <Suspense fallback={
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <div className="max-w-6xl mx-auto">
         <SkeletonCard />
       </div>
     }>
