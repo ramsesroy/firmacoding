@@ -1447,6 +1447,29 @@ function DashboardContent() {
                     <span>{saving ? "Saving..." : editingSignatureId ? "Update Signature" : "Save Signature"}</span>
                   </button>
                 </div>
+                {saveLimit && !isPremium && (
+                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-blue-600 text-sm">info</span>
+                        <p className="text-xs text-blue-900 font-medium">
+                          {saveLimit.remaining === 0 
+                            ? "You've reached your limit of 3 saved signatures"
+                            : `You can save ${saveLimit.remaining} more signature${saveLimit.remaining > 1 ? "s" : ""}`
+                          }
+                        </p>
+                      </div>
+                      {saveLimit.remaining === 0 && (
+                        <Link
+                          href="/dashboard/subscription"
+                          className="text-xs text-blue-600 hover:text-blue-700 font-semibold underline"
+                        >
+                          Upgrade →
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
               {copied && (
                 <p className="text-sm text-green-600 mt-3 text-center font-medium">
