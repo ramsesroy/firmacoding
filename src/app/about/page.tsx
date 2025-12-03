@@ -9,6 +9,12 @@ export const metadata: Metadata = {
   openGraph: {
     title: "About Us - Signature For Me",
     description: "Learn about Signature For Me, the easiest way to create and manage professional email signatures.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "About Us - Signature For Me",
+    description: "Learn about Signature For Me, the easiest way to create and manage professional email signatures.",
   },
 };
 

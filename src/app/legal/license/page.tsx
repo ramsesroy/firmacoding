@@ -7,6 +7,16 @@ export const metadata: Metadata = {
   openGraph: {
     title: "License - Signature For Me",
     description: "Information about the license and terms of use for Signature For Me software.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "License - Signature For Me",
+    description: "Information about the license and terms of use for Signature For Me software.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

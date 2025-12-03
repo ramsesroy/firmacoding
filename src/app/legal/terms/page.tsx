@@ -7,6 +7,16 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Terms of Service - Signature For Me",
     description: "Terms and conditions of use for Signature For Me. Read our terms of service before using the platform.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Terms of Service - Signature For Me",
+    description: "Terms and conditions of use for Signature For Me.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

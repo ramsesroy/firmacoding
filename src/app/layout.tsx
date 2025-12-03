@@ -11,17 +11,76 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://signaturefor.me';
+const siteName = 'Signature For Me';
+
 export const metadata: Metadata = {
-  title: "Signature For Me - Professional Email Signature Generator",
-  description: "Create and manage professional email signatures in minutes. Intuitive tool with multiple templates and HTML export.",
-  icons: {
-    icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: 'any' },
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Signature For Me - Professional Email Signature Generator",
+    template: "%s | Signature For Me",
+  },
+  description: "Create and manage professional email signatures in minutes. Intuitive tool with multiple templates, HTML export, and premium features. Free forever plan available.",
+  keywords: [
+    "email signature",
+    "email signature generator",
+    "professional email signature",
+    "Gmail signature",
+    "Outlook signature",
+    "email signature creator",
+    "HTML email signature",
+    "email signature template",
+    "business email signature",
+    "free email signature",
+  ],
+  authors: [{ name: "Signature For Me" }],
+  creator: "Signature For Me",
+  publisher: "Signature For Me",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName: siteName,
+    title: "Signature For Me - Professional Email Signature Generator",
+    description: "Create and manage professional email signatures in minutes. Intuitive tool with multiple templates and HTML export.",
+    images: [
+      {
+        url: `${siteUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: "Signature For Me - Professional Email Signature Generator",
+      },
     ],
-    apple: [
-      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Signature For Me - Professional Email Signature Generator",
+    description: "Create and manage professional email signatures in minutes. Intuitive tool with multiple templates and HTML export.",
+    images: [`${siteUrl}/og-image.png`],
+    creator: "@signatureforme",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    // Google Search Console verification - agregar cuando tengas el código
+    // google: "verification-code",
+  },
+  alternates: {
+    canonical: siteUrl,
   },
 };
 

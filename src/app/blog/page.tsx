@@ -8,9 +8,14 @@ export const metadata: Metadata = {
   title: "Blog - Signature For Me | Email Signature Guides & Tips",
   description: "Expert guides, tutorials, and tips about email signatures, professional communication, and digital branding. Learn how to create professional signatures for Gmail, Outlook, and more.",
   openGraph: {
+    title: "Blog - Signature For Me | Email Signature Guides & Tips",
+    description: "Expert guides, tutorials, and tips about email signatures, professional communication, and digital branding.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
     title: "Blog - Signature For Me",
     description: "Expert guides and tips about email signatures and professional communication.",
-    type: "website",
   },
 };
 

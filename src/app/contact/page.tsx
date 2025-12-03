@@ -5,10 +5,16 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Contact Us - Signature For Me",
-  description: "Get in touch with Signature For Me. Have questions, feedback, or need support? We're here to help.",
+  description: "Get in touch with Signature For Me. Have questions? We're here to help. Contact our support team for assistance with email signatures, features, or general inquiries.",
   openGraph: {
     title: "Contact Us - Signature For Me",
-    description: "Get in touch with Signature For Me. Have questions, feedback, or need support? We're here to help.",
+    description: "Get in touch with Signature For Me. Have questions? We're here to help.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Contact Us - Signature For Me",
+    description: "Get in touch with Signature For Me. Have questions? We're here to help.",
   },
 };
 

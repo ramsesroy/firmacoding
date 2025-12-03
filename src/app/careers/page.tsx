@@ -9,6 +9,12 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Careers - Signature For Me",
     description: "Join the Signature For Me team. Explore open positions and opportunities.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Careers - Signature For Me",
+    description: "Join the Signature For Me team. Explore open positions and opportunities.",
   },
 };
 

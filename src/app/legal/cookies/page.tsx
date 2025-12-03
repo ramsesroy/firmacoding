@@ -7,6 +7,16 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Cookie Policy - Signature For Me",
     description: "Signature For Me cookie policy. Learn how we use cookies and similar technologies on our website.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Cookie Policy - Signature For Me",
+    description: "Signature For Me cookie policy.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

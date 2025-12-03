@@ -7,6 +7,16 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Privacy Policy - Signature For Me",
     description: "Signature For Me privacy policy. Learn how we protect and use your personal information.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Privacy Policy - Signature For Me",
+    description: "Signature For Me privacy policy.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
