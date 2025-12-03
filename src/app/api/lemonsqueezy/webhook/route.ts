@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabaseClient";
 import crypto from "crypto";
 
 /**
- * Webhook handler para eventos de LemonSqueezy
+ * Webhook handler for LemonSqueezy events
  * POST /api/lemonsqueezy/webhook
  */
 export async function POST(request: NextRequest) {
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     const body = await request.text();
     const signature = request.headers.get("x-signature");
 
-    // Verificar la firma del webhook
+    // Verify webhook signature
     const webhookSecret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
     if (!webhookSecret) {
       console.error("LEMONSQUEEZY_WEBHOOK_SECRET not configured");
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verificar la firma HMAC
+    // Verify HMAC signature
     const hmac = crypto.createHmac("sha256", webhookSecret);
     const digest = hmac.update(body).digest("hex");
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     const event = JSON.parse(body);
 
-    // Procesar diferentes tipos de eventos
+    // Process different event types
     switch (event.meta.event_name) {
       case "subscription_created":
       case "subscription_updated":
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * Maneja eventos de suscripción (creación, actualización, pago exitoso)
+ * Handles subscription events (creation, update, successful payment)
  */
 async function handleSubscriptionEvent(event: any) {
   const subscription = event.data;
@@ -82,11 +82,11 @@ async function handleSubscriptionEvent(event: any) {
 
   const userId = customData.user_id;
 
-  // Determinar el tipo de plan basado en el variant_id
+  // Determine plan type based on variant_id
   const variantId = subscription.attributes.variant_id;
   const planType = getPlanTypeFromVariantId(variantId);
 
-  // Actualizar o crear la suscripción en Supabase
+  // Update or create subscription in Supabase
   const subscriptionData = {
     user_id: userId,
     plan_type: planType,
@@ -105,7 +105,7 @@ async function handleSubscriptionEvent(event: any) {
     updated_at: new Date().toISOString(),
   };
 
-  // Verificar si ya existe una suscripción para este usuario
+  // Check if subscription already exists for this user
   const { data: existingSubscription } = await supabase
     .from("subscriptions")
     .select("id")
@@ -113,13 +113,13 @@ async function handleSubscriptionEvent(event: any) {
     .single();
 
   if (existingSubscription) {
-    // Actualizar suscripción existente
+    // Update existing subscription
     await supabase
       .from("subscriptions")
       .update(subscriptionData)
       .eq("user_id", userId);
   } else {
-    // Crear nueva suscripción
+    // Create new subscription
     subscriptionData.current_period_start = new Date().toISOString();
     await supabase.from("subscriptions").insert([subscriptionData]);
   }
@@ -128,7 +128,7 @@ async function handleSubscriptionEvent(event: any) {
 }
 
 /**
- * Maneja la cancelación de suscripciones
+ * Handles subscription cancellations
  */
 async function handleSubscriptionCancellation(event: any) {
   const subscription = event.data;
@@ -142,7 +142,7 @@ async function handleSubscriptionCancellation(event: any) {
 
   const userId = customData.user_id;
 
-  // Actualizar el estado de la suscripción a cancelada
+  // Update subscription status to canceled
   await supabase
     .from("subscriptions")
     .update({
@@ -156,7 +156,7 @@ async function handleSubscriptionCancellation(event: any) {
 }
 
 /**
- * Maneja la creación de órdenes
+ * Handles order creation
  */
 async function handleOrderCreated(event: any) {
   const order = event.data;
@@ -170,7 +170,7 @@ async function handleOrderCreated(event: any) {
 
   const userId = customData.user_id;
 
-  // Actualizar la suscripción con el order_id
+  // Update subscription with order_id
   await supabase
     .from("subscriptions")
     .update({
@@ -183,7 +183,7 @@ async function handleOrderCreated(event: any) {
 }
 
 /**
- * Mapea el status de LemonSqueezy al status de nuestra base de datos
+ * Maps LemonSqueezy status to our database status
  */
 function mapLemonSqueezyStatus(status: string): "active" | "canceled" | "past_due" | "trialing" {
   switch (status) {
@@ -201,8 +201,8 @@ function mapLemonSqueezyStatus(status: string): "active" | "canceled" | "past_du
 }
 
 /**
- * Obtiene el tipo de plan basado en el variant_id
- * Nota: Estos variant IDs deben configurarse en las variables de entorno
+ * Gets the plan type based on variant_id
+ * Note: These variant IDs must be configured in environment variables
  */
 function getPlanTypeFromVariantId(variantId: string | number): "free" | "premium" | "team" | "agency" {
   const premiumVariantId = process.env.LEMONSQUEEZY_PREMIUM_VARIANT_ID;

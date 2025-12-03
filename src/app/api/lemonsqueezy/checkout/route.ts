@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 
 /**
- * API Route para crear un checkout de LemonSqueezy
+ * API Route to create a LemonSqueezy checkout
  * POST /api/lemonsqueezy/checkout
  */
 export async function POST(request: NextRequest) {
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verificar autenticación
+    // Verify authentication
     const authHeader = request.headers.get("authorization");
     if (!authHeader) {
       return NextResponse.json(
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Obtener el usuario desde Supabase
+    // Get user from Supabase
     const { data: { user }, error: authError } = await supabase.auth.getUser(
       authHeader.replace("Bearer ", "")
     );
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Crear checkout en LemonSqueezy
+    // Create checkout in LemonSqueezy
     const checkoutResponse = await fetch(
       `https://api.lemonsqueezy.com/v1/checkouts`,
       {

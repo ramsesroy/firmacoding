@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 
-// Función para obtener las variables de entorno de manera segura
+// Function to safely get environment variables
 function getSupabaseEnv() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -8,8 +8,8 @@ function getSupabaseEnv() {
   if (!supabaseUrl || !supabaseAnonKey) {
     console.error("Missing Supabase environment variables. Please check your .env.local file.");
     
-    // En lugar de lanzar error, retornamos valores por defecto vacíos
-    // para que la aplicación no se rompa
+    // Instead of throwing error, return empty default values
+    // so the application doesn't break
     return {
       url: supabaseUrl || "",
       key: supabaseAnonKey || "",
@@ -24,9 +24,9 @@ function getSupabaseEnv() {
 
 const { url, key } = getSupabaseEnv();
 
-// Crear el cliente de Supabase
-// Si no hay URL o key, aún creamos el cliente para evitar errores
-// pero mostrará errores más claros cuando se intente usar
+// Create Supabase client
+// If no URL or key, still create client to avoid errors
+// but will show clearer errors when trying to use it
 export const supabase = createClient(url || "https://placeholder.supabase.co", key || "placeholder-key", {
   auth: {
     persistSession: true,

@@ -4,7 +4,7 @@ import { generateQRCodeURL } from "./qrUtils";
 export async function generateSignatureHTML(
   data: SignatureProps,
   template: TemplateType,
-  userName: string = "Usuario"
+  userName: string = "User"
 ): Promise<string> {
   const { nombre, cargo, foto, telefono, redes = [], horario, textoAdicional, colorPersonalizado, qrLink, logoEmpresa, ctaTexto, telefonoMovil, direccion, iconoTelefono, iconoTelefonoMovil, iconoDireccion } = data;
 
@@ -75,11 +75,11 @@ export async function generateSignatureHTML(
       baseHTML = generateClassicHTML(nombre, cargo, foto, telefono, redes);
   }
 
-  // Retornar el HTML sin información de validación
+  // Return HTML without validation information
   return baseHTML;
 }
 
-// Función para obtener solo el HTML base sin validación (útil para calcular hash)
+// Function to get only base HTML without validation (useful for calculating hash)
 export function getBaseSignatureHTML(
   data: SignatureProps,
   template: TemplateType
@@ -2361,7 +2361,7 @@ function escapeHtml(text: string): string {
 export async function copyToClipboard(
   data: SignatureProps,
   template: TemplateType,
-  userName: string = "Usuario"
+  userName: string = "User"
 ): Promise<boolean> {
   // Generar el contenido HTML con validación
   const htmlContent = await generateSignatureHTML(data, template, userName);

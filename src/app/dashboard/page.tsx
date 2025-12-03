@@ -36,7 +36,7 @@ function DashboardContent() {
       setIsAuthenticated(!!session);
       setUser(session?.user || null);
       
-      // Verificar límites de guardado si está autenticado
+      // Check save limits if authenticated
       if (session?.user) {
         const limits = await canSaveSignature(session.user.id);
         setSaveLimit(limits);
@@ -60,7 +60,7 @@ function DashboardContent() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Actualizar límites cuando cambia la suscripción
+  // Update limits when subscription changes
   useEffect(() => {
     if (user?.id && !subscriptionLoading) {
       canSaveSignature(user.id).then(setSaveLimit);
@@ -427,7 +427,7 @@ function DashboardContent() {
         data = updateData;
         error = updateError;
       } else {
-        // Verificar límite de guardado antes de insertar nueva firma
+        // Check save limit before inserting new signature
         const { canSave, remaining, limit } = await canSaveSignature(session.user.id);
         
         if (!canSave) {
@@ -452,10 +452,10 @@ function DashboardContent() {
         data = insertData;
         error = insertError;
 
-        // Incrementar contador de firmas guardadas si se insertó correctamente
+          // Increment saved signatures counter if inserted successfully
         if (!error && insertData) {
           await incrementSavedSignatures(session.user.id);
-          // Actualizar límites
+          // Update limits
           const updatedLimits = await canSaveSignature(session.user.id);
           setSaveLimit(updatedLimits);
         }

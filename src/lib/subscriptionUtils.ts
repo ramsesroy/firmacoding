@@ -30,7 +30,7 @@ export interface UserLimits {
 }
 
 /**
- * Verifica si un usuario tiene plan premium activo
+ * Checks if a user has an active premium plan
  */
 export async function isPremiumUser(userId: string): Promise<boolean> {
   try {
@@ -41,11 +41,11 @@ export async function isPremiumUser(userId: string): Promise<boolean> {
       .single();
 
     if (error || !data) {
-      // Si no hay suscripción, es usuario free
+      // If no subscription exists, user is free
       return false;
     }
 
-    // Verificar que el plan no sea free y esté activo
+    // Verify that the plan is not free and is active
     const isActive = data.status === 'active' || data.status === 'trialing';
     const isPremium = data.plan_type !== 'free';
     const isNotExpired = new Date(data.current_period_end) > new Date();
@@ -58,7 +58,7 @@ export async function isPremiumUser(userId: string): Promise<boolean> {
 }
 
 /**
- * Obtiene la información de suscripción del usuario
+ * Gets the user's subscription information
  */
 export async function getUserSubscription(userId: string): Promise<Subscription | null> {
   try {
@@ -69,7 +69,7 @@ export async function getUserSubscription(userId: string): Promise<Subscription 
       .single();
 
     if (error || !data) {
-      // Si no existe suscripción, crear una free por defecto
+      // If subscription doesn't exist, create a free one by default
       return await createFreeSubscription(userId);
     }
 
@@ -81,7 +81,7 @@ export async function getUserSubscription(userId: string): Promise<Subscription 
 }
 
 /**
- * Crea una suscripción free por defecto para un usuario
+ * Creates a default free subscription for a user
  */
 export async function createFreeSubscription(userId: string): Promise<Subscription | null> {
   try {
@@ -92,7 +92,7 @@ export async function createFreeSubscription(userId: string): Promise<Subscripti
         plan_type: 'free',
         status: 'active',
         current_period_start: new Date().toISOString(),
-        current_period_end: new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000).toISOString(), // 100 años (ilimitado)
+        current_period_end: new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000).toISOString(), // 100 years (unlimited)
         cancel_at_period_end: false,
       })
       .select()
@@ -103,7 +103,7 @@ export async function createFreeSubscription(userId: string): Promise<Subscripti
       return null;
     }
 
-    // También crear límites iniciales
+    // Also create initial limits
     await supabase.from('user_limits').insert({
       user_id: userId,
       saved_signatures_count: 0,
@@ -119,18 +119,18 @@ export async function createFreeSubscription(userId: string): Promise<Subscripti
 }
 
 /**
- * Verifica si el usuario puede guardar más firmas
+ * Checks if the user can save more signatures
  */
 export async function canSaveSignature(userId: string): Promise<{ canSave: boolean; remaining: number; limit: number }> {
   try {
     const subscription = await getUserSubscription(userId);
     
-    // Premium users tienen límite ilimitado
+    // Premium users have unlimited limit
     if (subscription && subscription.plan_type !== 'free' && subscription.status === 'active') {
-      return { canSave: true, remaining: -1, limit: -1 }; // -1 significa ilimitado
+      return { canSave: true, remaining: -1, limit: -1 }; // -1 means unlimited
     }
 
-    // Para usuarios free, verificar límite
+    // For free users, check limit
     const { data: limits, error } = await supabase
       .from('user_limits')
       .select('saved_signatures_count, max_saved_signatures')
@@ -138,7 +138,7 @@ export async function canSaveSignature(userId: string): Promise<{ canSave: boole
       .single();
 
     if (error || !limits) {
-      // Crear registro inicial si no existe
+      // Create initial record if it doesn't exist
       const { data: newLimits } = await supabase
         .from('user_limits')
         .insert({
@@ -169,7 +169,7 @@ export async function canSaveSignature(userId: string): Promise<{ canSave: boole
 }
 
 /**
- * Incrementa el contador de firmas guardadas
+ * Increments the saved signatures counter
  */
 export async function incrementSavedSignatures(userId: string): Promise<boolean> {
   try {
@@ -178,7 +178,7 @@ export async function incrementSavedSignatures(userId: string): Promise<boolean>
     });
 
     if (error) {
-      // Fallback: actualizar manualmente si la función RPC no existe
+      // Fallback: update manually if RPC function doesn't exist
       const { data } = await supabase
         .from('user_limits')
         .select('saved_signatures_count')
@@ -222,7 +222,7 @@ export async function decrementSavedSignatures(userId: string): Promise<boolean>
     });
 
     if (error) {
-      // Fallback: actualizar manualmente
+      // Fallback: update manually
       const { data } = await supabase
         .from('user_limits')
         .select('saved_signatures_count')
@@ -248,7 +248,7 @@ export async function decrementSavedSignatures(userId: string): Promise<boolean>
 }
 
 /**
- * Obtiene los límites actuales del usuario
+ * Gets the current user limits
  */
 export async function getUserLimits(userId: string): Promise<UserLimits | null> {
   try {
@@ -259,7 +259,7 @@ export async function getUserLimits(userId: string): Promise<UserLimits | null> 
       .single();
 
     if (error || !data) {
-      // Crear límites por defecto
+      // Create default limits
       const { data: newLimits } = await supabase
         .from('user_limits')
         .insert({
@@ -282,7 +282,7 @@ export async function getUserLimits(userId: string): Promise<UserLimits | null> 
 }
 
 /**
- * Verifica si el usuario tiene acceso a una característica premium
+ * Checks if the user has access to a premium feature
  */
 export async function hasPremiumFeature(userId: string, feature: 'templates' | 'unlimited_saves' | 'analytics' | 'no_watermark'): Promise<boolean> {
   const isPremium = await isPremiumUser(userId);
@@ -291,7 +291,7 @@ export async function hasPremiumFeature(userId: string, feature: 'templates' | '
     return true;
   }
 
-  // Para usuarios free, algunas características están limitadas
+  // For free users, some features are limited
   switch (feature) {
     case 'templates':
       return false; // Solo tienen acceso a templates básicos

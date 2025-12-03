@@ -39,7 +39,7 @@ export default function SubscriptionPage() {
 
         setUser(session.user);
 
-        // Obtener límites
+        // Get limits
         const userLimits = await getUserLimits(session.user.id);
         if (userLimits) {
           const remaining = userLimits.max_saved_signatures === -1 
@@ -82,7 +82,7 @@ export default function SubscriptionPage() {
         return;
       }
 
-      // Crear checkout
+      // Create checkout
       const { checkout_url } = await createCheckout(premiumVariantId, session.access_token);
       
       // Redirigir al checkout

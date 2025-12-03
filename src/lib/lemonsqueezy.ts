@@ -8,7 +8,7 @@ export interface CheckoutResponse {
 }
 
 /**
- * Crea un checkout en LemonSqueezy para un usuario
+ * Creates a LemonSqueezy checkout for a user
  */
 export async function createCheckout(
   variantId: string,
