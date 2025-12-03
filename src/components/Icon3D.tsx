@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { ReactNode } from "react";
 
 interface Icon3DProps {
-  icon: string;
+  icon: string | ReactNode;
   className?: string;
   gradient?: string;
   size?: "sm" | "md" | "lg" | "xl";
@@ -57,10 +57,12 @@ export const Icon3D: React.FC<Icon3DProps> = ({
 
         {/* Icon content */}
         <div 
-          className="relative w-full h-full flex items-center justify-center z-10"
+          className="relative w-full h-full flex items-center justify-center z-10 text-white"
           style={{ transform: "translateZ(20px)" }}
         >
-          {icon}
+          {typeof icon === 'string' ? icon : React.cloneElement(icon as React.ReactElement, { 
+            className: `${(icon as React.ReactElement).props?.className || ''} text-white`,
+          })}
         </div>
 
         {/* Glow effect */}

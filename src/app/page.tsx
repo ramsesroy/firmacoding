@@ -7,6 +7,19 @@ import Pricing from "@/components/Pricing";
 import ScrollAnimation from "@/components/ScrollAnimation";
 import { Icon3D } from "@/components/Icon3D";
 import { useState } from "react";
+import { 
+  HiOutlineLightBulb, 
+  HiOutlineLockClosed, 
+  HiOutlineArrowUpTray,
+  HiOutlineEye,
+  HiOutlinePaintBrush,
+  HiOutlineDevicePhoneMobile,
+  HiOutlineSparkles,
+  HiOutlineChartBar,
+  HiOutlineDocumentText,
+  HiOutlineRocketLaunch,
+  HiOutlineUserCircle
+} from "react-icons/hi2";
 
 export default function LandingPage() {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
@@ -16,21 +29,24 @@ export default function LandingPage() {
       name: "Sarah Johnson",
       role: "Marketing Director",
       company: "TechCorp",
-      image: "👩‍💼",
+      icon: <HiOutlineUserCircle className="w-full h-full" />,
+      gradient: "from-blue-500 to-purple-500",
       text: "Creating professional signatures has never been easier. The templates are beautiful and the interface is intuitive. Saved me hours of work!",
     },
     {
       name: "Michael Chen",
       role: "Sales Manager",
       company: "Global Solutions",
-      image: "👨‍💼",
+      icon: <HiOutlineUserCircle className="w-full h-full" />,
+      gradient: "from-green-500 to-teal-500",
       text: "Our entire sales team now uses Signature For Me. The consistent branding across all our emails has improved our professional image significantly.",
     },
     {
       name: "Emily Rodriguez",
       role: "Freelance Designer",
       company: "Independent",
-      image: "👩‍🎨",
+      icon: <HiOutlineUserCircle className="w-full h-full" />,
+      gradient: "from-purple-500 to-pink-500",
       text: "As a freelancer, having a polished email signature is crucial. This tool helped me create multiple signatures for different clients effortlessly.",
     },
   ];
@@ -238,37 +254,37 @@ export default function LandingPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
             {[
               {
-                icon: "✨",
+                icon: <HiOutlineLightBulb className="w-full h-full" />,
                 title: "Intuitive Editor",
                 description: "Create customized signatures easily. No technical knowledge required. Drag, drop, and customize in minutes.",
                 gradient: "from-blue-500 to-cyan-500",
               },
               {
-                icon: "🔒",
+                icon: <HiOutlineLockClosed className="w-full h-full" />,
                 title: "Secure & Reliable",
                 description: "Your data is protected with the highest security standards. We never share your information with third parties.",
                 gradient: "from-purple-500 to-pink-500",
               },
               {
-                icon: "📤",
+                icon: <HiOutlineArrowUpTray className="w-full h-full" />,
                 title: "Easy Export",
                 description: "Compatible with Gmail, Outlook, Apple Mail, and any email client. One-click export in multiple formats.",
                 gradient: "from-green-500 to-emerald-500",
               },
               {
-                icon: "👁️",
+                icon: <HiOutlineEye className="w-full h-full" />,
                 title: "Live Preview",
                 description: "Visualize your signature in real-time as you create it. See exactly how it will look in emails.",
                 gradient: "from-orange-500 to-red-500",
               },
               {
-                icon: "🎨",
+                icon: <HiOutlinePaintBrush className="w-full h-full" />,
                 title: "Multiple Templates",
                 description: "Choose from 20+ professional templates. Each one is fully customizable to match your brand perfectly.",
                 gradient: "from-indigo-500 to-purple-500",
               },
               {
-                icon: "📱",
+                icon: <HiOutlineDevicePhoneMobile className="w-full h-full" />,
                 title: "100% Responsive",
                 description: "Create and edit from any device. Your signatures look perfect on desktop, tablet, and mobile.",
                 gradient: "from-teal-500 to-blue-500",
@@ -320,14 +336,14 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto">
             {[
               {
-                icon: "✨",
+                icon: <HiOutlineSparkles className="w-full h-full" />,
                 title: "AI Signature Enhancer",
                 description: "Get intelligent design suggestions powered by AI. Automatically optimize your signature based on your role, industry, and best practices.",
                 features: ["Smart layout recommendations", "Industry-specific optimizations", "Color scheme suggestions"],
                 gradient: "from-purple-500 to-indigo-600",
               },
               {
-                icon: "📊",
+                icon: <HiOutlineChartBar className="w-full h-full" />,
                 title: "Link Click Analytics",
                 description: "Track which links in your signature get the most clicks. Understand your audience and optimize your signature for maximum engagement.",
                 features: ["Real-time click tracking", "Performance dashboard", "Social media engagement insights"],
@@ -416,8 +432,8 @@ export default function LandingPage() {
                   }`}>
                     <div className="mb-4 flex justify-center">
                       <Icon3D 
-                        icon={testimonial.image} 
-                        gradient="from-blue-500 to-purple-500"
+                        icon={testimonial.icon} 
+                        gradient={testimonial.gradient}
                         size="lg"
                       />
                     </div>
@@ -466,19 +482,19 @@ export default function LandingPage() {
                 number: "1",
                 title: "Enter Your Information",
                 description: "Add your name, title, photo, and social links in a simple, intuitive form. No complex setup required.",
-                icon: "📝",
+                icon: <HiOutlineDocumentText className="w-full h-full" />,
               },
               {
                 number: "2",
                 title: "Customize Your Design",
                 description: "Choose from our beautiful templates and customize colors, fonts, and styles to match your brand perfectly.",
-                icon: "🎨",
+                icon: <HiOutlinePaintBrush className="w-full h-full" />,
               },
               {
                 number: "3",
                 title: "Copy & Use",
                 description: "Copy the HTML code or export as PNG/PDF. Paste it into your email client and you're ready to go!",
-                icon: "🚀",
+                icon: <HiOutlineRocketLaunch className="w-full h-full" />,
               },
             ].map((step, index) => (
               <ScrollAnimation key={index} direction="up" delay={index * 200} className="relative">
