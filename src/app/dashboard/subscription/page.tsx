@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useSubscription } from "@/hooks/useSubscription";
 import { getUserLimits, getUserSubscription } from "@/lib/subscriptionUtils";
@@ -11,14 +11,18 @@ import { MetadataHead } from "@/components/MetadataHead";
 import { SkeletonCard } from "@/components/Skeleton";
 import { createCheckout, getVariantIds } from "@/lib/lemonsqueezy";
 
+// Force dynamic rendering to support search params
+export const dynamic = "force-dynamic";
+
 interface UserLimits {
   saved_signatures_count: number;
   max_saved_signatures: number;
   remaining: number;
 }
 
-export default function SubscriptionPage() {
+function SubscriptionContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { showToast } = useToast();
   const { subscription, isPremium, loading: subscriptionLoading } = useSubscription();
   const [limits, setLimits] = useState<UserLimits | null>(null);
@@ -73,9 +77,20 @@ export default function SubscriptionPage() {
         return;
       }
 
-      // Get Premium variant ID (monthly by default)
+      // Check if a specific plan was requested via URL parameter
+      const planParam = searchParams.get("plan");
       const variantIds = getVariantIds();
-      const premiumVariantId = variantIds.premium;
+      
+      // Determine which variant to use based on plan parameter or default to monthly
+      let premiumVariantId: string | undefined;
+      if (planParam === "team" && variantIds.team) {
+        premiumVariantId = variantIds.team;
+      } else if (planParam === "agency" && variantIds.agency) {
+        premiumVariantId = variantIds.agency;
+      } else {
+        // Default to monthly premium
+        premiumVariantId = variantIds.premium;
+      }
 
       if (!premiumVariantId) {
         showToast("Premium plan not configured. Please contact support.", "error");
@@ -431,6 +446,18 @@ export default function SubscriptionPage() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function SubscriptionPage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        <SkeletonCard />
+      </div>
+    }>
+      <SubscriptionContent />
+    </Suspense>
   );
 }
 

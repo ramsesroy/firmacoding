@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
+import { useToast } from "@/components/Toast";
 
 interface Feature {
   text: string;
@@ -23,6 +26,52 @@ interface PricingTier {
 
 export default function Pricing() {
   const [isAnnual, setIsAnnual] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { showToast } = useToast();
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handlePricingClick = async (e: React.MouseEvent<HTMLAnchorElement>, tier: PricingTier) => {
+    // Prevent default link behavior for paid tiers
+    if (tier.name !== "Free" && !tier.ribbon) {
+      e.preventDefault();
+      
+      if (tier.ribbon) {
+        showToast(`${tier.name} plan is coming soon!`, "info");
+        return;
+      }
+
+      setIsLoading(true);
+      
+      // If not authenticated, redirect to login first
+      if (!isAuthenticated) {
+        showToast("Please sign in to upgrade", "info");
+        router.push(`/login?redirect=/dashboard/subscription&plan=${tier.name.toLowerCase()}`);
+        setIsLoading(false);
+        return;
+      }
+
+      // If authenticated, go to subscription page
+      router.push("/dashboard/subscription");
+      setIsLoading(false);
+    }
+  };
 
   const tiers: PricingTier[] = [
     {
@@ -245,18 +294,21 @@ export default function Pricing() {
                   {/* CTA Button */}
                   <Link
                     href={tier.ctaHref}
-                    className={`block w-full text-center py-3 px-4 rounded-lg font-medium transition-all duration-200 mb-6 ${
+                    className={`block w-full text-center py-3 px-4 rounded-lg font-medium transition-all duration-200 mb-6 relative ${
                       tier.popular
                         ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl"
                         : "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200"
-                    } ${tier.ribbon ? "opacity-50 cursor-not-allowed" : ""}`}
-                    onClick={(e) => {
-                      if (tier.ribbon) {
-                        e.preventDefault();
-                      }
-                    }}
+                    } ${tier.ribbon ? "opacity-50 cursor-not-allowed" : ""} ${isLoading ? "opacity-75 cursor-wait" : ""}`}
+                    onClick={(e) => handlePricingClick(e, tier)}
                   >
-                    {tier.ctaText}
+                    {isLoading && tier.name !== "Free" && !tier.ribbon ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <span className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                        Redirecting...
+                      </span>
+                    ) : (
+                      tier.ctaText
+                    )}
                   </Link>
 
                   {/* Features */}

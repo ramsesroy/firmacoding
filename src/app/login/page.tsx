@@ -19,6 +19,9 @@ export default function LoginPage() {
     // Check for authentication errors in URL
     const urlParams = new URLSearchParams(window.location.search);
     const authError = urlParams.get("error");
+    const redirectTo = urlParams.get("redirect");
+    const plan = urlParams.get("plan");
+    
     if (authError) {
       if (authError === "authentication_failed") {
         setError("Error authenticating with Google. Please try again.");
@@ -27,8 +30,10 @@ export default function LoginPage() {
       } else {
         setError("Authentication error. Please try again.");
       }
-      // Clear URL
-      window.history.replaceState({}, document.title, window.location.pathname);
+      // Clear URL but keep redirect params
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete("error");
+      window.history.replaceState({}, document.title, newUrl.toString());
     }
 
     // Check if already authenticated (without checking config, to always work)
@@ -44,7 +49,13 @@ export default function LoginPage() {
           return;
         }
         if (session) {
-          router.push("/dashboard");
+          // Redirect to specified path or default dashboard
+          if (redirectTo) {
+            const redirectUrl = plan ? `${redirectTo}?plan=${plan}` : redirectTo;
+            router.push(redirectUrl);
+          } else {
+            router.push("/dashboard");
+          }
         }
       } catch (err) {
         console.error("Error checking user:", err);
@@ -59,14 +70,20 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
 
+    // Get redirect params
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectTo = urlParams.get("redirect");
+    const plan = urlParams.get("plan");
+
     try {
       if (isSignUp) {
         // Sign up
+        const redirectUrl = redirectTo || "/dashboard";
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}${redirectUrl}`,
           },
         });
 
@@ -92,7 +109,13 @@ export default function LoginPage() {
         }
 
         if (data?.user) {
-          router.push("/dashboard");
+          // Redirect to specified path or default dashboard
+          if (redirectTo) {
+            const redirectUrl = plan ? `${redirectTo}?plan=${plan}` : redirectTo;
+            router.push(redirectUrl);
+          } else {
+            router.push("/dashboard");
+          }
           router.refresh(); // Refresh to ensure session loads
         }
       }
