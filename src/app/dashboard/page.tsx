@@ -14,6 +14,8 @@ import { useToast } from "@/components/Toast";
 import { MetadataHead } from "@/components/MetadataHead";
 import { SkeletonForm, SkeletonSignaturePreview } from "@/components/Skeleton";
 import { Watermark } from "@/components/Watermark";
+import { useSubscription } from "@/hooks/useSubscription";
+import { canSaveSignature, incrementSavedSignatures, decrementSavedSignatures } from "@/lib/subscriptionUtils";
 
 // Force dynamic rendering for this page to support search params
 export const dynamic = "force-dynamic";
@@ -24,6 +26,8 @@ function DashboardContent() {
   const { showToast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [user, setUser] = useState<any>(null);
+  const { isPremium, subscription, loading: subscriptionLoading } = useSubscription();
+  const [saveLimit, setSaveLimit] = useState<{ canSave: boolean; remaining: number; limit: number } | null>(null);
 
   // Check authentication on mount
   useEffect(() => {
@@ -31,17 +35,37 @@ function DashboardContent() {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
       setUser(session?.user || null);
+      
+      // Verificar límites de guardado si está autenticado
+      if (session?.user) {
+        const limits = await canSaveSignature(session.user.id);
+        setSaveLimit(limits);
+      }
     };
     checkAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setIsAuthenticated(!!session);
       setUser(session?.user || null);
+      
+      if (session?.user) {
+        const limits = await canSaveSignature(session.user.id);
+        setSaveLimit(limits);
+      } else {
+        setSaveLimit(null);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Actualizar límites cuando cambia la suscripción
+  useEffect(() => {
+    if (user?.id && !subscriptionLoading) {
+      canSaveSignature(user.id).then(setSaveLimit);
+    }
+  }, [isPremium, user?.id, subscriptionLoading]);
 
   
   // Example image URLs categorized by template type - Optimized for each template's specific dimensions and style
