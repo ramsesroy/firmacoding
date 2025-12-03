@@ -11,6 +11,7 @@ import { exportToPNG, exportToPDF, exportToPNGHQ, exportToPDFHQ, ExportSize, get
 import { useToast } from "@/components/Toast";
 import { MetadataHead } from "@/components/MetadataHead";
 import { SkeletonCard } from "@/components/Skeleton";
+import { decrementSavedSignatures } from "@/lib/subscriptionUtils";
 
 interface SignatureRecord {
   id: string;
@@ -89,6 +90,9 @@ export default function SignaturesPage() {
       setDeleting(true);
       setDeleteError(null);
 
+      // Get user session for decrementing counter
+      const { data: { session } } = await supabase.auth.getSession();
+
       const { error: deleteError } = await supabase
         .from("signatures")
         .delete()
@@ -98,12 +102,19 @@ export default function SignaturesPage() {
         throw deleteError;
       }
 
+      // Decrement saved signatures counter if user is authenticated
+      if (session?.user) {
+        await decrementSavedSignatures(session.user.id);
+      }
+
       // Close modal and reload list
       setDeleteConfirmId(null);
       await fetchSignatures();
+      showToast("Signature deleted successfully!", "success");
     } catch (err: any) {
       console.error("Error deleting signature:", err);
       setDeleteError(err.message || "Error deleting signature. Please try again.");
+      showToast("Error deleting signature", "error");
     } finally {
       setDeleting(false);
     }
