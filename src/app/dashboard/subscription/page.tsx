@@ -66,14 +66,14 @@ export default function SubscriptionPage() {
     try {
       setUpgrading(true);
       
-      // Obtener el token de sesión
+      // Get session token
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
         showToast("Please log in to upgrade", "error");
         return;
       }
 
-      // Obtener el variant ID de Premium (mensual por defecto)
+      // Get Premium variant ID (monthly by default)
       const variantIds = getVariantIds();
       const premiumVariantId = variantIds.premium;
 

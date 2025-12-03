@@ -474,7 +474,7 @@ function generateProfessionalHTML(
 </table>`;
 }
 
-// Minimal Corporate: Dos columnas separadas por línea vertical
+// Minimal Corporate: Two columns separated by vertical line
 function generateTemplate01HTML(
   nombre: string,
   cargo: string,
@@ -620,7 +620,7 @@ function generateTemplate02HTML(
 </table>`;
 }
 
-// Enterprise Vintage: Logo de empresa, línea azul, dos columnas, aviso confidencial, texto adicional
+// Enterprise Vintage: Company logo, blue line, two columns, confidential notice, additional text
 function generateTemplate03HTML(
   nombre: string,
   cargo: string,
@@ -726,7 +726,7 @@ function generateTemplate03HTML(
 </table>`;
 }
 
-// Modern 2: Foto cuadrada redondeada, línea vertical azul
+// Modern 2: Rounded square photo, vertical blue line
 function generateTemplate05HTML(
   nombre: string,
   cargo: string,
@@ -786,7 +786,7 @@ function generateTemplate05HTML(
 </table>`;
 }
 
-// QR Profesional: Con QR code, líneas punteadas, redes sociales, horario
+// QR Professional: With QR code, dotted lines, social media, schedule
 function generateTemplate06HTML(
   nombre: string,
   cargo: string,
@@ -883,7 +883,7 @@ function generateTemplate06HTML(
 </table>`;
 }
 
-// Modern 3: Foto cuadrada redondeada, línea vertical, iconos de redes
+// Modern 3: Rounded square photo, vertical line, social media icons
 function generateTemplate08HTML(
   nombre: string,
   cargo: string,
@@ -982,7 +982,7 @@ function generateTemplate08HTML(
 </table>`;
 }
 
-// Modern 4: Foto circular, línea vertical con color personalizado, botón CTA personalizable
+// Modern 4: Circular photo, vertical line with custom color, customizable CTA button
 function generateTemplate09HTML(
   nombre: string,
   cargo: string,
@@ -2363,13 +2363,13 @@ export async function copyToClipboard(
   template: TemplateType,
   userName: string = "User"
 ): Promise<boolean> {
-  // Generar el contenido HTML con validación
+  // Generate HTML content with validation
   const htmlContent = await generateSignatureHTML(data, template, userName);
 
   try {
-    // Crear un ClipboardItem con ambos formatos
-    // text/html: Para que se renderice en Gmail/clientes de correo
-    // text/plain: Contiene el HTML crudo para editores de código
+    // Create a ClipboardItem with both formats
+    // text/html: For rendering in Gmail/email clients
+    // text/plain: Contains raw HTML for code editors
     const clipboardItem = new ClipboardItem({
       "text/html": new Blob([htmlContent], { type: "text/html" }),
       "text/plain": new Blob([htmlContent], { type: "text/plain" }),
@@ -2378,9 +2378,9 @@ export async function copyToClipboard(
     await navigator.clipboard.write([clipboardItem]);
     return true;
   } catch (error) {
-    // Fallback para navegadores que no soportan ClipboardItem con múltiples tipos
+    // Fallback for browsers that don't support ClipboardItem with multiple types
     try {
-      // Crear un elemento temporal con el HTML
+      // Create a temporary element with the HTML
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = htmlContent;
       document.body.appendChild(tempDiv);

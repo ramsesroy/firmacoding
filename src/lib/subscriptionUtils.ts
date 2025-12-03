@@ -294,9 +294,9 @@ export async function hasPremiumFeature(userId: string, feature: 'templates' | '
   // For free users, some features are limited
   switch (feature) {
     case 'templates':
-      return false; // Solo tienen acceso a templates básicos
+      return false; // Free users only have access to basic templates
     case 'unlimited_saves':
-      return false; // Tienen límite de 3
+      return false; // Free users have a limit of 3 signatures
     case 'analytics':
       return false;
     case 'no_watermark':

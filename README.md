@@ -1,19 +1,20 @@
-# Signature For Me - SaaS de Editor de Firmas
+# Signature For Me - Email Signature Generator SaaS
 
-Proyecto SaaS para creación y gestión de firmas digitales.
+Professional email signature generator SaaS application built with Next.js, TypeScript, and Supabase.
 
-## Tecnologías
+## Technologies
 
-- Next.js 14
+- Next.js 16
 - TypeScript
 - Tailwind CSS
-- Supabase (Base de datos y autenticación)
+- Supabase (Database and Authentication)
+- LemonSqueezy (Payment Processing)
 
-## Configuración
+## Setup
 
-### Variables de Entorno
+### Environment Variables
 
-Crea un archivo `.env.local` en la raíz del proyecto con las siguientes variables:
+Create a `.env.local` file in the root directory with the following variables:
 
 ```env
 # Supabase Configuration
@@ -36,28 +37,31 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 # En producción: NEXT_PUBLIC_APP_URL=https://tu-dominio.com
 ```
 
-**Nota importante**: 
-- Puedes obtener las credenciales de Supabase desde tu proyecto en [Supabase](https://supabase.com).
-- Puedes obtener las credenciales de LemonSqueezy desde el panel de [LemonSqueezy](https://app.lemonsqueezy.com/).
-- Ver `LEMONSQUEEZY_SETUP.md` para instrucciones detalladas de configuración.
+**Important Notes**: 
+- You can get Supabase credentials from your project at [Supabase](https://supabase.com).
+- You can get LemonSqueezy credentials from the [LemonSqueezy](https://app.lemonsqueezy.com/) dashboard.
+- See `LEMONSQUEEZY_SETUP.md` for detailed setup instructions.
 
-### Base de Datos
+### Database
 
-Ejecuta el script SQL `supabase-setup.sql` en el SQL Editor de tu proyecto Supabase para crear la tabla `signatures` con las políticas de seguridad necesarias.
+Execute the SQL script `supabase-setup.sql` in the Supabase SQL Editor to create the `signatures` table with the necessary security policies.
 
-## Desarrollo
+Also execute `supabase-subscriptions.sql` to set up the subscription system.
+
+## Development
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Estructura del Proyecto
+## Project Structure
 
-- `/src/app` - Páginas de la aplicación
-- `/src/components` - Componentes reutilizables
-- `/src/lib` - Utilidades y funciones helper
-- `/src/types` - Definiciones de tipos TypeScript
+- `/src/app` - Application pages
+- `/src/components` - Reusable components
+- `/src/lib` - Utilities and helper functions
+- `/src/types` - TypeScript type definitions
+- `/src/hooks` - Custom React hooks
 
