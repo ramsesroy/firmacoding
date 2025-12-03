@@ -57,12 +57,16 @@ export const Icon3D: React.FC<Icon3DProps> = ({
 
         {/* Icon content */}
         <div 
-          className="relative w-full h-full flex items-center justify-center z-10 text-white"
-          style={{ transform: "translateZ(20px)" }}
+          className="relative w-full h-full flex items-center justify-center z-10"
+          style={{ transform: "translateZ(20px)", color: "white" }}
         >
-          {typeof icon === 'string' ? icon : React.cloneElement(icon as React.ReactElement, { 
-            className: `${(icon as React.ReactElement).props?.className || ''} text-white`,
-          })}
+          {typeof icon === 'string' ? (
+            <span className="text-white">{icon}</span>
+          ) : (
+            <div className="text-white [&>svg]:text-white [&>svg]:fill-white [&>svg]:stroke-white">
+              {icon}
+            </div>
+          )}
         </div>
 
         {/* Glow effect */}
