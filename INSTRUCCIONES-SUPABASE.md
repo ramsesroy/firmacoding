@@ -94,3 +94,4 @@ DROP POLICY IF EXISTS "Public read access to demomail" ON storage.objects;
 
 Y luego ejecuta el código de las políticas nuevamente.
 
+

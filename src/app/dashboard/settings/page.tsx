@@ -150,27 +150,33 @@ export default function SettingsPage() {
           keywords={["settings", "account", "preferences"]}
         />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
-        <div className="mb-4 sm:mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="material-symbols-outlined text-3xl text-blue-600">settings</span>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Settings</h1>
+          <div className="mb-4 sm:mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="material-symbols-outlined text-3xl text-blue-600">settings</span>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Settings</h1>
+            </div>
+            <p className="text-sm sm:text-base text-gray-600 ml-11">
+              Manage your account preferences
+            </p>
           </div>
-          <p className="text-sm sm:text-base text-gray-600 ml-11">
-            Manage your account preferences
-          </p>
+          <div className="bg-white rounded-lg shadow-md p-8 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p className="mt-4 text-gray-600">Loading settings...</p>
+          </div>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-8 text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Loading settings...</p>
-        </div>
-      </div>
       </>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
-      <div className="mb-4 sm:mb-8">
+    <>
+      <MetadataHead
+        title="Settings - Signature For Me"
+        description="Manage your Signature For Me account settings and preferences."
+        keywords={["settings", "account", "preferences"]}
+      />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        <div className="mb-4 sm:mb-8">
         <div className="flex items-center gap-3 mb-2">
           <span className="material-symbols-outlined text-3xl text-blue-600">settings</span>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Settings</h1>

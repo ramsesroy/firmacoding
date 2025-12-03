@@ -63,3 +63,4 @@ CREATE POLICY "Public read access to demomail"
     TO public
     USING (bucket_id = 'demomail');
 
+

@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
         keywords={["forgot password", "reset password", "recovery"]}
       />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
-      <div className="max-w-md w-full space-y-8">
+        <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Link href="/" className="inline-block">
             <div className="text-3xl font-bold text-gray-900 mb-2">
@@ -125,8 +125,8 @@ export default function ForgotPasswordPage() {
             ← Back to home
           </Link>
         </div>
+        </div>
       </div>
-    </div>
     </>
   );
 }
