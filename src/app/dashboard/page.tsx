@@ -42,18 +42,6 @@ function DashboardContent() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Define free templates (first 6)
-  const freeTemplates: TemplateType[] = [
-    "professional",
-    "classic",
-    "modern",
-    "modernaSinBarra",
-    "qrProfesional",
-    "developerMinimal2025"
-  ];
-
-  // Check if current template is premium
-  const isPremiumTemplate = !freeTemplates.includes(template);
   
   // Example image URLs categorized by template type - Optimized for each template's specific dimensions and style
   const getExamplePhoto = (template: TemplateType): string => {
@@ -153,6 +141,20 @@ function DashboardContent() {
   });
 
   const [template, setTemplate] = useState<TemplateType>("professional");
+
+  // Define free templates (first 6)
+  const freeTemplates: TemplateType[] = [
+    "professional",
+    "classic",
+    "modern",
+    "modernaSinBarra",
+    "qrProfesional",
+    "developerMinimal2025"
+  ];
+
+  // Check if current template is premium
+  const isPremiumTemplate = !freeTemplates.includes(template);
+
   const [nuevaRed, setNuevaRed] = useState({ nombre: "", url: "", icono: "" });
   const [copied, setCopied] = useState(false);
   const [uploading, setUploading] = useState(false);
