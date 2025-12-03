@@ -4,7 +4,6 @@ import "./globals.css";
 import { ToastProvider } from "@/components/Toast";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-import { isAnalyticsEnabled } from "@/lib/analytics";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const inter = Inter({
@@ -111,7 +110,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ErrorBoundary>
           <ToastProvider>
-            {isAnalyticsEnabled() && <GoogleAnalytics />}
+            <GoogleAnalytics />
             {children}
           </ToastProvider>
         </ErrorBoundary>
