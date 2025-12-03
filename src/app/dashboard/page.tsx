@@ -427,6 +427,19 @@ function DashboardContent() {
         data = updateData;
         error = updateError;
       } else {
+        // Verificar límite de guardado antes de insertar nueva firma
+        const { canSave, remaining, limit } = await canSaveSignature(session.user.id);
+        
+        if (!canSave) {
+          throw new Error(
+            `You've reached your limit of ${limit} saved signatures. ${
+              remaining === 0 
+                ? "Upgrade to Premium to save unlimited signatures!" 
+                : `You can save ${remaining} more signature${remaining > 1 ? 's' : ''}.`
+            }`
+          );
+        }
+
         // Insert new signature
         signatureRecord.user_id = session.user.id; // Associate signature with authenticated user
         
@@ -438,6 +451,14 @@ function DashboardContent() {
         
         data = insertData;
         error = insertError;
+
+        // Incrementar contador de firmas guardadas si se insertó correctamente
+        if (!error && insertData) {
+          await incrementSavedSignatures(session.user.id);
+          // Actualizar límites
+          const updatedLimits = await canSaveSignature(session.user.id);
+          setSaveLimit(updatedLimits);
+        }
       }
 
       if (error) {
