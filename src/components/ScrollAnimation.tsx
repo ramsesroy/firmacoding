@@ -7,6 +7,7 @@ interface ScrollAnimationProps {
   className?: string;
   delay?: number;
   direction?: "up" | "down" | "left" | "right" | "fade";
+  onClick?: () => void;
 }
 
 export default function ScrollAnimation({
@@ -14,6 +15,7 @@ export default function ScrollAnimation({
   className = "",
   delay = 0,
   direction = "up",
+  onClick,
 }: ScrollAnimationProps) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -57,6 +59,7 @@ export default function ScrollAnimation({
     <div
       ref={ref}
       className={`opacity-0 ${directionClasses[direction]} ${className}`}
+      onClick={onClick}
     >
       {children}
     </div>
