@@ -57,7 +57,7 @@ export default function Pricing() {
         { text: "Priority email support" },
       ],
       ctaText: "Upgrade now",
-      ctaHref: "/dashboard",
+      ctaHref: "/dashboard/subscription",
       badge: "MOST POPULAR",
       popular: true,
       gradient: true,
@@ -77,7 +77,7 @@ export default function Pricing() {
         { text: "Priority support" },
       ],
       ctaText: "Upgrade now",
-      ctaHref: "/dashboard",
+      ctaHref: "/dashboard/subscription",
       ribbon: "Coming Soon",
     },
     {
@@ -95,7 +95,7 @@ export default function Pricing() {
         { text: "Dedicated account manager" },
       ],
       ctaText: "Upgrade now",
-      ctaHref: "/dashboard",
+      ctaHref: "/dashboard/subscription",
       ribbon: "Coming Soon",
     },
   ];

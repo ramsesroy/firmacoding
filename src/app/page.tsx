@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Pricing from "@/components/Pricing";
 import ScrollAnimation from "@/components/ScrollAnimation";
+import { Icon3D } from "@/components/Icon3D";
 import { useState } from "react";
 
 export default function LandingPage() {
@@ -282,8 +283,12 @@ export default function LandingPage() {
                 <div className="h-full bg-white rounded-2xl p-8 border-2 border-gray-100 hover:border-transparent hover:shadow-2xl transition-all duration-300 relative overflow-hidden">
                   <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
                   <div className="relative z-10">
-                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center text-2xl mb-6 transform group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 shadow-lg`}>
-                      {feature.icon}
+                    <div className="mb-6">
+                      <Icon3D 
+                        icon={feature.icon} 
+                        gradient={feature.gradient}
+                        size="md"
+                      />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
                     <p className="text-gray-600 leading-relaxed">{feature.description}</p>
@@ -332,8 +337,12 @@ export default function LandingPage() {
               <ScrollAnimation key={index} direction={index % 2 === 0 ? "right" : "left"} delay={index * 200}>
                 <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 group h-full">
                   <div className="flex items-start gap-4">
-                    <div className={`flex-shrink-0 w-16 h-16 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      {feature.icon}
+                    <div className="flex-shrink-0">
+                      <Icon3D 
+                        icon={feature.icon} 
+                        gradient={feature.gradient}
+                        size="lg"
+                      />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-2xl font-bold text-gray-900 mb-3">{feature.title}</h3>
@@ -405,7 +414,13 @@ export default function LandingPage() {
                       ? "border-blue-500 shadow-2xl" 
                       : "border-gray-100 hover:border-gray-200 hover:shadow-xl"
                   }`}>
-                    <div className="text-4xl mb-4">{testimonial.image}</div>
+                    <div className="mb-4 flex justify-center">
+                      <Icon3D 
+                        icon={testimonial.image} 
+                        gradient="from-blue-500 to-purple-500"
+                        size="lg"
+                      />
+                    </div>
                     <p className="text-gray-700 leading-relaxed mb-6 italic">
                       "{testimonial.text}"
                     </p>
@@ -468,9 +483,12 @@ export default function LandingPage() {
             ].map((step, index) => (
               <ScrollAnimation key={index} direction="up" delay={index * 200} className="relative">
                 <div className="text-center group">
-                  <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 text-white text-2xl font-bold mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300 z-10">
-                    <span className="text-4xl">{step.icon}</span>
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300"></div>
+                  <div className="relative inline-flex items-center justify-center mb-6 z-10">
+                    <Icon3D 
+                      icon={step.icon} 
+                      gradient="from-blue-600 to-purple-600"
+                      size="xl"
+                    />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3">{step.title}</h3>
                   <p className="text-gray-600 leading-relaxed">{step.description}</p>
