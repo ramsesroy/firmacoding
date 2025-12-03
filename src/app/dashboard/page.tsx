@@ -655,82 +655,78 @@ function DashboardContent() {
 
                 {/* Upgrade Banner - Only show for non-authenticated users */}
                 {!isAuthenticated && (
-                  <div className="mt-6 relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 border-2 border-blue-200/50 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                  <div className="mt-6 relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 border-2 border-blue-200/50 shadow-lg hover:shadow-xl transition-all duration-300">
                     {/* Animated background pattern */}
-                    <div className="absolute inset-0 opacity-10">
+                    <div className="absolute inset-0 opacity-5">
                       <div className="absolute inset-0" style={{
                         backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%233b82f6' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-                        backgroundSize: '40px 40px',
+                        backgroundSize: '30px 30px',
                       }}></div>
                     </div>
 
-                    <div className="relative p-6 sm:p-8">
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                        {/* Icon */}
-                        <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-300">
-                          <span className="material-symbols-outlined text-white text-3xl sm:text-4xl" style={{ fontVariationSettings: '"FILL" 1, "wght" 600' }}>
-                            stars
-                          </span>
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full">
-                              <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
-                              Unlock Premium
+                    <div className="relative p-4 sm:p-5">
+                      <div className="flex flex-col gap-4">
+                        {/* Header with Icon and Badge */}
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg">
+                            <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: '"FILL" 1, "wght" 600' }}>
+                              stars
                             </span>
                           </div>
-                          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-                            Get Access to 14+ Premium Templates
-                          </h3>
-                          <p className="text-gray-700 text-sm sm:text-base leading-relaxed mb-4">
-                            Create stunning professional signatures with our exclusive premium templates. 
-                            <span className="font-semibold text-blue-700"> Sign up for free</span> and unlock unlimited access to all templates.
-                          </p>
-                          
-                          {/* Features list */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
-                            {[
-                              "14+ Premium Templates",
-                              "Unlimited Signatures",
-                              "Save & Manage All",
-                              "No Watermarks"
-                            ].map((feature, idx) => (
-                              <div key={idx} className="flex items-center gap-2 text-sm text-gray-700">
-                                <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                </svg>
-                                <span className="font-medium">{feature}</span>
-                              </div>
-                            ))}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-blue-600 text-white text-xs font-bold rounded-full">
+                                <span className="w-1 h-1 bg-white rounded-full animate-pulse"></span>
+                                Premium
+                              </span>
+                            </div>
+                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
+                              Unlock 14+ Premium Templates
+                            </h3>
                           </div>
                         </div>
 
-                        {/* CTA Button */}
-                        <div className="flex-shrink-0 w-full sm:w-auto">
+                        {/* Description */}
+                        <p className="text-gray-700 text-sm leading-relaxed">
+                          Create stunning professional signatures with our exclusive premium templates. 
+                          <span className="font-semibold text-blue-700"> Sign up for free</span> and unlock unlimited access.
+                        </p>
+                        
+                        {/* Features list - Compact */}
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                              "14+ Premium Templates",
+                              "Unlimited Signatures",
+                              "Save & Manage",
+                              "No Watermarks"
+                            ].map((feature, idx) => (
+                              <div key={idx} className="flex items-center gap-1.5 text-xs text-gray-700">
+                                <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                </svg>
+                                <span className="font-medium truncate">{feature}</span>
+                              </div>
+                            ))}
+                        </div>
+
+                        {/* CTA Button - Full width on mobile */}
+                        <div className="pt-2">
                           <Link
                             href="/login"
-                            className="group/btn inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white font-bold rounded-xl shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-300 hover:scale-105 active:scale-95"
-                            style={{
-                              backgroundSize: '200% 100%',
-                            }}
+                            className="group/btn inline-flex items-center justify-center gap-2 w-full px-5 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                           >
-                            <span className="material-symbols-outlined text-xl">rocket_launch</span>
-                            <span>Sign Up Free</span>
-                            <svg className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <span className="material-symbols-outlined text-lg">rocket_launch</span>
+                            <span>Sign Up Free - No Credit Card</span>
+                            <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
                           </Link>
-                          <p className="mt-2 text-xs text-center sm:text-left text-gray-600">
-                            <span className="font-semibold">No credit card</span> required • Takes 30 seconds
-                          </p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Decorative corner accent */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-bl-full"></div>
+                    {/* Decorative corner accent - Smaller */}
+                    <div className="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-blue-400/15 to-purple-400/15 rounded-bl-full"></div>
                   </div>
                 )}
               </div>
