@@ -12,6 +12,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/components/Toast";
 import { MetadataHead } from "@/components/MetadataHead";
 import { SkeletonForm, SkeletonSignaturePreview } from "@/components/Skeleton";
+import { Watermark } from "@/components/Watermark";
 
 // Force dynamic rendering for this page to support search params
 export const dynamic = "force-dynamic";
@@ -20,6 +21,39 @@ function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showToast } = useToast();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [user, setUser] = useState<any>(null);
+
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+      setUser(session?.user || null);
+    };
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Define free templates (first 6)
+  const freeTemplates: TemplateType[] = [
+    "professional",
+    "classic",
+    "modern",
+    "modernaSinBarra",
+    "qrProfesional",
+    "developerMinimal2025"
+  ];
+
+  // Check if current template is premium
+  const isPremiumTemplate = !freeTemplates.includes(template);
   
   // Example image URLs categorized by template type - Optimized for each template's specific dimensions and style
   const getExamplePhoto = (template: TemplateType): string => {
@@ -500,33 +534,46 @@ function DashboardContent() {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
                   {[
-                    { id: "professional", name: "Professional", badge: "Most Popular", icon: "palette", color: "from-purple-500 to-indigo-600" },
-                    { id: "classic", name: "Classic", icon: "description", color: "from-gray-500 to-gray-700" },
-                    { id: "modern", name: "Modern", icon: "auto_awesome", color: "from-pink-500 to-rose-600" },
-                    { id: "modernaSinBarra", name: "Modern Clean", icon: "diamond", color: "from-cyan-500 to-blue-600" },
-                    { id: "qrProfesional", name: "QR Professional", icon: "qr_code_scanner", color: "from-green-500 to-emerald-600" },
-                    { id: "developerMinimal2025", name: "Developer Pro", icon: "code", color: "from-slate-700 to-gray-900", badge: "Premium" },
-                    { id: "ultraMinimal", name: "Ultra Minimal", icon: "minimize", color: "from-gray-600 to-gray-800", badge: "Premium" },
-                    { id: "growthMarketing", name: "Growth Marketing", icon: "trending_up", color: "from-purple-500 to-pink-600", badge: "Premium" },
-                    { id: "freelanceDesigner", name: "Freelance Designer", icon: "brush", color: "from-orange-500 to-red-600", badge: "Premium" },
-                    { id: "corporateConsultant", name: "Corporate Elite", icon: "business", color: "from-blue-600 to-indigo-700", badge: "Premium" },
-                    { id: "interiorDesign", name: "Interior Design", icon: "home", color: "from-amber-600 to-orange-700", badge: "New" },
-                    { id: "universityProfessor", name: "University Professor", icon: "school", color: "from-blue-500 to-blue-700", badge: "New" },
-                    { id: "universityBanner", name: "University Banner", icon: "account_balance", color: "from-blue-400 to-blue-600", badge: "New" },
-                    { id: "creativePortfolio", name: "Creative Portfolio", icon: "palette", color: "from-pink-500 to-purple-600", badge: "New" },
-                    { id: "militaryProfessional", name: "Military Professional", icon: "military_tech", color: "from-green-700 to-green-900", badge: "New" },
-                    { id: "churchProfessional", name: "Church Coordinator", icon: "church", color: "from-teal-500 to-cyan-600", badge: "New" },
-                    { id: "universityPresident", name: "University President", icon: "school", color: "from-amber-700 to-orange-800", badge: "New" },
-                    { id: "pastorSignature", name: "Pastor Signature", icon: "volunteer_activism", color: "from-teal-400 to-cyan-500", badge: "New" },
-                    { id: "lawStudent", name: "Law Student", icon: "gavel", color: "from-emerald-600 to-green-700", badge: "New" },
-                    { id: "greenExecutive", name: "Green Executive", icon: "eco", color: "from-green-600 to-emerald-700", badge: "New" },
-                  ].map((tpl) => (
+                    { id: "professional", name: "Professional", badge: "Most Popular", icon: "palette", color: "from-purple-500 to-indigo-600", isPremium: false },
+                    { id: "classic", name: "Classic", icon: "description", color: "from-gray-500 to-gray-700", isPremium: false },
+                    { id: "modern", name: "Modern", icon: "auto_awesome", color: "from-pink-500 to-rose-600", isPremium: false },
+                    { id: "modernaSinBarra", name: "Modern Clean", icon: "diamond", color: "from-cyan-500 to-blue-600", isPremium: false },
+                    { id: "qrProfesional", name: "QR Professional", icon: "qr_code_scanner", color: "from-green-500 to-emerald-600", isPremium: false },
+                    { id: "developerMinimal2025", name: "Developer Pro", icon: "code", color: "from-slate-700 to-gray-900", badge: "Premium", isPremium: false },
+                    { id: "ultraMinimal", name: "Ultra Minimal", icon: "minimize", color: "from-gray-600 to-gray-800", badge: "Premium", isPremium: true },
+                    { id: "growthMarketing", name: "Growth Marketing", icon: "trending_up", color: "from-purple-500 to-pink-600", badge: "Premium", isPremium: true },
+                    { id: "freelanceDesigner", name: "Freelance Designer", icon: "brush", color: "from-orange-500 to-red-600", badge: "Premium", isPremium: true },
+                    { id: "corporateConsultant", name: "Corporate Elite", icon: "business", color: "from-blue-600 to-indigo-700", badge: "Premium", isPremium: true },
+                    { id: "interiorDesign", name: "Interior Design", icon: "home", color: "from-amber-600 to-orange-700", badge: "New", isPremium: true },
+                    { id: "universityProfessor", name: "University Professor", icon: "school", color: "from-blue-500 to-blue-700", badge: "New", isPremium: true },
+                    { id: "universityBanner", name: "University Banner", icon: "account_balance", color: "from-blue-400 to-blue-600", badge: "New", isPremium: true },
+                    { id: "creativePortfolio", name: "Creative Portfolio", icon: "palette", color: "from-pink-500 to-purple-600", badge: "New", isPremium: true },
+                    { id: "militaryProfessional", name: "Military Professional", icon: "military_tech", color: "from-green-700 to-green-900", badge: "New", isPremium: true },
+                    { id: "churchProfessional", name: "Church Coordinator", icon: "church", color: "from-teal-500 to-cyan-600", badge: "New", isPremium: true },
+                    { id: "universityPresident", name: "University President", icon: "school", color: "from-amber-700 to-orange-800", badge: "New", isPremium: true },
+                    { id: "pastorSignature", name: "Pastor Signature", icon: "volunteer_activism", color: "from-teal-400 to-cyan-500", badge: "New", isPremium: true },
+                    { id: "lawStudent", name: "Law Student", icon: "gavel", color: "from-emerald-600 to-green-700", badge: "New", isPremium: true },
+                    { id: "greenExecutive", name: "Green Executive", icon: "eco", color: "from-green-600 to-emerald-700", badge: "New", isPremium: true },
+                  ]
+                  .filter((tpl) => {
+                    // Show all templates if authenticated, only free templates if not
+                    if (isAuthenticated === null) return true; // Show all while checking
+                    return isAuthenticated || !tpl.isPremium;
+                  })
+                  .map((tpl) => (
                     <button
                       key={tpl.id}
                       type="button"
                       aria-label={`Select ${tpl.name} template`}
                       aria-pressed={template === tpl.id}
                       onClick={() => {
+                        // Check if template is premium and user is not authenticated
+                        if (tpl.isPremium && !isAuthenticated) {
+                          showToast("Please sign up or log in to access premium templates!", "info");
+                          router.push("/login");
+                          return;
+                        }
+
                         const newTemplate = tpl.id as TemplateType;
                         setTemplate(newTemplate);
                         
@@ -1223,7 +1270,8 @@ function DashboardContent() {
                 backgroundPosition: '0 0, 15px 15px'
               }}
             >
-              <div ref={previewRef} className="flex items-center justify-center min-h-[350px] bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+              <div ref={previewRef} className="relative flex items-center justify-center min-h-[350px] bg-white rounded-xl shadow-lg border border-gray-100 p-6 overflow-hidden">
+                <Watermark enabled={!isAuthenticated && isPremiumTemplate} />
                 <SignaturePreview
                   nombre={signatureData.nombre}
                   cargo={signatureData.cargo}
