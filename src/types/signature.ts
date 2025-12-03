@@ -10,18 +10,18 @@ export interface SignatureProps {
   foto?: string;
   telefono?: string;
   redes?: RedSocial[];
-  // Campos adicionales para templates específicos
-  horario?: string; // Para QR Profesional
-  textoAdicional?: string; // Para Enterprise Vintage
-  colorPersonalizado?: string; // Para Moderna sin barra, Modern 4
-  qrLink?: string; // Para QR Profesional y QR Corporated
-  logoEmpresa?: string; // Para Enterprise Vintage y Professional
-  ctaTexto?: string; // Para Modern 4 (texto del botón CTA)
-  telefonoMovil?: string; // Para Professional (teléfono móvil adicional)
-  direccion?: string; // Para Professional (dirección)
-  iconoTelefono?: string; // Icono personalizable para teléfono
-  iconoDireccion?: string; // Icono personalizable para dirección
-  iconoTelefonoMovil?: string; // Icono personalizable para teléfono móvil
+  // Additional fields for specific templates
+  horario?: string; // For QR Professional
+  textoAdicional?: string; // For Enterprise Vintage
+  colorPersonalizado?: string; // For Modern without bar, Modern 4
+  qrLink?: string; // For QR Professional and QR Corporate
+  logoEmpresa?: string; // For Enterprise Vintage and Professional
+  ctaTexto?: string; // For Modern 4 (CTA button text)
+  telefonoMovil?: string; // For Professional (additional mobile phone)
+  direccion?: string; // For Professional (address)
+  iconoTelefono?: string; // Customizable icon for phone
+  iconoDireccion?: string; // Customizable icon for address
+  iconoTelefonoMovil?: string; // Customizable icon for mobile phone
 }
 
 export type TemplateType = 

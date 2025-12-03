@@ -1,12 +1,12 @@
 /**
- * Genera la URL de un código QR usando una API pública
- * @param text - Texto o URL para generar el QR
- * @param size - Tamaño del QR en píxeles (default: 200)
- * @returns URL de la imagen del código QR
+ * Generates the URL of a QR code using a public API
+ * @param text - Text or URL to generate the QR code
+ * @param size - QR code size in pixels (default: 200)
+ * @returns URL of the QR code image
  */
 export function generateQRCodeURL(text: string, size: number = 200): string {
-  // Usar API pública de QR code (qrcode.tec-it.com o similar)
-  // Escapar el texto para la URL
+  // Use public QR code API (qrcode.tec-it.com or similar)
+  // Escape text for URL
   const encodedText = encodeURIComponent(text);
   
   // API de QR Server - gratuita y confiable
@@ -14,10 +14,10 @@ export function generateQRCodeURL(text: string, size: number = 200): string {
 }
 
 /**
- * Genera la URL de un código QR para un vCard (contacto)
- * @param contactData - Datos del contacto
- * @param size - Tamaño del QR en píxeles (default: 200)
- * @returns URL de la imagen del código QR
+ * Generates the URL of a QR code for a vCard (contact)
+ * @param contactData - Contact data
+ * @param size - QR code size in pixels (default: 200)
+ * @returns URL of the QR code image
  */
 export function generateVCardQRCodeURL(
   contactData: {

@@ -30,7 +30,7 @@ export const Watermark: React.FC<WatermarkProps> = ({ enabled = true }) => {
       {/* Overlay semi-transparent */}
       <div className="absolute inset-0 bg-white/5 backdrop-blur-[1px]"></div>
       
-      {/* Logo central más grande */}
+      {/* Larger central logo */}
       <div className="relative z-10 bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-2xl border-2 border-gray-300/50 transform rotate-[-5deg]">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -45,7 +45,7 @@ export const Watermark: React.FC<WatermarkProps> = ({ enabled = true }) => {
         </div>
       </div>
       
-      {/* Mensaje de upgrade */}
+      {/* Upgrade message */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 bg-blue-600/95 backdrop-blur-sm text-white px-6 py-3 rounded-xl shadow-2xl border-2 border-blue-400/50">
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined">lock</span>
