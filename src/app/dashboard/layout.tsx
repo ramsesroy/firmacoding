@@ -21,10 +21,16 @@ export default function DashboardLayout({
 
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      setUser(session.user);
-    }
+    setUser(session?.user || null);
   };
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -126,26 +132,36 @@ export default function DashboardLayout({
 
         {/* User Info & Logout */}
         <div className="p-4 border-t border-gray-200 space-y-4">
-          {user && (
-            <div className="flex items-center gap-3 px-2 py-2">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <span className="material-symbols-outlined text-blue-600 text-xl">person</span>
+          {user ? (
+            <>
+              <div className="flex items-center gap-3 px-2 py-2">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-blue-600 text-xl">person</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    {user.user_metadata?.full_name || user.email?.split("@")[0] || "User"}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
-                  {user.user_metadata?.full_name || user.email?.split("@")[0] || "User"}
-                </p>
-                <p className="text-xs text-gray-500 truncate">{user.email}</p>
-              </div>
-            </div>
+              <button
+                onClick={handleSignOut}
+                className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 text-sm font-medium"
+              >
+                <span className="material-symbols-outlined text-xl">logout</span>
+                <span>Sign Out</span>
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center justify-center gap-3 w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 text-sm font-semibold shadow-lg shadow-blue-500/30"
+            >
+              <span className="material-symbols-outlined text-xl">login</span>
+              <span>Sign In</span>
+            </Link>
           )}
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-3 w-full px-4 py-2.5 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 text-sm font-medium"
-          >
-            <span className="material-symbols-outlined text-xl">logout</span>
-            <span>Sign Out</span>
-          </button>
         </div>
       </aside>
 
