@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next'
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://signaturefor.me'
 
-  // Páginas estáticas principales
+  // Main static pages
   const routes = [
     '',
     '/about',
@@ -17,8 +17,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/legal/license',
   ]
 
-  // Obtener posts del blog (si existen)
-  // En el futuro, puedes hacer esto dinámico leyendo de la base de datos
+  // Get blog posts (if they exist)
+  // In the future, you can make this dynamic by reading from the database
   const blogPosts: string[] = [
     '/blog/how-to-create-professional-email-signature-gmail-outlook-2026',
     '/blog/how-to-create-professional-email-signature-5-minutes-2026',
@@ -27,7 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ]
 
   const sitemap: MetadataRoute.Sitemap = [
-    // Página principal - prioridad más alta
+    // Homepage - highest priority
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -36,9 +36,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ]
 
-  // Otras páginas principales
+  // Other main pages
   for (const route of routes) {
-    if (route === '') continue; // Ya agregada arriba
+    if (route === '') continue; // Already added above
     
     const changeFreq: MetadataRoute.Sitemap[number]['changeFrequency'] = 
       route === '/blog' ? 'daily' : 'weekly';
@@ -51,7 +51,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })
   }
 
-  // Posts del blog
+  // Blog posts
   for (const post of blogPosts) {
     sitemap.push({
       url: `${baseUrl}${post}`,

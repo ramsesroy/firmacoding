@@ -9,7 +9,7 @@ export function generateQRCodeURL(text: string, size: number = 200): string {
   // Escape text for URL
   const encodedText = encodeURIComponent(text);
   
-  // API de QR Server - gratuita y confiable
+  // QR Server API - free and reliable
   return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodedText}`;
 }
 

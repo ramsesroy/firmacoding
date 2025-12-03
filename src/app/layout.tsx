@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    // Google Search Console verification - agregar cuando tengas el código
+    // Google Search Console verification - add when you have the code
     // google: "verification-code",
   },
   alternates: {

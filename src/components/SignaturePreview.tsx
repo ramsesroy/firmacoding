@@ -742,7 +742,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = memo(({
     );
   };
 
-  // Minimal Corporate: Dos columnas separadas por línea vertical
+  // Minimal Corporate: Two columns separated by vertical line
   const renderTemplate01 = () => {
     const cargoParts = (cargo || "").split("|").map((p) => p.trim());
     const cargoTitle = cargoParts[0] || cargo || "Tu Cargo";
@@ -1080,7 +1080,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = memo(({
     );
   };
 
-  // Enterprise Vintage: Logo de empresa, línea azul, dos columnas, aviso confidencial
+  // Enterprise Vintage: Company logo, blue line, two columns, confidential notice
   const renderTemplate03 = () => {
     const cargoParts = (cargo || "").split("|").map((p) => p.trim());
     const cargoTitle = cargoParts[0] || cargo || "Tu Cargo";
@@ -1378,7 +1378,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = memo(({
     );
   };
 
-  // Modern 2: Foto cuadrada redondeada, línea vertical azul, labels azules
+  // Modern 2: Rounded square photo, blue vertical line, blue labels
   const renderTemplate05 = () => {
     const cargoParts = (cargo || "").split("|").map((p) => p.trim());
     const cargoTitle = cargoParts[0] || cargo || "Tu Cargo";
@@ -1563,7 +1563,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = memo(({
     );
   };
 
-  // QR Profesional: Con QR code, líneas punteadas, redes sociales, horario
+  // QR Professional: With QR code, dotted lines, social networks, schedule
   const renderTemplate06 = () => {
     const cargoParts = (cargo || "").split("|").map((p) => p.trim());
     const cargoTitle = cargoParts[0] || cargo || "Tu Cargo";
@@ -1817,7 +1817,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = memo(({
     );
   };
 
-  // Modern 3: Foto cuadrada redondeada, línea vertical, iconos de redes mejorados
+  // Modern 3: Rounded square photo, vertical line, improved social network icons
   const renderTemplate08 = () => {
     const cargoParts = (cargo || "").split("|").map((p) => p.trim());
     const cargoTitle = cargoParts[0] || cargo || "Tu Cargo";
@@ -1825,7 +1825,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = memo(({
     const email = redes.find((r) => r.url.includes("@"));
     const website = redes.find((r) => r.url.includes("www"));
 
-    // Función para obtener icono según el nombre de la red
+    // Function to get icon based on network name
     const getSocialIcon = (nombre: string): string => {
       if (!nombre) return "🔗";
       const nameLower = nombre.toLowerCase();
@@ -2101,7 +2101,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = memo(({
     );
   };
 
-  // Modern 4: Foto circular, línea vertical con color personalizable, botón CTA personalizable
+  // Modern 4: Circular photo, vertical line with customizable color, customizable CTA button
   const renderTemplate09 = () => {
     const cargoParts = (cargo || "").split("|").map((p) => p.trim());
     const cargoTitle = cargoParts[0] || cargo || "Tu Cargo";
@@ -2111,7 +2111,7 @@ const SignaturePreview: React.FC<SignaturePreviewProps> = memo(({
 
     // Color por defecto: #20b2aa (teal), o color personalizado
     const accentColor = colorPersonalizado || "#20b2aa";
-    const lightColor = `${accentColor}20`; // Versión clara para el botón
+    const lightColor = `${accentColor}20`; // Light version for the button
 
     return (
       <table
