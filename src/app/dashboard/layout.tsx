@@ -52,6 +52,12 @@ export default function DashboardLayout({
       active: pathname === "/dashboard/signatures",
     },
     {
+      href: "/dashboard/subscription",
+      label: "Subscription",
+      icon: "card_membership",
+      active: pathname === "/dashboard/subscription",
+    },
+    {
       href: "/dashboard/settings",
       label: "Settings",
       icon: "settings",
