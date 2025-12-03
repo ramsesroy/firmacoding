@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, Suspense, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import SignaturePreview from "@/components/SignaturePreview";
 import IconPicker from "@/components/IconPicker";
