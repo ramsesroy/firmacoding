@@ -173,7 +173,12 @@ export default function SubscriptionPage() {
           {/* Current Plan Card */}
           <div className="lg:col-span-2 space-y-6">
             {/* Plan Info */}
-            <div className={`bg-gradient-to-br from-${currentPlan.color}-50 to-${currentPlan.color}-100 border-2 border-${currentPlan.color}-200 rounded-2xl p-6 sm:p-8 shadow-lg`}>
+            <div className={`bg-gradient-to-br rounded-2xl p-6 sm:p-8 shadow-lg border-2 ${
+              subscription.plan_type === 'free' ? 'from-gray-50 to-gray-100 border-gray-200' :
+              subscription.plan_type === 'premium' ? 'from-blue-50 to-blue-100 border-blue-200' :
+              subscription.plan_type === 'team' ? 'from-purple-50 to-purple-100 border-purple-200' :
+              'from-indigo-50 to-indigo-100 border-indigo-200'
+            }`}>
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
