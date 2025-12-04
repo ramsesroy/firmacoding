@@ -126,6 +126,9 @@ export const analytics = {
   aiSignatureGenerated: (count: number) => {
     trackEvent("ai_signature_generated", "ai", `Generated ${count} designs`, count);
   },
+  aiSignatureError: (errorMessage: string) => {
+    trackEvent("ai_signature_error", "ai", errorMessage);
+  },
 };
 
 // Check if analytics is enabled
