@@ -27,47 +27,68 @@
    - Menú lateral → **SQL Editor**
    - Haz clic en **"New query"**
 
-2. **Ejecuta este SQL** (reemplaza `TU-USER-ID-AQUI` con el UUID que copiaste):
+2. **Ejecuta este SQL** (cambia el email si usaste uno diferente):
 
 ```sql
--- Crear suscripción Premium
-INSERT INTO public.subscriptions (
-    user_id,
-    plan_type,
-    status,
-    current_period_start,
-    current_period_end,
-    cancel_at_period_end
-) VALUES (
-    'TU-USER-ID-AQUI'::UUID,  -- Reemplaza con el UUID del usuario
-    'premium',                -- Plan premium
-    'active',                 -- Estado activo
-    NOW(),                    -- Periodo inicio: ahora
-    NOW() + INTERVAL '1 year', -- Periodo fin: 1 año
-    FALSE                     -- No cancelar automáticamente
-)
-ON CONFLICT (user_id) 
-DO UPDATE SET
-    plan_type = 'premium',
-    status = 'active',
-    updated_at = NOW();
+DO $$
+DECLARE
+    v_user_id UUID;
+    user_email TEXT := 'premium@example.com';  -- CAMBIA ESTE EMAIL si usaste otro
+BEGIN
+    -- Buscar el usuario por email
+    SELECT id INTO v_user_id
+    FROM auth.users
+    WHERE email = user_email;
 
--- Actualizar límites (ilimitado para Premium)
-INSERT INTO public.user_limits (
-    user_id,
-    saved_signatures_count,
-    max_saved_signatures,
-    last_reset_date
-) VALUES (
-    'TU-USER-ID-AQUI'::UUID,  -- Reemplaza con el UUID del usuario
-    0,                        -- Contador inicial
-    -1,                       -- -1 = ilimitado
-    CURRENT_DATE
-)
-ON CONFLICT (user_id)
-DO UPDATE SET
-    max_saved_signatures = -1,  -- Ilimitado
-    updated_at = NOW();
+    -- Verificar si el usuario existe
+    IF v_user_id IS NULL THEN
+        RAISE EXCEPTION 'Usuario con email % no encontrado. Por favor crea el usuario primero.', user_email;
+    END IF;
+
+    -- Crear/Actualizar suscripción Premium
+    INSERT INTO public.subscriptions (
+        user_id,
+        plan_type,
+        status,
+        current_period_start,
+        current_period_end,
+        cancel_at_period_end
+    ) VALUES (
+        v_user_id,
+        'premium',
+        'active',
+        NOW(),
+        NOW() + INTERVAL '1 year',
+        FALSE
+    )
+    ON CONFLICT (user_id) 
+    DO UPDATE SET
+        plan_type = 'premium',
+        status = 'active',
+        current_period_start = NOW(),
+        current_period_end = NOW() + INTERVAL '1 year',
+        cancel_at_period_end = FALSE,
+        updated_at = NOW();
+
+    -- Crear/Actualizar límites (ilimitado)
+    INSERT INTO public.user_limits (
+        user_id,
+        saved_signatures_count,
+        max_saved_signatures,
+        last_reset_date
+    ) VALUES (
+        v_user_id,
+        0,
+        -1,
+        CURRENT_DATE
+    )
+    ON CONFLICT (user_id)
+    DO UPDATE SET
+        max_saved_signatures = -1,
+        updated_at = NOW();
+
+    RAISE NOTICE 'Usuario Premium configurado correctamente para: % (ID: %)', user_email, v_user_id;
+END $$;
 ```
 
 3. **Ejecuta el query** (haz clic en "Run" o presiona `Ctrl+Enter`)
