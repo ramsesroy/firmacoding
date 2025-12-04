@@ -30,7 +30,7 @@ export const initGA = (measurementId: string) => {
   window.gtag = function () {
     window.dataLayer?.push(arguments);
   };
-  window.gtag("js", new Date().toISOString());
+  window.gtag("js", new Date() as any);
   window.gtag("config", measurementId, {
     page_path: window.location.pathname,
   });
