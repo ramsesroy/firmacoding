@@ -132,6 +132,7 @@ export default function SignaturesPage() {
       }
 
       // Close modal and reload list
+      analytics.deleteSignature();
       setDeleteConfirmId(null);
       await fetchSignatures();
       showToast("Signature deleted successfully!", "success");
@@ -172,6 +173,7 @@ export default function SignaturesPage() {
 
       await copyToClipboard(signatureData, signature.template_id);
       setCopiedId(signature.id);
+      analytics.copySignature();
       showToast("Signature copied to clipboard!", "success");
       setTimeout(() => setCopiedId(null), 3000);
     } catch (err) {

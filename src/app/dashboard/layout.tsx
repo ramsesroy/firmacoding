@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useSubscription } from "@/hooks/useSubscription";
+import { analytics } from "@/lib/analytics";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function DashboardLayout({
@@ -36,6 +37,7 @@ export default function DashboardLayout({
   }, []);
 
   const handleSignOut = async () => {
+    analytics.signOut();
     await supabase.auth.signOut();
     router.push("/");
     router.refresh();
