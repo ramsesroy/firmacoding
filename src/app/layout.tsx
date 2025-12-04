@@ -109,9 +109,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ErrorBoundary>
           <ToastProvider>
-            <Suspense fallback={null}>
-              <GoogleAnalytics />
-            </Suspense>
+            <GoogleAnalytics />
             {children}
           </ToastProvider>
         </ErrorBoundary>
@@ -119,4 +117,3 @@ export default function RootLayout({
     </html>
   );
 }
-
