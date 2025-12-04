@@ -148,6 +148,10 @@ export default function AIGeneratorPage() {
         logo: formData.logo,
       });
 
+      // Create AbortController with extended timeout for slow AI processing
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 150000); // 2.5 minutes timeout
+
       const response = await fetch(AI_API_ROUTE, {
         method: "POST",
         headers: {
@@ -163,7 +167,10 @@ export default function AIGeneratorPage() {
           image: formData.image,
           logo: formData.logo,
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       console.log("Response status:", response.status);
       console.log("Response headers:", Object.fromEntries(response.headers.entries()));
