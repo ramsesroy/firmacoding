@@ -14,6 +14,7 @@ import { SkeletonCard } from "@/components/Skeleton";
 import { useSubscription } from "@/hooks/useSubscription";
 import { getUserLimits } from "@/lib/subscriptionUtils";
 import { decrementSavedSignatures } from "@/lib/subscriptionUtils";
+import { analytics } from "@/lib/analytics";
 
 interface SignatureRecord {
   id: string;
@@ -202,6 +203,7 @@ export default function SignaturesPage() {
         addWatermark: !isPremium, // Add watermark for free users
       });
       showToast("PNG exported successfully!", "success");
+      analytics.exportSignature("PNG");
       setShowExportMenu(null);
     } catch (error) {
       console.error("Error exporting PNG:", error);
@@ -234,6 +236,7 @@ export default function SignaturesPage() {
         addWatermark: !isPremium, // Add watermark for free users
       });
       showToast("PDF exported successfully!", "success");
+      analytics.exportSignature("PDF");
       setShowExportMenu(null);
     } catch (error) {
       console.error("Error exporting PDF:", error);
