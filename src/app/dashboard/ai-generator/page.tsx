@@ -188,12 +188,18 @@ export default function AIGeneratorPage() {
         throw new Error(`Invalid response format. Expected JSON, got: ${contentType}`);
       }
 
-      const data: AISignatureResult[] = await response.json();
+      let data: AISignatureResult[] = await response.json();
       console.log("Received data:", data);
 
       if (!Array.isArray(data) || data.length === 0) {
         throw new Error("Invalid response from AI generator: Expected array with at least one signature");
       }
+
+      // Process n8n template variables in all HTML results
+      data = data.map(signature => ({
+        ...signature,
+        html: processN8nTemplate(signature.html, formData)
+      }));
 
       setResults(data);
       analytics.aiSignatureGenerated(data.length);
@@ -228,13 +234,11 @@ export default function AIGeneratorPage() {
 
   const handleCopyHTML = async (html: string, name: string) => {
     try {
-      // Create a temporary element to extract text for clipboard
-      const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = html;
-      const textContent = tempDiv.innerText || tempDiv.textContent || "";
-
-      // Copy HTML to clipboard
-      await navigator.clipboard.writeText(html);
+      // Process template variables before copying
+      const processedHtml = processN8nTemplate(html, formData);
+      
+      // Copy processed HTML to clipboard
+      await navigator.clipboard.writeText(processedHtml);
       showToast(`${name} signature copied to clipboard!`, "success");
       analytics.copySignature();
     } catch (error) {
@@ -244,6 +248,8 @@ export default function AIGeneratorPage() {
   };
 
   const handleSaveSignature = async (html: string, name: string) => {
+    // Process template variables before saving
+    const processedHtml = processN8nTemplate(html, formData);
     try {
       const { data: { session } } = await supabase.auth.getSession();
 
@@ -266,7 +272,7 @@ export default function AIGeneratorPage() {
 
       // Extract data from HTML to save
       const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = html;
+      tempDiv.innerHTML = processedHtml;
       
       // Try to extract name and position from HTML
       const textContent = tempDiv.innerText || "";
@@ -280,6 +286,7 @@ export default function AIGeneratorPage() {
         image_url: formData.image || null,
         social_links: null,
         template_id: "professional" as TemplateType,
+        signature_html: processedHtml, // Save the processed HTML
       };
 
       const { error } = await supabase.from("signatures").insert([signatureRecord]);
@@ -601,7 +608,7 @@ export default function AIGeneratorPage() {
                     <div
                       className="mb-4 p-4 bg-white rounded-lg border border-gray-200 overflow-x-auto"
                       dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(result.html),
+                        __html: DOMPurify.sanitize(processN8nTemplate(result.html, formData)),
                       }}
                     />
 
