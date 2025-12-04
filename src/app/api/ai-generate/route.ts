@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const AI_WEBHOOK_URL = process.env.NEXT_PUBLIC_AI_WEBHOOK_URL || "https://n8n.supportpalestine.site/webhook-test/generar-firma";
+const AI_WEBHOOK_URL = process.env.NEXT_PUBLIC_AI_WEBHOOK_URL || "http://207.180.211.243:5678/webhook/generar-firma";
 
 export async function POST(request: NextRequest) {
   try {

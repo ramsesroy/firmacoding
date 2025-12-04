@@ -7,8 +7,10 @@ El error que estás viendo indica que el webhook de n8n está devolviendo un **4
 ## URL del Webhook
 
 ```
-https://n8n.supportpalestine.site/webhook-test/generar-firma
+http://207.180.211.243:5678/webhook/generar-firma
 ```
+
+**Nota:** Usamos IP directa en lugar del dominio para evitar bloqueos de Hostinger.
 
 ## Pasos para Verificar y Corregir
 
@@ -37,7 +39,7 @@ Puedes probar el webhook usando **curl** o **Postman**:
 #### Opción A: Usando curl (Terminal)
 
 ```bash
-curl -X POST https://n8n.supportpalestine.site/webhook-test/generar-firma \
+curl -X POST http://207.180.211.243:5678/webhook/generar-firma \
   -H "Content-Type: application/json" \
   -d '{
     "fullName": "John Doe",
@@ -54,7 +56,7 @@ curl -X POST https://n8n.supportpalestine.site/webhook-test/generar-firma \
 #### Opción B: Usando Postman o similar
 
 1. **Método:** POST
-2. **URL:** `https://n8n.supportpalestine.site/webhook-test/generar-firma`
+2. **URL:** `http://207.180.211.243:5678/webhook/generar-firma`
 3. **Headers:**
    - `Content-Type: application/json`
 4. **Body (raw JSON):**
@@ -98,7 +100,7 @@ El webhook debe devolver un **Array JSON** con este formato:
 **Solución:** Activa el workflow en n8n
 
 #### Problema 2: Path Incorrecto
-**Solución:** Verifica que el path en n8n sea exactamente `/webhook-test/generar-firma`
+**Solución:** Verifica que el path en n8n sea exactamente `/webhook/generar-firma`
 
 #### Problema 3: Webhook Requiere Autenticación
 **Solución:** 
@@ -106,8 +108,8 @@ El webhook debe devolver un **Array JSON** con este formato:
 - O actualizar la API route para incluir las credenciales
 
 #### Problema 4: URL Incorrecta
-**Solución:** Verifica que la URL base de n8n sea correcta:
-- `https://n8n.supportpalestine.site`
+**Solución:** Verifica que la URL/IP de n8n sea correcta:
+- `http://207.180.211.243:5678` (IP directa para evitar bloqueos)
 - No debe tener trailing slash
 
 #### Problema 5: CORS (si pruebas desde navegador)
@@ -130,7 +132,7 @@ El webhook debe devolver un **Array JSON** con este formato:
 Cuando ejecutes el test, revisa los logs en la terminal donde corre `npm run dev`. Verás:
 
 ```
-AI Generate API - Sending to webhook: https://...
+AI Generate API - Sending to webhook: http://207.180.211.243:5678/webhook/generar-firma
 AI Generate API - Payload: {...}
 AI Generate API - Response status: 404
 AI Generate API - Error response body: ...
