@@ -26,8 +26,8 @@ export async function POST(request: NextRequest) {
           "Accept": "application/json",
         },
         body: JSON.stringify(body),
-        // Add timeout
-        signal: AbortSignal.timeout(30000), // 30 seconds timeout
+        // Add timeout - increased to 2 minutes for slow AI processing
+        signal: AbortSignal.timeout(120000), // 120 seconds (2 minutes) timeout
       });
 
       console.log("AI Generate API - Response status:", response.status);
@@ -85,8 +85,9 @@ export async function POST(request: NextRequest) {
       if (fetchError.name === "AbortError" || fetchError.name === "TimeoutError") {
         return NextResponse.json(
           {
-            error: "Webhook request timed out. The service may be slow or unavailable.",
-            webhookUrl: AI_WEBHOOK_URL
+            error: "The AI generation is taking longer than expected. Please try again - the service may be processing your request.",
+            webhookUrl: AI_WEBHOOK_URL,
+            suggestion: "AI generation can take up to 2 minutes. Please wait and try again if the first attempt times out."
           },
           { status: 504 }
         );

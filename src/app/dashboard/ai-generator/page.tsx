@@ -538,8 +538,14 @@ export default function AIGeneratorPage() {
                 <p className="text-lg font-semibold text-gray-900 mb-2">
                   {currentQuote}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 mb-4">
                   Creating your perfect signature...
+                </p>
+                <div className="w-full max-w-xs bg-gray-100 rounded-full h-2 overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-purple-500 via-fuchsia-500 to-purple-500 animate-pulse" style={{ width: '60%' }}></div>
+                </div>
+                <p className="text-xs text-gray-400 mt-3">
+                  This may take up to 2 minutes. Please be patient...
                 </p>
               </div>
             )}
