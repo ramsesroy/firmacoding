@@ -122,6 +122,31 @@ export default function AIGeneratorPage() {
     }
   };
 
+  // Process n8n template variables in HTML
+  const processN8nTemplate = (html: string, formData: typeof formData): string => {
+    let processed = html;
+    
+    // Replace simple variables
+    processed = processed.replace(/\{\{\s*\$json\.body\.fullName\s*\}\}/g, formData.fullName || '');
+    processed = processed.replace(/\{\{\s*\$json\.body\.position\s*\}\}/g, formData.position || '');
+    processed = processed.replace(/\{\{\s*\$json\.body\.company\s*\}\}/g, formData.company || '');
+    processed = processed.replace(/\{\{\s*\$json\.body\.email\s*\}\}/g, formData.email || '');
+    processed = processed.replace(/\{\{\s*\$json\.body\.phone\s*\}\}/g, formData.phone || '');
+    processed = processed.replace(/\{\{\s*\$json\.body\.website\s*\}\}/g, formData.website || '');
+    processed = processed.replace(/\{\{\s*\$json\.body\.image\s*\}\}/g, formData.image || '');
+    processed = processed.replace(/\{\{\s*\$json\.body\.logo\s*\}\}/g, formData.logo || '');
+    
+    // Process conditional blocks {{if $json.body.field}}...{{endif}}
+    const ifPattern = /\{\{if\s+\$json\.body\.(\w+)\}\}(.*?)\{\{endif\}\}/gs;
+    processed = processed.replace(ifPattern, (match, fieldName, content) => {
+      const fieldValue = formData[fieldName as keyof typeof formData];
+      // Only include content if field has a value
+      return fieldValue && fieldValue.trim() ? content : '';
+    });
+    
+    return processed;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
