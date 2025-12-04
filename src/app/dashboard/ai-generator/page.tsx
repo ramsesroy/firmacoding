@@ -16,8 +16,8 @@ import { Icon3D } from "@/components/Icon3D";
 import { HiSparkles } from "react-icons/hi2";
 import DOMPurify from "isomorphic-dompurify";
 
-// Webhook URL - Replace with your actual n8n webhook URL
-const AI_WEBHOOK_URL = process.env.NEXT_PUBLIC_AI_WEBHOOK_URL || "";
+// Webhook URL - n8n automation webhook
+const AI_WEBHOOK_URL = process.env.NEXT_PUBLIC_AI_WEBHOOK_URL || "https://n8n.supportpalestine.site/webhook-test/generar-firma";
 
 interface AISignatureResult {
   name: string;

@@ -11,10 +11,10 @@ La funcionalidad **AI Enhancer** permite a los usuarios generar firmas de correo
 Agrega la siguiente variable a tu archivo `.env.local`:
 
 ```env
-NEXT_PUBLIC_AI_WEBHOOK_URL=https://tu-webhook-url-de-n8n.com/webhook/ai-signature
+NEXT_PUBLIC_AI_WEBHOOK_URL=https://n8n.supportpalestine.site/webhook-test/generar-firma
 ```
 
-**Nota:** Reemplaza la URL con la URL real de tu webhook de n8n.
+**Nota:** Si no se configura esta variable, se usará la URL por defecto del webhook.
 
 ### 2. Estructura del Webhook
 
