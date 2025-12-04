@@ -558,7 +558,7 @@ function DashboardContent() {
               <Link
                 href="/dashboard/ai-generator"
                 className="group relative inline-flex items-center gap-4 px-6 py-4 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 rounded-2xl shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1 overflow-hidden"
-                onClick={() => analytics.trackEvent("click_cta", "navigation", "AI Enhancer")}
+                onClick={() => analytics.clickCTA("dashboard", "AI Enhancer")}
               >
                 {/* Animated background */}
                 <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 opacity-100 group-hover:opacity-90 transition-opacity duration-300"></div>
