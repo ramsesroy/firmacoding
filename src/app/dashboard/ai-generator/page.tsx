@@ -123,7 +123,18 @@ export default function AIGeneratorPage() {
   };
 
   // Process n8n template variables in HTML
-  const processN8nTemplate = (html: string, formData: typeof formData): string => {
+  type FormData = {
+    fullName: string;
+    position: string;
+    company: string;
+    email: string;
+    phone: string;
+    website: string;
+    image: string;
+    logo: string;
+  };
+  
+  const processN8nTemplate = (html: string, formData: FormData): string => {
     let processed = html;
     
     // Replace simple variables
