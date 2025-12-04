@@ -16,8 +16,8 @@ import { Icon3D } from "@/components/Icon3D";
 import { HiSparkles } from "react-icons/hi2";
 import DOMPurify from "isomorphic-dompurify";
 
-// Webhook URL - n8n automation webhook
-const AI_WEBHOOK_URL = process.env.NEXT_PUBLIC_AI_WEBHOOK_URL || "https://n8n.supportpalestine.site/webhook-test/generar-firma";
+// API Route - Use Next.js API route as proxy to avoid CORS issues
+const AI_API_ROUTE = "/api/ai-generate";
 
 interface AISignatureResult {
   name: string;
@@ -130,19 +130,13 @@ export default function AIGeneratorPage() {
       return;
     }
 
-    if (!AI_WEBHOOK_URL) {
-      showToast("AI Generator is not configured. Please contact support.", "error");
-      console.error("AI_WEBHOOK_URL is not set. Check your environment variables.");
-      return;
-    }
-
-    console.log("AI_WEBHOOK_URL:", AI_WEBHOOK_URL);
+    console.log("Using API route:", AI_API_ROUTE);
 
     setLoading(true);
     setResults([]);
 
     try {
-      console.log("Sending request to:", AI_WEBHOOK_URL);
+      console.log("Sending request to API route:", AI_API_ROUTE);
       console.log("Request payload:", {
         fullName: formData.fullName,
         position: formData.position,
@@ -154,7 +148,7 @@ export default function AIGeneratorPage() {
         logo: formData.logo,
       });
 
-      const response = await fetch(AI_WEBHOOK_URL, {
+      const response = await fetch(AI_API_ROUTE, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
