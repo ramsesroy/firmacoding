@@ -206,7 +206,17 @@ export default function AIGeneratorPage() {
       if (error instanceof TypeError && error.message.includes("fetch")) {
         errorMessage = "Network error: Could not connect to AI service. Please check your connection and try again.";
       } else if (error instanceof Error) {
-        errorMessage = error.message;
+        // Check if it's an abort/timeout error
+        if (error.name === "AbortError" || error.message.includes("aborted")) {
+          errorMessage = "The request took too long. AI generation can take up to 2 minutes. Please try again and wait patiently.";
+        } else {
+          const errorData = error.message.toLowerCase();
+          if (errorData.includes("timeout") || errorData.includes("504") || errorData.includes("slow") || errorData.includes("taking longer")) {
+            errorMessage = "The AI generation is taking longer than expected. This is normal - AI processing can take up to 2 minutes. Please try again and wait patiently.";
+          } else {
+            errorMessage = error.message;
+          }
+        }
       }
       
       showToast(errorMessage, "error");
