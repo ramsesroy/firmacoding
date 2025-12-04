@@ -137,7 +137,45 @@ export default function AIGeneratorPage() {
   const processN8nTemplate = (html: string, formData: FormData): string => {
     let processed = html;
     
-    // Replace simple variables
+    // First, process conditional blocks before replacing variables
+    // Handle complex conditions like: {{ if $json.body.image || $json.body.logo }}
+    const complexIfPattern = /\{\{\s*if\s+([\s\S]*?)\s*\}\}([\s\S]*?)\{\{\s*endif\s*\}\}/gi;
+    processed = processed.replace(complexIfPattern, (match, condition, content) => {
+      // Extract field names from condition (handles || and &&)
+      const fieldNames = condition.match(/\$json\.body\.(\w+)/g);
+      if (!fieldNames) return '';
+      
+      // Check if any field in condition has a value (for ||) or all have values (for &&)
+      const hasOr = condition.includes('||');
+      const hasAnd = condition.includes('&&');
+      
+      let shouldInclude = false;
+      
+      if (hasOr) {
+        // OR condition: true if ANY field has value
+        shouldInclude = fieldNames.some(fieldRef => {
+          const fieldName = fieldRef.replace('$json.body.', '') as keyof FormData;
+          const fieldValue = formData[fieldName];
+          return fieldValue && fieldValue.trim();
+        });
+      } else if (hasAnd) {
+        // AND condition: true if ALL fields have value
+        shouldInclude = fieldNames.every(fieldRef => {
+          const fieldName = fieldRef.replace('$json.body.', '') as keyof FormData;
+          const fieldValue = formData[fieldName];
+          return fieldValue && fieldValue.trim();
+        });
+      } else {
+        // Simple condition: check single field
+        const fieldName = fieldNames[0].replace('$json.body.', '') as keyof FormData;
+        const fieldValue = formData[fieldName];
+        shouldInclude = !!(fieldValue && fieldValue.trim());
+      }
+      
+      return shouldInclude ? content : '';
+    });
+    
+    // Replace simple variables (after processing conditionals)
     processed = processed.replace(/\{\{\s*\$json\.body\.fullName\s*\}\}/g, formData.fullName || '');
     processed = processed.replace(/\{\{\s*\$json\.body\.position\s*\}\}/g, formData.position || '');
     processed = processed.replace(/\{\{\s*\$json\.body\.company\s*\}\}/g, formData.company || '');
@@ -147,14 +185,25 @@ export default function AIGeneratorPage() {
     processed = processed.replace(/\{\{\s*\$json\.body\.image\s*\}\}/g, formData.image || '');
     processed = processed.replace(/\{\{\s*\$json\.body\.logo\s*\}\}/g, formData.logo || '');
     
-    // Process conditional blocks {{if $json.body.field}}...{{endif}}
-    // Use [\s\S] instead of . with 's' flag for ES2017 compatibility
-    const ifPattern = /\{\{if\s+\$json\.body\.(\w+)\}\}([\s\S]*?)\{\{endif\}\}/g;
-    processed = processed.replace(ifPattern, (match, fieldName, content) => {
-      const fieldValue = formData[fieldName as keyof typeof formData];
-      // Only include content if field has a value
-      return fieldValue && fieldValue.trim() ? content : '';
+    // Remove empty image tags (src="" or src with just whitespace)
+    processed = processed.replace(/<img([^>]*)\s+src\s*=\s*["']\s*["']([^>]*)>/gi, '');
+    processed = processed.replace(/<img([^>]*)\s+src\s*=\s*["']\s*\{\{\s*\$json\.body\.(image|logo)\s*\}\}\s*["']([^>]*)>/gi, '');
+    
+    // Remove image tags where src attribute is empty or only contains template variable that evaluates to empty
+    // This handles cases where logo is empty but company name exists
+    const imagePattern = /<img([^>]*?)(?:\s+src\s*=\s*["']\s*["']|\s+src\s*=\s*["']\s*\{\{\s*\$json\.body\.(image|logo)\s*\}\}\s*["'])([^>]*?)>/gi;
+    processed = processed.replace(imagePattern, (match, before, fieldName, after) => {
+      if (fieldName) {
+        const fieldValue = formData[fieldName as keyof FormData];
+        if (!fieldValue || !fieldValue.trim()) {
+          return ''; // Remove image tag if field is empty
+        }
+      }
+      return match; // Keep image tag if field has value
     });
+    
+    // Clean up any remaining empty conditional markers
+    processed = processed.replace(/\{\{\s*if\s+[^}]+\s*\}\}\s*\{\{\s*endif\s*\}\}/gi, '');
     
     return processed;
   };
