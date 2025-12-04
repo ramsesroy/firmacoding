@@ -148,7 +148,8 @@ export default function AIGeneratorPage() {
     processed = processed.replace(/\{\{\s*\$json\.body\.logo\s*\}\}/g, formData.logo || '');
     
     // Process conditional blocks {{if $json.body.field}}...{{endif}}
-    const ifPattern = /\{\{if\s+\$json\.body\.(\w+)\}\}(.*?)\{\{endif\}\}/gs;
+    // Use [\s\S] instead of . with 's' flag for ES2017 compatibility
+    const ifPattern = /\{\{if\s+\$json\.body\.(\w+)\}\}([\s\S]*?)\{\{endif\}\}/g;
     processed = processed.replace(ifPattern, (match, fieldName, content) => {
       const fieldValue = formData[fieldName as keyof typeof formData];
       // Only include content if field has a value
