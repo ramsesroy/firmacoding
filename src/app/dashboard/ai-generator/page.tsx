@@ -153,14 +153,14 @@ export default function AIGeneratorPage() {
       
       if (hasOr) {
         // OR condition: true if ANY field has value
-        shouldInclude = fieldNames.some(fieldRef => {
+        shouldInclude = fieldNames.some((fieldRef: string) => {
           const fieldName = fieldRef.replace('$json.body.', '') as keyof FormData;
           const fieldValue = formData[fieldName];
           return fieldValue && fieldValue.trim();
         });
       } else if (hasAnd) {
         // AND condition: true if ALL fields have value
-        shouldInclude = fieldNames.every(fieldRef => {
+        shouldInclude = fieldNames.every((fieldRef: string) => {
           const fieldName = fieldRef.replace('$json.body.', '') as keyof FormData;
           const fieldValue = formData[fieldName];
           return fieldValue && fieldValue.trim();
