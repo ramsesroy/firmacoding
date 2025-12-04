@@ -17,6 +17,8 @@ import { Watermark } from "@/components/Watermark";
 import { useSubscription } from "@/hooks/useSubscription";
 import { canSaveSignature, incrementSavedSignatures, decrementSavedSignatures } from "@/lib/subscriptionUtils";
 import { analytics } from "@/lib/analytics";
+import { Icon3D } from "@/components/Icon3D";
+import { HiOutlineSparkles } from "react-icons/hi2";
 
 // Force dynamic rendering for this page to support search params
 export const dynamic = "force-dynamic";
@@ -549,6 +551,52 @@ function DashboardContent() {
                 : "Create and customize your professional email signature in minutes"}
             </p>
           </div>
+          
+          {/* AI Enhancer Button - Premium Feature */}
+          {!editingSignatureId && (
+            <div className="mt-6">
+              <Link
+                href="/dashboard/ai-generator"
+                className="group relative inline-flex items-center gap-4 px-6 py-4 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 rounded-2xl shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1 overflow-hidden"
+                onClick={() => analytics.trackEvent("click_cta", "navigation", "AI Enhancer")}
+              >
+                {/* Animated background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 opacity-100 group-hover:opacity-90 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.1)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] bg-[position:-100%_0,0_0] bg-no-repeat group-hover:animate-[shimmer_2s_infinite]"></div>
+                
+                {/* Icon 3D */}
+                <div className="relative z-10 flex-shrink-0">
+                  <Icon3D 
+                    icon={<HiOutlineSparkles className="w-6 h-6" />}
+                    gradient="from-white to-purple-100"
+                    size="md"
+                  />
+                </div>
+                
+                {/* Text Content */}
+                <div className="relative z-10 text-left">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="text-white font-bold text-lg sm:text-xl group-hover:text-purple-50 transition-colors">
+                      Create with AI
+                    </span>
+                    <span className="px-2 py-0.5 bg-white/20 backdrop-blur-sm text-white text-xs font-bold rounded-full border border-white/30">
+                      PREMIUM
+                    </span>
+                  </div>
+                  <p className="text-purple-50 text-sm font-medium opacity-90 group-hover:opacity-100 transition-opacity">
+                    Let AI design your perfect signature
+                  </p>
+                </div>
+                
+                {/* Arrow Icon */}
+                <div className="relative z-10 flex-shrink-0 ml-auto">
+                  <span className="material-symbols-outlined text-white text-2xl group-hover:translate-x-1 transition-transform duration-300">
+                    arrow_forward
+                  </span>
+                </div>
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Layout: Flex column on mobile, grid on desktop */}

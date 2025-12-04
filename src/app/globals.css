@@ -406,6 +406,15 @@ body {
     transform: translateY(-5px) rotateX(5deg) rotateY(5deg) scale(1.1) !important;
   }
 
+  @keyframes shimmer {
+    0% {
+      background-position: -100% 0;
+    }
+    100% {
+      background-position: 100% 0;
+    }
+  }
+
   .icon-3d-glow {
     animation: pulse-glow-3d 2s ease-in-out infinite;
   }
