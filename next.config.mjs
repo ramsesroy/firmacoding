@@ -34,8 +34,6 @@ const nextConfig = {
   // Optimize bundle size
   compress: true,
   poweredByHeader: false,
-  // Optimize production builds
-  swcMinify: true,
   // Enable React strict mode for better error detection
   reactStrictMode: true,
 };
