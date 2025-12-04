@@ -17,18 +17,18 @@ http://207.180.211.243:5678/webhook/generar-firma
 ### 1. Verificar que el Workflow esté Activo
 
 1. **Ve a tu instancia de n8n:**
-   - https://n8n.supportpalestine.site (o donde tengas n8n)
+   - http://207.180.211.243:5678 (IP directa para evitar bloqueos)
 
 2. **Verifica el workflow:**
    - Asegúrate de que el workflow con el webhook esté **ACTIVO**
    - Debe tener un nodo "Webhook" configurado
-   - El path debe ser: `/webhook-test/generar-firma`
+   - El path debe ser: `/webhook/generar-firma`
 
 ### 2. Verificar la URL del Webhook
 
 En n8n, verifica:
 - **Método HTTP:** Debe ser `POST`
-- **Path:** `/webhook-test/generar-firma`
+- **Path:** `/webhook/generar-firma`
 - **Authentication:** Verifica si requiere autenticación
 - **Response Mode:** Debe responder con JSON
 
