@@ -132,13 +132,28 @@ export default function AIGeneratorPage() {
 
     if (!AI_WEBHOOK_URL) {
       showToast("AI Generator is not configured. Please contact support.", "error");
+      console.error("AI_WEBHOOK_URL is not set. Check your environment variables.");
       return;
     }
+
+    console.log("AI_WEBHOOK_URL:", AI_WEBHOOK_URL);
 
     setLoading(true);
     setResults([]);
 
     try {
+      console.log("Sending request to:", AI_WEBHOOK_URL);
+      console.log("Request payload:", {
+        fullName: formData.fullName,
+        position: formData.position,
+        company: formData.company,
+        email: formData.email,
+        phone: formData.phone,
+        website: formData.website,
+        image: formData.image,
+        logo: formData.logo,
+      });
+
       const response = await fetch(AI_WEBHOOK_URL, {
         method: "POST",
         headers: {
@@ -156,14 +171,27 @@ export default function AIGeneratorPage() {
         }),
       });
 
+      console.log("Response status:", response.status);
+      console.log("Response headers:", Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
+        throw new Error(`API error (${response.status}): ${response.statusText}. ${errorText.substring(0, 200)}`);
+      }
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error("Non-JSON response:", text);
+        throw new Error(`Invalid response format. Expected JSON, got: ${contentType}`);
       }
 
       const data: AISignatureResult[] = await response.json();
+      console.log("Received data:", data);
 
       if (!Array.isArray(data) || data.length === 0) {
-        throw new Error("Invalid response from AI generator");
+        throw new Error("Invalid response from AI generator: Expected array with at least one signature");
       }
 
       setResults(data);
@@ -171,12 +199,16 @@ export default function AIGeneratorPage() {
       showToast("AI signatures generated successfully!", "success");
     } catch (error) {
       console.error("Error generating AI signatures:", error);
-      showToast(
-        error instanceof Error
-          ? error.message
-          : "Error generating signatures. Please try again.",
-        "error"
-      );
+      
+      let errorMessage = "Error generating signatures. Please try again.";
+      
+      if (error instanceof TypeError && error.message.includes("fetch")) {
+        errorMessage = "Network error: Could not connect to AI service. Please check your connection and try again.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      showToast(errorMessage, "error");
       analytics.aiSignatureError(error instanceof Error ? error.message : "unknown");
     } finally {
       setLoading(false);
