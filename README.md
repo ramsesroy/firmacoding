@@ -41,6 +41,10 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 # Get your Measurement ID from Google Analytics 4: https://analytics.google.com
 
 # AI Generator Webhook (Optional - Premium Feature)
+NEXT_PUBLIC_AI_WEBHOOK_URL=https://your-n8n-webhook-url.com
+# Get your webhook URL from n8n workflow
+
+# AI Generator Webhook (Optional - Premium Feature)
 NEXT_PUBLIC_N8N_WEBHOOK_URL=https://your-webhook-url.n8n.cloud/webhook/ai-signature
 # Get your webhook URL from your n8n workflow
 ```

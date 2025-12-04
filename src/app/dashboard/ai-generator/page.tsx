@@ -1,24 +1,30 @@
 "use client";
 
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/components/Toast";
 import { useSubscription } from "@/hooks/useSubscription";
-import { MetadataHead } from "@/components/MetadataHead";
-import { SkeletonCard } from "@/components/Skeleton";
-import { analytics } from "@/lib/analytics";
+import { uploadImage } from "@/lib/imageUtils";
+import { copyToClipboard } from "@/lib/signatureUtils";
+import { TemplateType } from "@/types/signature";
 import { canSaveSignature, incrementSavedSignatures } from "@/lib/subscriptionUtils";
+import { analytics } from "@/lib/analytics";
+import { Icon3D } from "@/components/Icon3D";
+import { HiSparkles } from "react-icons/hi2";
+import DOMPurify from "isomorphic-dompurify";
 
 // Webhook URL - Replace with your actual n8n webhook URL
-const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || "https://your-webhook-url.n8n.cloud/webhook/ai-signature";
+const AI_WEBHOOK_URL = process.env.NEXT_PUBLIC_AI_WEBHOOK_URL || "";
 
 interface AISignatureResult {
   name: string;
   html: string;
 }
 
-const LOADING_QUOTES = [
+const INSPIRATIONAL_QUOTES = [
   "Your next email could change everything.",
   "Great things never came from comfort zones.",
   "Be so good they can't ignore you.",
@@ -34,10 +40,10 @@ const LOADING_QUOTES = [
 export default function AIGeneratorPage() {
   const router = useRouter();
   const { showToast } = useToast();
-  const { isPremium, loading: subscriptionLoading } = useSubscription();
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [results, setResults] = useState<AISignatureResult[]>([]);
-  const [currentQuote, setCurrentQuote] = useState("");
+  const { isPremium } = useSubscription();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
   const [formData, setFormData] = useState({
     fullName: "",
     position: "",
@@ -45,194 +51,192 @@ export default function AIGeneratorPage() {
     email: "",
     phone: "",
     website: "",
-    image: null as File | null,
-    imagePreview: "",
+    image: "",
+    logo: "",
   });
 
-  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<AISignatureResult[]>([]);
+  const [currentQuote, setCurrentQuote] = useState(INSPIRATIONAL_QUOTES[0]);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
-  // Check if user has premium access
-  if (!subscriptionLoading && !isPremium) {
-    return (
-      <div className="max-w-4xl mx-auto">
-        <MetadataHead
-          title="AI Generator - Signature For Me"
-          description="Create professional email signatures with AI assistance"
-        />
-        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border-2 border-purple-200 p-8 sm:p-12 text-center">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-xl">
-            <span className="material-symbols-outlined text-white text-4xl">lock</span>
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Premium Feature</h2>
-          <p className="text-lg text-gray-600 mb-8">
-            AI Enhancer is available for Premium subscribers. Upgrade to unlock this powerful feature.
-          </p>
-          <button
-            onClick={() => router.push("/dashboard/subscription")}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg"
-          >
-            Upgrade to Premium
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // Rotate quotes during loading
+  React.useEffect(() => {
+    if (loading) {
+      const interval = setInterval(() => {
+        setCurrentQuote(
+          INSPIRATIONAL_QUOTES[
+            Math.floor(Math.random() * INSPIRATIONAL_QUOTES.length)
+          ]
+        );
+      }, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [loading]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        showToast("Image size must be less than 5MB", "error");
-        return;
-      }
-      setFormData({
-        ...formData,
-        image: file,
-        imagePreview: URL.createObjectURL(file),
-      });
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const imageURL = await uploadImage(file);
+      setFormData((prev) => ({ ...prev, image: imageURL }));
+      showToast("Image uploaded successfully!", "success");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      showToast(
+        error instanceof Error ? error.message : "Error uploading image",
+        "error"
+      );
+    } finally {
+      setUploadingImage(false);
     }
   };
 
-  const removeImage = () => {
-    if (formData.imagePreview) {
-      URL.revokeObjectURL(formData.imagePreview);
-    }
-    setFormData({
-      ...formData,
-      image: null,
-      imagePreview: "",
-    });
-    if (imageInputRef.current) {
-      imageInputRef.current.value = "";
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadingLogo(true);
+    try {
+      const logoURL = await uploadImage(file);
+      setFormData((prev) => ({ ...prev, logo: logoURL }));
+      showToast("Logo uploaded successfully!", "success");
+    } catch (error) {
+      console.error("Error uploading logo:", error);
+      showToast(
+        error instanceof Error ? error.message : "Error uploading logo",
+        "error"
+      );
+    } finally {
+      setUploadingLogo(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
-    if (!formData.fullName || !formData.position || !formData.email) {
-      showToast("Please fill in at least Name, Position, and Email", "error");
+    if (!formData.fullName || !formData.email) {
+      showToast("Please fill in at least your name and email", "error");
       return;
     }
 
-    setIsGenerating(true);
-    setResults([]);
-    
-    // Set random quote
-    const randomQuote = LOADING_QUOTES[Math.floor(Math.random() * LOADING_QUOTES.length)];
-    setCurrentQuote(randomQuote);
+    if (!AI_WEBHOOK_URL) {
+      showToast("AI Generator is not configured. Please contact support.", "error");
+      return;
+    }
 
-    // Change quote every 3 seconds
-    const quoteInterval = setInterval(() => {
-      const newQuote = LOADING_QUOTES[Math.floor(Math.random() * LOADING_QUOTES.length)];
-      setCurrentQuote(newQuote);
-    }, 3000);
+    setLoading(true);
+    setResults([]);
 
     try {
-      // Prepare form data
-      const payload: any = {
-        fullName: formData.fullName,
-        position: formData.position,
-        company: formData.company,
-        email: formData.email,
-        phone: formData.phone,
-        website: formData.website || "",
-      };
+      const response = await fetch(AI_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          position: formData.position,
+          company: formData.company,
+          email: formData.email,
+          phone: formData.phone,
+          website: formData.website,
+          image: formData.image,
+          logo: formData.logo,
+        }),
+      });
 
-      // If image is uploaded, convert to base64
-      if (formData.image) {
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          const base64Image = reader.result as string;
-          payload.image = base64Image;
-          
-          // Make API call
-          await makeAPIRequest(payload);
-        };
-        reader.readAsDataURL(formData.image);
-      } else {
-        await makeAPIRequest(payload);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`);
       }
 
-      clearInterval(quoteInterval);
-    } catch (error) {
-      clearInterval(quoteInterval);
-      console.error("Error generating AI signature:", error);
-      showToast(
-        error instanceof Error ? error.message : "Failed to generate signature. Please try again.",
-        "error"
-      );
-      setIsGenerating(false);
-      analytics.trackError("AI Generator Error", error instanceof Error ? error.message : "Unknown error");
-    }
-  };
+      const data: AISignatureResult[] = await response.json();
 
-  const makeAPIRequest = async (payload: any) => {
-    const response = await fetch(N8N_WEBHOOK_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+      if (!Array.isArray(data) || data.length === 0) {
+        throw new Error("Invalid response from AI generator");
+      }
 
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    
-    // Handle array response
-    if (Array.isArray(data)) {
       setResults(data);
       analytics.aiSignatureGenerated(data.length);
-    } else if (data.signatures && Array.isArray(data.signatures)) {
-      setResults(data.signatures);
-      analytics.aiSignatureGenerated(data.signatures.length);
-    } else {
-      throw new Error("Unexpected API response format");
+      showToast("AI signatures generated successfully!", "success");
+    } catch (error) {
+      console.error("Error generating AI signatures:", error);
+      showToast(
+        error instanceof Error
+          ? error.message
+          : "Error generating signatures. Please try again.",
+        "error"
+      );
+      analytics.aiSignatureError(error instanceof Error ? error.message : "unknown");
+    } finally {
+      setLoading(false);
     }
-
-    setIsGenerating(false);
   };
 
-  const handleCopyHTML = (html: string, name: string) => {
-    navigator.clipboard.writeText(html);
-    showToast(`${name} HTML copied to clipboard!`, "success");
-    analytics.trackEvent("copy_signature", "ai", name);
+  const handleCopyHTML = async (html: string, name: string) => {
+    try {
+      // Create a temporary element to extract text for clipboard
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = html;
+      const textContent = tempDiv.innerText || tempDiv.textContent || "";
+
+      // Copy HTML to clipboard
+      await navigator.clipboard.writeText(html);
+      showToast(`${name} signature copied to clipboard!`, "success");
+      analytics.copySignature();
+    } catch (error) {
+      console.error("Error copying to clipboard:", error);
+      showToast("Error copying signature", "error");
+    }
   };
 
-  const handleUseSignature = async (result: AISignatureResult) => {
+  const handleSaveSignature = async (html: string, name: string) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
+
       if (!session?.user) {
-        showToast("Please sign in to save signatures", "error");
+        showToast("Please sign in to save signatures", "info");
         router.push("/login");
         return;
       }
 
       // Check save limit
-      const limits = await canSaveSignature(session.user.id);
-      if (!limits.canSave) {
+      const { canSave } = await canSaveSignature(session.user.id);
+      if (!canSave) {
         showToast(
-          `You've reached your limit of ${limits.limit} saved signatures. Upgrade to Premium for unlimited saves!`,
+          "You've reached your signature limit. Upgrade to Premium for unlimited signatures!",
           "error"
         );
         router.push("/dashboard/subscription");
         return;
       }
 
-      // Extract signature data from HTML (basic extraction)
-      // This is a simplified version - you might want to enhance this
+      // Extract data from HTML to save
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = html;
+      
+      // Try to extract name and position from HTML
+      const textContent = tempDiv.innerText || "";
+      const lines = textContent.split("\n").filter((line) => line.trim());
+
       const signatureRecord: any = {
         user_id: session.user.id,
-        name: formData.fullName,
-        role: formData.position,
+        name: formData.fullName || name,
+        role: formData.position || "",
         phone: formData.phone || null,
-        image_url: formData.imagePreview || null,
-        template_id: "professional", // Default template ID
-        html_content: result.html, // Store the HTML directly
+        image_url: formData.image || null,
+        social_links: null,
+        template_id: "professional" as TemplateType,
       };
 
       const { error } = await supabase.from("signatures").insert([signatureRecord]);
@@ -242,45 +246,51 @@ export default function AIGeneratorPage() {
       }
 
       await incrementSavedSignatures(session.user.id);
-      showToast(`${result.name} signature saved successfully!`, "success");
       analytics.createSignature("ai-generated");
+      showToast("Signature saved successfully!", "success");
       router.push("/dashboard/signatures");
     } catch (error) {
       console.error("Error saving signature:", error);
-      showToast("Error saving signature. Please try again.", "error");
+      showToast(
+        error instanceof Error ? error.message : "Error saving signature",
+        "error"
+      );
     }
   };
 
   return (
-    <>
-      <MetadataHead
-        title="AI Signature Generator - Signature For Me"
-        description="Create professional email signatures with AI assistance"
-      />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100">
       <div className="max-w-[1920px] mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-              <span className="material-symbols-outlined text-white text-2xl">auto_awesome</span>
-            </div>
+        <div className="mb-8 sm:mb-10">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors mb-4"
+          >
+            <span className="material-symbols-outlined text-xl">arrow_back</span>
+            <span className="text-sm font-medium">Back to Editor</span>
+          </Link>
+          <div className="flex items-center gap-4 mb-4">
+            <Icon3D 
+              icon={<HiSparkles />} 
+              gradient="from-violet-500 via-purple-500 to-fuchsia-500"
+              size="lg"
+            />
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                AI Signature Generator
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 bg-clip-text text-transparent">
+                Create with AI
               </h1>
-              <p className="text-sm text-gray-600 mt-1">
-                Let AI design your perfect professional signature
+              <p className="text-base sm:text-lg text-gray-600 mt-1">
+                Let artificial intelligence design your perfect email signature
               </p>
             </div>
           </div>
         </div>
 
-        {/* Two Column Layout */}
+        {/* Main Content - Split View */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Left Column - Form */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 sm:p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Information</h2>
-            
+          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-lg p-6 sm:p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Full Name */}
               <div>
@@ -289,10 +299,11 @@ export default function AIGeneratorPage() {
                 </label>
                 <input
                   type="text"
-                  required
+                  name="fullName"
                   value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-white text-gray-900"
                   placeholder="John Doe"
                 />
               </div>
@@ -300,15 +311,15 @@ export default function AIGeneratorPage() {
               {/* Position */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  Position / Role <span className="text-red-500">*</span>
+                  Position / Job Title
                 </label>
                 <input
                   type="text"
-                  required
+                  name="position"
                   value={formData.position}
-                  onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
-                  placeholder="Marketing Director"
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-white text-gray-900"
+                  placeholder="Senior Developer"
                 />
               </div>
 
@@ -319,10 +330,11 @@ export default function AIGeneratorPage() {
                 </label>
                 <input
                   type="text"
+                  name="company"
                   value={formData.company}
-                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
-                  placeholder="Acme Corporation"
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-white text-gray-900"
+                  placeholder="Tech Corp"
                 />
               </div>
 
@@ -333,10 +345,11 @@ export default function AIGeneratorPage() {
                 </label>
                 <input
                   type="email"
-                  required
+                  name="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-white text-gray-900"
                   placeholder="john@example.com"
                 />
               </div>
@@ -348,9 +361,10 @@ export default function AIGeneratorPage() {
                 </label>
                 <input
                   type="tel"
+                  name="phone"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-white text-gray-900"
                   placeholder="+1 (555) 123-4567"
                 />
               </div>
@@ -358,13 +372,14 @@ export default function AIGeneratorPage() {
               {/* Website */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  Website / LinkedIn (Optional)
+                  Website / LinkedIn
                 </label>
                 <input
                   type="url"
+                  name="website"
                   value={formData.website}
-                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all"
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-white text-gray-900"
                   placeholder="https://linkedin.com/in/johndoe"
                 />
               </div>
@@ -372,37 +387,92 @@ export default function AIGeneratorPage() {
               {/* Image Upload */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  Profile Photo / Logo (Optional)
+                  Profile Photo
                 </label>
-                {!formData.imagePreview ? (
-                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-purple-400 transition-colors cursor-pointer">
-                    <input
-                      ref={imageInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="hidden"
-                      id="image-upload"
-                    />
-                    <label htmlFor="image-upload" className="cursor-pointer">
-                      <span className="material-symbols-outlined text-4xl text-gray-400 mb-2">cloud_upload</span>
-                      <p className="text-sm text-gray-600">Click to upload image</p>
-                      <p className="text-xs text-gray-500 mt-1">JPG, PNG or GIF • Max 5MB</p>
-                    </label>
-                  </div>
-                ) : (
+                {formData.image ? (
                   <div className="relative">
-                    <img
-                      src={formData.imagePreview}
-                      alt="Preview"
-                      className="w-full h-32 object-cover rounded-xl"
+                    <Image
+                      src={formData.image}
+                      alt="Profile preview"
+                      width={200}
+                      height={200}
+                      className="w-32 h-32 object-cover rounded-xl shadow-md"
                     />
                     <button
                       type="button"
-                      onClick={removeImage}
-                      className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                      onClick={() => setFormData((prev) => ({ ...prev, image: "" }))}
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
                     >
-                      <span className="material-symbols-outlined text-sm">close</span>
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingImage}
+                      className="w-full"
+                    >
+                      {uploadingImage ? (
+                        <span className="text-sm text-gray-500">Uploading...</span>
+                      ) : (
+                        <span className="text-sm text-gray-600">Click to upload photo</span>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Logo Upload */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  Company Logo
+                </label>
+                {formData.logo ? (
+                  <div className="relative">
+                    <Image
+                      src={formData.logo}
+                      alt="Logo preview"
+                      width={200}
+                      height={100}
+                      className="h-20 w-auto object-contain rounded-xl shadow-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData((prev) => ({ ...prev, logo: "" }))}
+                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center">
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={uploadingLogo}
+                      className="w-full"
+                    >
+                      {uploadingLogo ? (
+                        <span className="text-sm text-gray-500">Uploading...</span>
+                      ) : (
+                        <span className="text-sm text-gray-600">Click to upload logo</span>
+                      )}
                     </button>
                   </div>
                 )}
@@ -411,108 +481,109 @@ export default function AIGeneratorPage() {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isGenerating}
-                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                disabled={loading}
+                className="w-full px-6 py-4 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 text-white font-bold rounded-xl shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
               >
-                {isGenerating ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                    Generating with AI...
-                  </span>
+                {loading ? (
+                  <>
+                    <span className="inline-block animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span>
+                    <span>Generating...</span>
+                  </>
                 ) : (
-                  "Generate with AI"
+                  <>
+                    <HiSparkles className="w-5 h-5" />
+                    <span>Generate with AI</span>
+                  </>
                 )}
               </button>
             </form>
           </div>
 
-          {/* Right Column - Preview/Results */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 sm:p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">AI Generated Designs</h2>
-            
-            <div className="min-h-[400px]">
-              {/* Initial State */}
-              {!isGenerating && results.length === 0 && (
-                <div className="flex items-center justify-center h-full min-h-[400px] text-center">
-                  <div className="max-w-md">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-4xl text-purple-400">auto_awesome</span>
-                    </div>
-                    <p className="text-lg text-gray-600">
-                      Complete the form to let AI design your perfect signature
-                    </p>
+          {/* Right Column - Preview Canvas */}
+          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-lg p-6 sm:p-8">
+            {loading && (
+              <div className="flex flex-col items-center justify-center h-full min-h-[500px] text-center">
+                <div className="relative mb-8">
+                  <div className="w-20 h-20 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <HiSparkles className="w-8 h-8 text-purple-600 animate-pulse" />
                   </div>
                 </div>
-              )}
+                <p className="text-lg font-semibold text-gray-900 mb-2">
+                  {currentQuote}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Creating your perfect signature...
+                </p>
+              </div>
+            )}
 
-              {/* Loading State */}
-              {isGenerating && (
-                <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
-                  <div className="w-20 h-20 mb-6 relative">
-                    <div className="absolute inset-0 rounded-full border-4 border-purple-200"></div>
-                    <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-purple-600 animate-spin"></div>
-                    <div className="absolute inset-2 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
-                      <span className="material-symbols-outlined text-3xl text-purple-600">auto_awesome</span>
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">AI is crafting your signature...</h3>
-                  {currentQuote && (
-                    <p className="text-purple-600 italic max-w-md animate-pulse">
-                      "{currentQuote}"
-                    </p>
-                  )}
+            {!loading && results.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full min-h-[500px] text-center text-gray-400">
+                <div className="w-24 h-24 bg-gradient-to-br from-purple-100 to-fuchsia-100 rounded-2xl flex items-center justify-center mb-6">
+                  <HiSparkles className="w-12 h-12 text-purple-400" />
                 </div>
-              )}
+                <p className="text-xl font-semibold text-gray-600 mb-2">
+                  Complete the form
+                </p>
+                <p className="text-base text-gray-500">
+                  Fill in your information and let AI design your perfect email signature
+                </p>
+              </div>
+            )}
 
-              {/* Results State */}
-              {!isGenerating && results.length > 0 && (
-                <div className="space-y-6">
-                  {results.map((result, index) => (
+            {!loading && results.length > 0 && (
+              <div className="space-y-6 max-h-[800px] overflow-y-auto custom-scrollbar">
+                {results.map((result, index) => (
+                  <div
+                    key={index}
+                    className="border-2 border-gray-200 rounded-xl p-6 hover:border-purple-300 transition-all bg-gradient-to-br from-white to-gray-50"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-bold text-gray-900">
+                        {result.name}
+                      </h3>
+                      <span className="px-3 py-1 bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white text-xs font-bold rounded-full">
+                        AI Generated
+                      </span>
+                    </div>
+
+                    {/* Signature Preview */}
                     <div
-                      key={index}
-                      className="border-2 border-gray-200 rounded-xl p-6 hover:border-purple-300 transition-all shadow-sm hover:shadow-md"
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xl font-bold text-gray-900">{result.name}</h3>
-                        <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">
-                          AI Generated
-                        </span>
-                      </div>
-                      
-                      {/* Signature Preview */}
-                      <div className="mb-4 p-4 bg-gray-50 rounded-lg overflow-x-auto">
-                        <div
-                          dangerouslySetInnerHTML={{ __html: result.html }}
-                          className="signature-preview"
-                        />
-                      </div>
+                      className="mb-4 p-4 bg-white rounded-lg border border-gray-200 overflow-x-auto"
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(result.html),
+                      }}
+                    />
 
-                      {/* Action Buttons */}
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => handleCopyHTML(result.html, result.name)}
-                          className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
-                        >
-                          <span className="material-symbols-outlined text-sm">content_copy</span>
-                          Copy HTML
-                        </button>
-                        <button
-                          onClick={() => handleUseSignature(result)}
-                          className="flex-1 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all flex items-center justify-center gap-2"
-                        >
-                          <span className="material-symbols-outlined text-sm">save</span>
-                          Save Signature
-                        </button>
-                      </div>
+                    {/* Actions */}
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <button
+                        onClick={() => handleCopyHTML(result.html, result.name)}
+                        className="flex-1 px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                      >
+                        <span className="material-symbols-outlined text-lg">
+                          content_copy
+                        </span>
+                        <span>Copy HTML</span>
+                      </button>
+                      <button
+                        onClick={() => handleSaveSignature(result.html, result.name)}
+                        className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white font-semibold rounded-xl hover:from-purple-700 hover:to-fuchsia-700 transition-all flex items-center justify-center gap-2"
+                      >
+                        <span className="material-symbols-outlined text-lg">
+                          save
+                        </span>
+                        <span>Save Signature</span>
+                      </button>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
-
