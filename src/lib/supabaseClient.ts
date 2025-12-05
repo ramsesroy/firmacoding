@@ -6,7 +6,12 @@ function getSupabaseEnv() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error("Missing Supabase environment variables. Please check your .env.local file.");
+    console.error("❌ Missing Supabase environment variables!");
+    console.error("📝 Please check your .env.local file in the project root.");
+    console.error("🔧 Required variables:");
+    console.error("   - NEXT_PUBLIC_SUPABASE_URL");
+    console.error("   - NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    console.error("💡 After adding/updating .env.local, RESTART the server (npm run dev)");
     
     // Instead of throwing error, return empty default values
     // so the application doesn't break
@@ -14,6 +19,11 @@ function getSupabaseEnv() {
       url: supabaseUrl || "",
       key: supabaseAnonKey || "",
     };
+  }
+
+  // Log success in development only
+  if (process.env.NODE_ENV === "development") {
+    console.log("✅ Supabase environment variables loaded successfully");
   }
 
   return {

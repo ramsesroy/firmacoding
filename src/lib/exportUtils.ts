@@ -1,6 +1,7 @@
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { SignatureProps, TemplateType } from "@/types/signature";
+import { getOptimizedImageUrl } from "./imageUtils";
 
 export type ExportSize = "auto" | "small" | "medium" | "large";
 
@@ -10,6 +11,7 @@ export interface ExportOptions {
   quality?: number; // 0-1 for image quality
   onProgress?: (progress: number) => void; // Progress callback 0-100
   addWatermark?: boolean; // Add watermark for free users
+  useCloudflareOptimization?: boolean; // Use Cloudflare for image optimization (premium only, optional)
 }
 
 // Size presets in pixels
@@ -20,18 +22,128 @@ const SIZE_PRESETS = {
 };
 
 /**
+ * Wait for all images in element to load completely
+ */
+async function waitForImagesToLoad(element: HTMLElement, timeout: number = 10000): Promise<void> {
+  const images = Array.from(element.querySelectorAll("img")) as HTMLImageElement[];
+  const imagePromises = images.map((img) => {
+    return new Promise<void>((resolve, reject) => {
+      // If image is already loaded, resolve immediately
+      if (img.complete && img.naturalWidth > 0) {
+        resolve();
+        return;
+      }
+
+      // If image has an error, resolve anyway (don't block export)
+      if (img.complete && img.naturalWidth === 0) {
+        console.warn("Image failed to load:", img.src);
+        resolve(); // Resolve anyway to not block export
+        return;
+      }
+
+      // Wait for load or error
+      const timeoutId = setTimeout(() => {
+        console.warn("Image load timeout:", img.src);
+        resolve(); // Resolve anyway to not block export
+      }, timeout);
+
+      img.onload = () => {
+        clearTimeout(timeoutId);
+        resolve();
+      };
+
+      img.onerror = () => {
+        clearTimeout(timeoutId);
+        console.warn("Image load error:", img.src);
+        resolve(); // Resolve anyway to not block export
+      };
+    });
+  });
+
+  await Promise.all(imagePromises);
+}
+
+/**
+ * Optimizes images in HTML element before export
+ * Uses Supabase Storage Transformations for Supabase images (all users)
+ * Optionally uses Cloudflare for premium users if configured
+ */
+async function optimizeImagesInElement(
+  element: HTMLElement,
+  useCloudflare: boolean = false
+): Promise<{ restore: () => void }> {
+  const images = element.querySelectorAll("img");
+  const originalSources: Map<HTMLImageElement, string> = new Map();
+  
+  // Store original sources and optimize
+  images.forEach((img) => {
+    const src = img.getAttribute("src");
+    if (src && !src.startsWith("data:") && !src.includes("drive.google.com")) {
+      originalSources.set(img, src);
+      
+      // For export, use original images to avoid loading issues
+      // The optimization can cause images to not load in time for html2canvas
+      // Instead, we'll rely on the high scale factor for quality
+      
+      // Only optimize if explicitly requested (Cloudflare for premium)
+      if (useCloudflare) {
+        const optimized = getOptimizedImageUrl(src, {
+          width: 1920,
+          quality: 95,
+        });
+        if (optimized !== src) {
+          img.setAttribute("src", optimized);
+        }
+      } else {
+        // For standard export, ensure we use the original full-quality image
+        // Remove any query parameters that might reduce quality
+        try {
+          const url = new URL(src);
+          url.searchParams.delete("width");
+          url.searchParams.delete("height");
+          url.searchParams.delete("quality");
+          const cleanUrl = url.toString();
+          if (cleanUrl !== src) {
+            img.setAttribute("src", cleanUrl);
+          }
+        } catch (e) {
+          // If URL parsing fails, keep original src
+        }
+      }
+    }
+  });
+  
+  // Return restore function
+  return {
+    restore: () => {
+      originalSources.forEach((originalSrc, img) => {
+        img.setAttribute("src", originalSrc);
+      });
+    },
+  };
+}
+
+/**
  * Export signature to PNG (Ultra High Quality - 4K+ resolution)
- * Uses dom-to-image-more with high scale factor for crisp rendering
+ * Uses html2canvas with high scale factor for crisp rendering
+ * Premium users can get Cloudflare-optimized images (optional)
  */
 export async function exportToPNGHQ(
   element: HTMLElement,
   filename: string = "signature.png",
   options: ExportOptions = {}
 ): Promise<void> {
-  const { size = "auto", margin = 20, onProgress } = options;
+  const { size = "auto", margin = 20, onProgress, useCloudflareOptimization = false } = options;
 
   try {
     onProgress?.(10);
+
+    // Optimize images before export
+    const imageOptimizer = await optimizeImagesInElement(element, useCloudflareOptimization);
+    
+    // Wait for all images to load completely
+    onProgress?.(15);
+    await waitForImagesToLoad(element, 10000); // 10 second timeout
 
     let targetWidth: number;
     let targetHeight: number;
@@ -54,19 +166,36 @@ export async function exportToPNGHQ(
 
     onProgress?.(30);
 
-    // Use html2canvas - scale will be applied manually
+    // Use html2canvas with better settings for quality
     const canvas = await html2canvas(element, {
       logging: false,
       useCORS: true,
       allowTaint: false,
+      scale: 2, // Start with 2x for better quality
+      backgroundColor: "#ffffff",
+      removeContainer: false,
+      imageTimeout: 30000, // Wait longer for images to load (30 seconds)
+      onclone: (clonedDoc) => {
+        // Ensure all images in cloned document are loaded
+        const clonedImages = clonedDoc.querySelectorAll("img");
+        clonedImages.forEach((img) => {
+          if (!img.complete) {
+            // Force reload if not complete
+            const src = img.getAttribute("src");
+            if (src) {
+              img.src = src;
+            }
+          }
+        });
+      },
     });
 
     onProgress?.(60);
 
     // Scale canvas manually for ultra-high quality
     const scaledCanvas = document.createElement("canvas");
-    scaledCanvas.width = canvas.width * scale;
-    scaledCanvas.height = canvas.height * scale;
+    scaledCanvas.width = canvas.width * (scale / 2); // Adjust for initial 2x scale
+    scaledCanvas.height = canvas.height * (scale / 2);
     const scaledCtx = scaledCanvas.getContext("2d");
     
     if (!scaledCtx) {
@@ -120,6 +249,9 @@ export async function exportToPNGHQ(
       drawWatermark(ctx, finalCanvas.width, finalCanvas.height, scale);
     }
 
+    // Restore original images
+    imageOptimizer.restore();
+
     onProgress?.(90);
 
     // Convert to blob and download
@@ -148,6 +280,7 @@ export async function exportToPNGHQ(
 
 /**
  * Export signature to PNG (Legacy - kept for compatibility)
+ * Standard quality for registered users
  */
 export async function exportToPNG(
   element: HTMLElement,
@@ -157,15 +290,19 @@ export async function exportToPNG(
   const { size = "auto", margin = 20, quality = 1 } = options;
 
   try {
+    // Optimize images (without Cloudflare for standard export)
+    const imageOptimizer = await optimizeImagesInElement(element, false);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
     let width: number;
     let height: number;
-    let scale = 6; // Maximum scale for ultra high quality (6x = print quality)
+    let scale = 4; // Standard quality: 4x scale
 
     if (size === "auto") {
       const rect = element.getBoundingClientRect();
       width = rect.width + margin * 2;
       height = rect.height + margin * 2;
-      scale = 6;
+      scale = 4;
     } else {
       const preset = SIZE_PRESETS[size];
       width = preset.width;
@@ -173,20 +310,22 @@ export async function exportToPNG(
       const rect = element.getBoundingClientRect();
       const scaleX = (width - margin * 2) / rect.width;
       const scaleY = (height - margin * 2) / rect.height;
-      scale = Math.max(4, Math.min(scaleX, scaleY, 6));
+      scale = Math.max(3, Math.min(scaleX, scaleY, 4));
     }
 
     const canvas = await html2canvas(element, {
       logging: false,
       useCORS: true,
       allowTaint: false,
+      scale: 2,
+      backgroundColor: "#ffffff",
     });
 
     let scaledCanvas = canvas;
     if (scale !== 1) {
       scaledCanvas = document.createElement("canvas");
-      scaledCanvas.width = canvas.width * scale;
-      scaledCanvas.height = canvas.height * scale;
+      scaledCanvas.width = canvas.width * (scale / 2);
+      scaledCanvas.height = canvas.height * (scale / 2);
       const ctx = scaledCanvas.getContext("2d");
       if (ctx) {
         ctx.imageSmoothingEnabled = true;
@@ -236,6 +375,9 @@ export async function exportToPNG(
       }
     }
 
+    // Restore original images
+    imageOptimizer.restore();
+
     finalCanvas.toBlob(
       (blob) => {
         if (blob) {
@@ -261,16 +403,24 @@ export async function exportToPNG(
 /**
  * Export signature to PDF (Ultra High Quality)
  * Uses high-resolution canvas rendering
+ * Premium users can get Cloudflare-optimized images (optional)
  */
 export async function exportToPDFHQ(
   element: HTMLElement,
   filename: string = "signature.pdf",
   options: ExportOptions = {}
 ): Promise<void> {
-  const { size = "auto", margin = 20, onProgress } = options;
+  const { size = "auto", margin = 20, onProgress, useCloudflareOptimization = false } = options;
 
   try {
     onProgress?.(10);
+
+    // Optimize images before export
+    const imageOptimizer = await optimizeImagesInElement(element, useCloudflareOptimization);
+    
+    // Wait for all images to load completely
+    onProgress?.(15);
+    await waitForImagesToLoad(element, 10000); // 10 second timeout
 
     let targetWidth: number;
     let targetHeight: number;
@@ -298,14 +448,30 @@ export async function exportToPDFHQ(
       logging: false,
       useCORS: true,
       allowTaint: false,
+      scale: 2,
+      backgroundColor: "#ffffff",
+      imageTimeout: 30000, // Wait longer for images to load (30 seconds)
+      onclone: (clonedDoc) => {
+        // Ensure all images in cloned document are loaded
+        const clonedImages = clonedDoc.querySelectorAll("img");
+        clonedImages.forEach((img) => {
+          if (!img.complete) {
+            // Force reload if not complete
+            const src = img.getAttribute("src");
+            if (src) {
+              img.src = src;
+            }
+          }
+        });
+      },
     });
 
     onProgress?.(60);
 
     // Scale canvas manually for ultra-high quality
     const scaledCanvas = document.createElement("canvas");
-    scaledCanvas.width = canvas.width * scale;
-    scaledCanvas.height = canvas.height * scale;
+    scaledCanvas.width = canvas.width * (scale / 2);
+    scaledCanvas.height = canvas.height * (scale / 2);
     const scaledCtx = scaledCanvas.getContext("2d");
     
     if (!scaledCtx) {
@@ -357,29 +523,37 @@ export async function exportToPDFHQ(
       drawWatermark(ctx, finalCanvas.width, finalCanvas.height, scale);
     }
 
+    // Restore original images
+    imageOptimizer.restore();
+
     onProgress?.(80);
 
     // Convert to PDF dimensions (300 DPI for print quality)
     const dpi = 300;
     const pxToMm = 25.4 / dpi;
-    const pdfWidth = (targetWidth / scale) * pxToMm;
-    const pdfHeight = (targetHeight / scale) * pxToMm;
-    const imagePdfWidth = ((targetWidth - margin * 2) / scale) * pxToMm;
-    const imagePdfHeight = ((targetHeight - margin * 2) / scale) * pxToMm;
+    
+    // Calculate dimensions based on actual canvas size
+    const actualWidth = finalCanvas.width;
+    const actualHeight = finalCanvas.height;
+    const pdfWidth = (actualWidth / scale) * pxToMm;
+    const pdfHeight = (actualHeight / scale) * pxToMm;
+    const imagePdfWidth = ((actualWidth - margin * 2 * scale) / scale) * pxToMm;
+    const imagePdfHeight = ((actualHeight - margin * 2 * scale) / scale) * pxToMm;
 
-    // Create PDF
+    // Create PDF with proper dimensions
     const pdf = new jsPDF({
       orientation: pdfWidth > pdfHeight ? "landscape" : "portrait",
       unit: "mm",
       format: [pdfWidth, pdfHeight],
-      compress: true,
+      compress: false, // Disable compression for better quality
     });
 
-    const imgData = finalCanvas.toDataURL("image/png", 1.0);
+    // Use JPEG with high quality for better file size and compatibility
+    const imgData = finalCanvas.toDataURL("image/jpeg", 0.95);
     const x = (pdfWidth - imagePdfWidth) / 2;
     const y = (pdfHeight - imagePdfHeight) / 2;
 
-    pdf.addImage(imgData, "PNG", x, y, imagePdfWidth, imagePdfHeight, undefined, "FAST");
+    pdf.addImage(imgData, "JPEG", x, y, imagePdfWidth, imagePdfHeight, undefined, "SLOW");
 
     onProgress?.(95);
     pdf.save(filename);
@@ -401,15 +575,19 @@ export async function exportToPDF(
   const { size = "auto", margin = 20, quality = 1 } = options;
 
   try {
+    // Optimize images (without Cloudflare for standard export)
+    const imageOptimizer = await optimizeImagesInElement(element, false);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
     let width: number;
     let height: number;
-    let scale = 6;
+    let scale = 4;
 
     if (size === "auto") {
       const rect = element.getBoundingClientRect();
       width = rect.width + margin * 2;
       height = rect.height + margin * 2;
-      scale = 6;
+      scale = 4;
     } else {
       const preset = SIZE_PRESETS[size];
       width = preset.width;
@@ -417,20 +595,22 @@ export async function exportToPDF(
       const rect = element.getBoundingClientRect();
       const scaleX = (width - margin * 2) / rect.width;
       const scaleY = (height - margin * 2) / rect.height;
-      scale = Math.max(4, Math.min(scaleX, scaleY, 6));
+      scale = Math.max(3, Math.min(scaleX, scaleY, 4));
     }
 
     const canvas = await html2canvas(element, {
       logging: false,
       useCORS: true,
       allowTaint: false,
+      scale: 2,
+      backgroundColor: "#ffffff",
     });
 
     let scaledCanvas = canvas;
     if (scale !== 1) {
       scaledCanvas = document.createElement("canvas");
-      scaledCanvas.width = canvas.width * scale;
-      scaledCanvas.height = canvas.height * scale;
+      scaledCanvas.width = canvas.width * (scale / 2);
+      scaledCanvas.height = canvas.height * (scale / 2);
       const ctx = scaledCanvas.getContext("2d");
       if (ctx) {
         ctx.imageSmoothingEnabled = true;
@@ -468,6 +648,9 @@ export async function exportToPDF(
         imageWidth = availableHeight * aspectRatio;
       }
     }
+
+    // Restore original images
+    imageOptimizer.restore();
 
     const pdf = new jsPDF({
       orientation: pdfWidth > pdfHeight ? "landscape" : "portrait",

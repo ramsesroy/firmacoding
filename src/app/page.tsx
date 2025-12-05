@@ -14,7 +14,6 @@ import {
   HiOutlineEye,
   HiOutlinePaintBrush,
   HiOutlineDevicePhoneMobile,
-  HiOutlineSparkles,
   HiOutlineChartBar,
   HiOutlineDocumentText,
   HiOutlineRocketLaunch,
@@ -100,12 +99,6 @@ export default function LandingPage() {
 
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <ScrollAnimation direction="fade" delay={0}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-blue-100 rounded-full text-sm font-medium text-blue-700 mb-8 shadow-sm">
-                <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
-                New: AI Signature Enhancer Available Now
-              </div>
-            </ScrollAnimation>
 
             <ScrollAnimation direction="down" delay={100}>
               <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
@@ -335,13 +328,6 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto">
             {[
-              {
-                icon: <HiOutlineSparkles className="w-full h-full" />,
-                title: "AI Signature Enhancer",
-                description: "Get intelligent design suggestions powered by AI. Automatically optimize your signature based on your role, industry, and best practices.",
-                features: ["Smart layout recommendations", "Industry-specific optimizations", "Color scheme suggestions"],
-                gradient: "from-purple-500 to-indigo-600",
-              },
               {
                 icon: <HiOutlineChartBar className="w-full h-full" />,
                 title: "Link Click Analytics",

@@ -174,7 +174,6 @@ function SubscriptionContent() {
       description: "For growing teams",
       features: [
         "Everything in Premium",
-        "AI Enhancer (coming soon)",
         "Bulk CSV upload (coming soon)",
         "Team dashboard (coming soon)",
         "Custom branding (coming soon)",

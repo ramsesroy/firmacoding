@@ -8,17 +8,16 @@ import SignaturePreview from "@/components/SignaturePreview";
 import IconPicker from "@/components/IconPicker";
 import { TemplateType, RedSocial } from "@/types/signature";
 import { copyToClipboard } from "@/lib/signatureUtils";
-import { uploadImage } from "@/lib/imageUtils";
+import { uploadImage, getTempImages, getRemainingSessionUploads } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/components/Toast";
 import { MetadataHead } from "@/components/MetadataHead";
 import { SkeletonForm, SkeletonSignaturePreview } from "@/components/Skeleton";
-import { Watermark } from "@/components/Watermark";
+// Watermark component removed - free users can use all features without watermark
 import { useSubscription } from "@/hooks/useSubscription";
 import { canSaveSignature, incrementSavedSignatures, decrementSavedSignatures } from "@/lib/subscriptionUtils";
 import { analytics } from "@/lib/analytics";
 import { Icon3D } from "@/components/Icon3D";
-import { HiOutlineSparkles } from "react-icons/hi2";
 
 // Force dynamic rendering for this page to support search params
 export const dynamic = "force-dynamic";
@@ -31,13 +30,18 @@ function DashboardContent() {
   const [user, setUser] = useState<any>(null);
   const { isPremium, subscription, loading: subscriptionLoading } = useSubscription();
   const [saveLimit, setSaveLimit] = useState<{ canSave: boolean; remaining: number; limit: number } | null>(null);
+  
+  // Use ref to track previous authentication state to avoid stale closure
+  const prevAuthenticatedRef = useRef<boolean | null>(null);
 
   // Check authentication on mount
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
+      const authenticated = !!session;
+      setIsAuthenticated(authenticated);
       setUser(session?.user || null);
+      prevAuthenticatedRef.current = authenticated;
       
       // Check save limits if authenticated
       if (session?.user) {
@@ -49,14 +53,59 @@ function DashboardContent() {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setIsAuthenticated(!!session);
+      const wasAuthenticated = prevAuthenticatedRef.current;
+      const isNowAuthenticated = !!session;
+      
+      setIsAuthenticated(isNowAuthenticated);
       setUser(session?.user || null);
+      prevAuthenticatedRef.current = isNowAuthenticated;
+      
+      // Migrate temp images when user logs in or registers
+      if (session?.user && !wasAuthenticated && isNowAuthenticated) {
+        try {
+          const { migrateTempImages } = await import("@/lib/imageUtils");
+          const migrated = await migrateTempImages(session.user.id);
+          
+          if (migrated.length > 0) {
+            // Update image URLs in signature data if they were migrated
+            setSignatureData((prev) => {
+              let updated = { ...prev };
+              
+              // Update foto if it was migrated
+              const fotoMigration = migrated.find((m) => m.oldUrl === prev.foto);
+              if (fotoMigration) {
+                updated.foto = fotoMigration.newUrl;
+              }
+              
+              // Update logoEmpresa if it was migrated
+              const logoMigration = migrated.find((m) => m.oldUrl === prev.logoEmpresa);
+              if (logoMigration) {
+                updated.logoEmpresa = logoMigration.newUrl;
+              }
+              
+              return updated;
+            });
+            
+            showToast(
+              `Migrated ${migrated.length} image(s) to permanent storage!`,
+              "success"
+            );
+          }
+        } catch (error) {
+          console.error("Error migrating temp images:", error);
+          // Don't show error to user - migration is not critical
+        }
+      }
       
       if (session?.user) {
         const limits = await canSaveSignature(session.user.id);
         setSaveLimit(limits);
       } else {
         setSaveLimit(null);
+        // Update temp images count for unauthenticated users
+        const tempImages = getTempImages();
+        setTempImagesCount(tempImages.length);
+        setRemainingSessionUploads(getRemainingSessionUploads(false));
       }
     });
 
@@ -168,6 +217,15 @@ function DashboardContent() {
     iconoDireccion: "📍",
   });
 
+  // Update temp images count and session uploads when images are uploaded
+  useEffect(() => {
+    if (!isAuthenticated) {
+      const tempImages = getTempImages();
+      setTempImagesCount(tempImages.length);
+      setRemainingSessionUploads(getRemainingSessionUploads(false));
+    }
+  }, [signatureData.foto, signatureData.logoEmpresa, isAuthenticated]);
+
   const [template, setTemplate] = useState<TemplateType>("professional");
 
   // Define free templates (first 6)
@@ -195,6 +253,16 @@ function DashboardContent() {
   const [loadingSignature, setLoadingSignature] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Preview states
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewFile, setPreviewFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewType, setPreviewType] = useState<"foto" | "logo" | null>(null);
+  
+  // Session upload tracking
+  const [tempImagesCount, setTempImagesCount] = useState(0);
+  const [remainingSessionUploads, setRemainingSessionUploads] = useState<number | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
   // Load signature for editing if edit query parameter exists
@@ -308,19 +376,60 @@ function DashboardContent() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
+    // Show preview before uploading
+    const url = URL.createObjectURL(file);
+    setPreviewFile(file);
+    setPreviewUrl(url);
+    setPreviewType("foto");
+    setShowPreview(true);
+    
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleConfirmUpload = async () => {
+    if (!previewFile || !previewType) return;
+
+    setShowPreview(false);
+    setUploading(previewType === "foto");
+    setUploadingLogo(previewType === "logo");
+
     try {
-      const imageURL = await uploadImage(file);
-      setSignatureData({ ...signatureData, foto: imageURL });
-      showToast("Image uploaded successfully!", "success");
+      const imageURL = await uploadImage(previewFile);
+      
+      if (previewType === "foto") {
+        setSignatureData({ ...signatureData, foto: imageURL });
+        showToast("Image uploaded successfully!", "success");
+      } else {
+        setSignatureData({ ...signatureData, logoEmpresa: imageURL });
+        showToast("Logo uploaded successfully!", "success");
+      }
     } catch (error) {
       showToast(error instanceof Error ? error.message : "Error uploading image", "error");
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
     } finally {
       setUploading(false);
+      setUploadingLogo(false);
+      // Clean up preview URL
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setPreviewFile(null);
+      setPreviewUrl(null);
+      setPreviewType(null);
     }
+  };
+
+  const handleCancelPreview = () => {
+    setShowPreview(false);
+    // Clean up preview URL
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewFile(null);
+    setPreviewUrl(null);
+    setPreviewType(null);
   };
 
   const handleRemoveImage = () => {
@@ -334,18 +443,16 @@ function DashboardContent() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setUploadingLogo(true);
-    try {
-      const imageURL = await uploadImage(file);
-      setSignatureData({ ...signatureData, logoEmpresa: imageURL });
-      showToast("Logo uploaded successfully!", "success");
-    } catch (error) {
-      showToast(error instanceof Error ? error.message : "Error uploading logo", "error");
-      if (logoFileInputRef.current) {
-        logoFileInputRef.current.value = "";
-      }
-    } finally {
-      setUploadingLogo(false);
+    // Show preview before uploading
+    const url = URL.createObjectURL(file);
+    setPreviewFile(file);
+    setPreviewUrl(url);
+    setPreviewType("logo");
+    setShowPreview(true);
+    
+    // Reset input
+    if (logoFileInputRef.current) {
+      logoFileInputRef.current.value = "";
     }
   };
 
@@ -552,51 +659,6 @@ function DashboardContent() {
             </p>
           </div>
           
-          {/* AI Enhancer Button - Premium Feature */}
-          {!editingSignatureId && (
-            <div className="mt-6">
-              <Link
-                href="/dashboard/ai-generator"
-                className="group relative inline-flex items-center gap-4 px-6 py-4 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 rounded-2xl shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1 overflow-hidden"
-                onClick={() => analytics.clickCTA("dashboard", "AI Enhancer")}
-              >
-                {/* Animated background */}
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 opacity-100 group-hover:opacity-90 transition-opacity duration-300"></div>
-                <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.1)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] bg-[position:-100%_0,0_0] bg-no-repeat group-hover:animate-[shimmer_2s_infinite]"></div>
-                
-                {/* Icon 3D */}
-                <div className="relative z-10 flex-shrink-0">
-                  <Icon3D 
-                    icon={<HiOutlineSparkles className="w-6 h-6" />}
-                    gradient="from-white to-purple-100"
-                    size="md"
-                  />
-                </div>
-                
-                {/* Text Content */}
-                <div className="relative z-10 text-left">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-white font-bold text-lg sm:text-xl group-hover:text-purple-50 transition-colors">
-                      Create with AI
-                    </span>
-                    <span className="px-2 py-0.5 bg-white/20 backdrop-blur-sm text-white text-xs font-bold rounded-full border border-white/30">
-                      PREMIUM
-                    </span>
-                  </div>
-                  <p className="text-purple-50 text-sm font-medium opacity-90 group-hover:opacity-100 transition-opacity">
-                    Let AI design your perfect signature
-                  </p>
-                </div>
-                
-                {/* Arrow Icon */}
-                <div className="relative z-10 flex-shrink-0 ml-auto">
-                  <span className="material-symbols-outlined text-white text-2xl group-hover:translate-x-1 transition-transform duration-300">
-                    arrow_forward
-                  </span>
-                </div>
-              </Link>
-            </div>
-          )}
         </div>
 
         {/* Layout: Flex column on mobile, grid on desktop */}
@@ -785,24 +847,52 @@ function DashboardContent() {
                               </span>
                             </div>
                             <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
-                              Unlock 14+ Premium Templates
+                              Save & Manage Your Signatures
                             </h3>
                           </div>
                         </div>
 
                         {/* Description */}
                         <p className="text-gray-700 text-sm leading-relaxed">
-                          Create stunning professional signatures with our exclusive premium templates. 
-                          <span className="font-semibold text-blue-700"> Sign up for free</span> and unlock unlimited access.
+                          You can create and copy signatures for free! 
+                          <span className="font-semibold text-blue-700"> Sign up for free</span> to save and manage unlimited signatures.
                         </p>
+
+                        {/* Temporary Images Notice */}
+                        {(tempImagesCount > 0 || remainingSessionUploads !== null) && (
+                          <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                            <div className="flex items-start gap-2">
+                              <span className="material-symbols-outlined text-amber-600 text-lg flex-shrink-0 mt-0.5">info</span>
+                              <div className="flex-1">
+                                <p className="text-xs text-amber-800 font-medium mb-1">
+                                  Temporary Images Notice
+                                </p>
+                                <p className="text-xs text-amber-700 leading-relaxed mb-2">
+                                  Images uploaded without an account will be automatically deleted after 24 hours. 
+                                  <span className="font-semibold"> Sign up</span> to keep your images permanently and access all features.
+                                </p>
+                                {tempImagesCount > 0 && (
+                                  <p className="text-xs text-amber-700">
+                                    <span className="font-semibold">{tempImagesCount}</span> temporary image{tempImagesCount !== 1 ? 's' : ''} will be deleted in 24 hours.
+                                  </p>
+                                )}
+                                {remainingSessionUploads !== null && remainingSessionUploads < 10 && (
+                                  <p className="text-xs text-amber-700 mt-1">
+                                    <span className="font-semibold">{remainingSessionUploads}</span> upload{remainingSessionUploads !== 1 ? 's' : ''} remaining this session.
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                         
                         {/* Features list - Compact */}
                         <div className="grid grid-cols-2 gap-2">
                           {[
-                              "14+ Premium Templates",
-                              "Unlimited Signatures",
-                              "Save & Manage",
-                              "No Watermarks"
+                              "Save Unlimited Signatures",
+                              "Access from Anywhere",
+                              "Edit Anytime",
+                              "14+ Premium Templates"
                             ].map((feature, idx) => (
                               <div key={idx} className="flex items-center gap-1.5 text-xs text-gray-700">
                                 <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -950,6 +1040,7 @@ function DashboardContent() {
                         height={176}
                         className="max-w-full h-44 object-contain mx-auto rounded-xl shadow-md"
                         loading="lazy"
+                        quality={85}
                         unoptimized={signatureData.foto.startsWith("data:") || signatureData.foto.includes("drive.google.com")}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -1455,7 +1546,7 @@ function DashboardContent() {
               }}
             >
               <div ref={previewRef} className="relative flex items-center justify-center min-h-[350px] bg-white rounded-xl shadow-lg border border-gray-100 p-6 overflow-hidden">
-                <Watermark enabled={!isAuthenticated && isPremiumTemplate} />
+                {/* Watermark removed - free users can use all features without watermark */}
                 <SignaturePreview
                   nombre={signatureData.nombre}
                   cargo={signatureData.cargo}
@@ -1582,6 +1673,80 @@ function DashboardContent() {
           </div>
         </div>
       </div>
+
+      {/* Image Preview Modal */}
+      {showPreview && previewUrl && previewFile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <span className="material-symbols-outlined text-blue-600">image</span>
+                Preview {previewType === "foto" ? "Photo" : "Logo"}
+              </h3>
+              <button
+                onClick={handleCancelPreview}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
+                aria-label="Close preview"
+              >
+                <span className="material-symbols-outlined text-2xl">close</span>
+              </button>
+            </div>
+
+            {/* Preview Image */}
+            <div className="flex-1 overflow-auto p-6 flex items-center justify-center bg-gray-50">
+              <div className="relative max-w-full max-h-[60vh]">
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="max-w-full max-h-[60vh] object-contain rounded-lg shadow-lg"
+                />
+              </div>
+            </div>
+
+            {/* File Info */}
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+              <div className="flex items-center justify-between text-sm text-gray-600 mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">description</span>
+                  <span className="font-medium">{previewFile.name}</span>
+                </div>
+                <span className="text-gray-500">
+                  {(previewFile.size / 1024 / 1024).toFixed(2)} MB
+                </span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="px-6 py-4 border-t border-gray-200 flex gap-3">
+              <button
+                onClick={handleCancelPreview}
+                className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-semibold flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined text-lg">cancel</span>
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmUpload}
+                disabled={uploading || uploadingLogo}
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/30"
+              >
+                {uploading || uploadingLogo ? (
+                  <>
+                    <span className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></span>
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-lg">cloud_upload</span>
+                    Confirm & Upload
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </>
   );

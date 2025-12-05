@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -11,6 +11,15 @@ function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
+
+  // Create stable string representation of relevant search params to avoid unnecessary re-renders
+  // This prevents the effect from running on every render when searchParams object reference changes
+  const searchParamsKey = useMemo(() => {
+    const errorParam = searchParams.get("error");
+    const errorDescription = searchParams.get("error_description");
+    // Create stable key from actual parameter values, not the object reference
+    return `${errorParam || ""}_${errorDescription || ""}`;
+  }, [searchParams]);
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -44,6 +53,15 @@ function AuthCallbackContent() {
         }
 
         if (session) {
+          // Migrate temp images when user authenticates via OAuth
+          try {
+            const { migrateTempImages } = await import("@/lib/imageUtils");
+            await migrateTempImages(session.user.id);
+          } catch (error) {
+            console.error("Error migrating temp images:", error);
+            // Don't block auth if migration fails
+          }
+          
           router.push("/dashboard");
           router.refresh();
         } else {
@@ -62,8 +80,10 @@ function AuthCallbackContent() {
     };
 
     handleAuthCallback();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
+    // Use searchParamsKey (stable string) instead of searchParams (object reference)
+    // This ensures the effect only runs when the actual parameter values change,
+    // not when the searchParams object reference changes on each render
+  }, [router, searchParamsKey]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4">

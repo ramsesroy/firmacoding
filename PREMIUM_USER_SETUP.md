@@ -194,7 +194,7 @@ Puedes crear usuarios con estos planes:
    - ✅ Acceso a todos los templates (incluidos los premium)
    - ✅ Guardar firmas ilimitadas
    - ✅ Exportar PNG/PDF sin watermark
-   - ✅ Acceso al AI Generator
+   - ✅ Acceso a todos los templates premium
    - ✅ Badge "Premium" visible en el dashboard
 
 3. **Verifica en el Dashboard:**

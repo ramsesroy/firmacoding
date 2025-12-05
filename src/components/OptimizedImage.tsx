@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getOptimizedImageUrl, getContextualImageUrl, supportsWebP } from "@/lib/imageUtils";
 
 interface OptimizedImageProps {
   src: string;
@@ -14,6 +15,8 @@ interface OptimizedImageProps {
   sizes?: string;
   quality?: number;
   onError?: () => void;
+  context?: "thumbnail" | "preview" | "full";
+  optimize?: boolean;
 }
 
 export default function OptimizedImage({
@@ -27,9 +30,50 @@ export default function OptimizedImage({
   sizes,
   quality = 85,
   onError,
+  context = "full",
+  optimize = true,
 }: OptimizedImageProps) {
   const [imgSrc, setImgSrc] = useState(src);
   const [hasError, setHasError] = useState(false);
+  const [webPSupported, setWebPSupported] = useState(false);
+
+  // Check WebP support on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setWebPSupported(supportsWebP());
+    }
+  }, []);
+
+  // Update image source when src changes
+  useEffect(() => {
+    if (src) {
+      let optimizedSrc = src;
+      
+      // Apply optimization if enabled and source is not a data URL or external
+      if (optimize && !src.startsWith("data:") && !src.includes("drive.google.com")) {
+        if (context !== "full") {
+          // Use contextual optimization
+          optimizedSrc = getContextualImageUrl(src, context);
+        } else if (width || height) {
+          // Use specific dimensions
+          optimizedSrc = getOptimizedImageUrl(src, {
+            width,
+            height,
+            quality,
+            format: webPSupported ? "webp" : undefined,
+          });
+        } else {
+          // Use quality and format optimization
+          optimizedSrc = getOptimizedImageUrl(src, {
+            quality,
+            format: webPSupported ? "webp" : undefined,
+          });
+        }
+      }
+      
+      setImgSrc(optimizedSrc);
+    }
+  }, [src, context, width, height, quality, webPSupported, optimize]);
 
   const handleError = () => {
     if (!hasError) {
@@ -44,6 +88,7 @@ export default function OptimizedImage({
 
   // Don't optimize data URLs or Google Drive URLs that don't support optimization
   const shouldOptimize =
+    optimize &&
     !imgSrc.startsWith("data:") &&
     !imgSrc.includes("drive.google.com");
 

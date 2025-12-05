@@ -114,14 +114,13 @@ Para desarrollo local, puedes deshabilitar la verificación de email:
   - Intenta guardar una 4ta firma
   - Debería mostrar mensaje de límite alcanzado
 
-### 🤖 Funcionalidades Premium (AI Generator)
+### 🤖 Funcionalidades Premium
 
-- [ ] **AI Generator:**
+- [ ] **Templates Premium:**
   - Ve a `/dashboard`
-  - Haz clic en "Create with AI"
-  - Completa el formulario
-  - Genera firmas con IA
-  - Copia o guarda las firmas generadas
+  - Verifica que puedas acceder a todos los templates premium
+  - Crea una firma con un template premium
+  - Verifica que no aparezca watermark en exports
 
 **Nota:** Requiere `NEXT_PUBLIC_AI_WEBHOOK_URL` configurada
 
@@ -212,12 +211,10 @@ Password: premium123
 - [ ] Exportar PNG
 - [ ] Exportar PDF
 
-### AI Generator
-- [ ] Acceder a AI Generator
-- [ ] Completar formulario
-- [ ] Generar firmas
-- [ ] Ver resultados
-- [ ] Copiar HTML
+### Templates Premium
+- [ ] Verificar acceso a templates premium
+- [ ] Crear firma con template premium
+- [ ] Verificar que no aparezca watermark
 - [ ] Guardar firma generada
 
 ### Suscripciones

@@ -121,7 +121,6 @@ export default function Pricing() {
       description: "For growing teams",
       features: [
         { text: "Everything in Premium" },
-        { text: "AI Enhancer (auto-optimize based on role/industry)" },
         { text: "Bulk CSV upload → generate signatures for entire team" },
         { text: "Team dashboard & member management" },
         { text: "Custom branding (logo + colors)" },

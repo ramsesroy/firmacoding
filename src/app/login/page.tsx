@@ -94,6 +94,16 @@ export default function LoginPage() {
 
         if (data?.user) {
           analytics.signUp("email");
+          
+          // Migrate temp images if user just registered
+          try {
+            const { migrateTempImages } = await import("@/lib/imageUtils");
+            await migrateTempImages(data.user.id);
+          } catch (error) {
+            console.error("Error migrating temp images:", error);
+            // Don't block registration if migration fails
+          }
+          
           setMessage("Registration successful! Please verify your email before signing in.");
           // Clear form
           setEmail("");
@@ -112,6 +122,16 @@ export default function LoginPage() {
 
         if (data?.user) {
           analytics.signIn("email");
+          
+          // Migrate temp images when user logs in
+          try {
+            const { migrateTempImages } = await import("@/lib/imageUtils");
+            await migrateTempImages(data.user.id);
+          } catch (error) {
+            console.error("Error migrating temp images:", error);
+            // Don't block login if migration fails
+          }
+          
           // Redirect to specified path or default dashboard
           if (redirectTo) {
             const redirectUrl = plan ? `${redirectTo}?plan=${plan}` : redirectTo;

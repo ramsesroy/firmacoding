@@ -199,10 +199,17 @@ export default function SignaturesPage() {
       const elementToExport = signatureElement || previewRef;
 
       const filename = `${signature.name.replace(/\s+/g, "_")}_signature.png`;
+      
+      // Check if Cloudflare is configured for premium users
+      // Cloudflare is available if we have URLs stored in localStorage
+      const cloudflareConfigured = typeof window !== "undefined" && 
+        localStorage.getItem("cloudflare_image_urls") !== null;
+      
       await exportToPNGHQ(elementToExport, filename, {
         size: exportSize,
         margin: 20,
         addWatermark: !isPremium, // Add watermark for free users
+        useCloudflareOptimization: isPremium && cloudflareConfigured, // Use Cloudflare for premium users if configured
       });
       showToast("PNG exported successfully!", "success");
       analytics.exportSignature("PNG");
@@ -232,10 +239,16 @@ export default function SignaturesPage() {
       const elementToExport = signatureElement || previewRef;
 
       const filename = `${signature.name.replace(/\s+/g, "_")}_signature.pdf`;
+      // Check if Cloudflare is configured for premium users
+      // Cloudflare is available if we have URLs stored in localStorage
+      const cloudflareConfigured = typeof window !== "undefined" && 
+        localStorage.getItem("cloudflare_image_urls") !== null;
+      
       await exportToPDFHQ(elementToExport, filename, {
         size: exportSize,
         margin: 20,
         addWatermark: !isPremium, // Add watermark for free users
+        useCloudflareOptimization: isPremium && cloudflareConfigured, // Use Cloudflare for premium users if configured
       });
       showToast("PDF exported successfully!", "success");
       analytics.exportSignature("PDF");
