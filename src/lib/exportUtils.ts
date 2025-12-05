@@ -188,7 +188,7 @@ export async function exportToPNGHQ(
           }
         });
       },
-    });
+    } as any);
 
     onProgress?.(60);
 
@@ -319,7 +319,7 @@ export async function exportToPNG(
       allowTaint: false,
       scale: 2,
       backgroundColor: "#ffffff",
-    });
+    } as any);
 
     let scaledCanvas = canvas;
     if (scale !== 1) {
@@ -464,7 +464,7 @@ export async function exportToPDFHQ(
           }
         });
       },
-    });
+    } as any);
 
     onProgress?.(60);
 
@@ -604,7 +604,7 @@ export async function exportToPDF(
       allowTaint: false,
       scale: 2,
       backgroundColor: "#ffffff",
-    });
+    } as any);
 
     let scaledCanvas = canvas;
     if (scale !== 1) {
