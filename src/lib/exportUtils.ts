@@ -175,7 +175,7 @@ export async function exportToPNGHQ(
       backgroundColor: "#ffffff",
       removeContainer: false,
       imageTimeout: 30000, // Wait longer for images to load (30 seconds)
-      onclone: (clonedDoc) => {
+      onclone: (clonedDoc: Document) => {
         // Ensure all images in cloned document are loaded
         const clonedImages = clonedDoc.querySelectorAll("img");
         clonedImages.forEach((img) => {
@@ -451,7 +451,7 @@ export async function exportToPDFHQ(
       scale: 2,
       backgroundColor: "#ffffff",
       imageTimeout: 30000, // Wait longer for images to load (30 seconds)
-      onclone: (clonedDoc) => {
+      onclone: (clonedDoc: Document) => {
         // Ensure all images in cloned document are loaded
         const clonedImages = clonedDoc.querySelectorAll("img");
         clonedImages.forEach((img) => {
