@@ -56,6 +56,16 @@ export default function DashboardLayout({
       icon: "badge",
       active: pathname === "/dashboard/signatures",
     },
+    ...(isPremium
+      ? [
+          {
+            href: "/dashboard/analytics",
+            label: "Link Analytics",
+            icon: "analytics",
+            active: pathname === "/dashboard/analytics",
+          },
+        ]
+      : []),
     {
       href: "/dashboard/subscription",
       label: "Subscription",

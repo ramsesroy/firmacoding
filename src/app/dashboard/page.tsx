@@ -361,7 +361,16 @@ function DashboardContent() {
   }, [template, loadingSignature, editingSignatureId]);
 
   const handleCopyToClipboard = async () => {
-    const success = await copyToClipboard(signatureData, template, signatureData.nombre || "User");
+    const success = await copyToClipboard(
+      signatureData,
+      template,
+      signatureData.nombre || "User",
+      {
+        userId: user?.id,
+        signatureId: editingSignatureId || undefined,
+        enableLinkTracking: isPremium || false,
+      }
+    );
     if (success) {
       setCopied(true);
       showToast("Signature copied to clipboard!", "success");

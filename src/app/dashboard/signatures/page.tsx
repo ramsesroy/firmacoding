@@ -171,7 +171,17 @@ export default function SignaturesPage() {
         iconoDireccion: "📍",
       };
 
-      await copyToClipboard(signatureData, signature.template_id);
+      const session = await supabase.auth.getSession();
+      await copyToClipboard(
+        signatureData,
+        signature.template_id,
+        signatureData.nombre || "User",
+        {
+          userId: session.data.session?.user?.id,
+          signatureId: signature.id,
+          enableLinkTracking: isPremium || false,
+        }
+      );
       setCopiedId(signature.id);
       analytics.copySignature();
       showToast("Signature copied to clipboard!", "success");

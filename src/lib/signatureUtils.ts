@@ -1,10 +1,16 @@
 import { SignatureProps, TemplateType, RedSocial } from "@/types/signature";
 import { generateQRCodeURL } from "./qrUtils";
+import { convertLinksToTracked } from "./linkTracking";
 
 export async function generateSignatureHTML(
   data: SignatureProps,
   template: TemplateType,
-  userName: string = "User"
+  userName: string = "User",
+  options?: {
+    userId?: string;
+    signatureId?: string;
+    enableLinkTracking?: boolean;
+  }
 ): Promise<string> {
   const { nombre, cargo, foto, telefono, redes = [], horario, textoAdicional, colorPersonalizado, qrLink, logoEmpresa, ctaTexto, telefonoMovil, direccion, iconoTelefono, iconoTelefonoMovil, iconoDireccion } = data;
 
@@ -73,6 +79,20 @@ export async function generateSignatureHTML(
       break;
     default:
       baseHTML = generateClassicHTML(nombre, cargo, foto, telefono, redes);
+  }
+
+  // Convert links to tracked links if enabled and user is premium
+  if (options?.enableLinkTracking && options?.userId) {
+    try {
+      baseHTML = await convertLinksToTracked(
+        baseHTML,
+        options.userId,
+        options.signatureId
+      );
+    } catch (error) {
+      console.error("Error converting links to tracked:", error);
+      // Continue with original HTML if conversion fails
+    }
   }
 
   // Return HTML without validation information
@@ -2361,10 +2381,15 @@ function escapeHtml(text: string): string {
 export async function copyToClipboard(
   data: SignatureProps,
   template: TemplateType,
-  userName: string = "User"
+  userName: string = "User",
+  options?: {
+    userId?: string;
+    signatureId?: string;
+    enableLinkTracking?: boolean;
+  }
 ): Promise<boolean> {
   // Generate HTML content with validation
-  const htmlContent = await generateSignatureHTML(data, template, userName);
+  const htmlContent = await generateSignatureHTML(data, template, userName, options);
 
   try {
     // Create a ClipboardItem with both formats
