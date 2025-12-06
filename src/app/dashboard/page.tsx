@@ -18,6 +18,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { canSaveSignature, incrementSavedSignatures, decrementSavedSignatures } from "@/lib/subscriptionUtils";
 import { analytics } from "@/lib/analytics";
 import { Icon3D } from "@/components/Icon3D";
+import AiSuggestionsPanel from "@/components/AiSuggestionsPanel";
 
 // Force dynamic rendering for this page to support search params
 export const dynamic = "force-dynamic";
@@ -264,6 +265,9 @@ function DashboardContent() {
   const [tempImagesCount, setTempImagesCount] = useState(0);
   const [remainingSessionUploads, setRemainingSessionUploads] = useState<number | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+  
+  // AI Suggestions Panel
+  const [showAiPanel, setShowAiPanel] = useState(false);
 
   // Load signature for editing if edit query parameter exists
   useEffect(() => {
@@ -1581,6 +1585,17 @@ function DashboardContent() {
             {/* Action Buttons */}
             <div className="mt-auto pt-6 border-t-2 border-gray-100">
               <div className="flex flex-col gap-4">
+                {/* AI Helper Button - Only for Premium users */}
+                {isPremium && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAiPanel(true)}
+                    className="group w-full px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 shadow-xl shadow-purple-500/40 hover:shadow-2xl hover:shadow-purple-500/50 hover:scale-[1.02]"
+                  >
+                    <span className="material-symbols-outlined text-xl">auto_awesome</span>
+                    <span>✨ Improve with AI</span>
+                  </button>
+                )}
                 <div className="flex flex-col sm:flex-row gap-4">
                   <button
                     type="button"
@@ -1756,6 +1771,56 @@ function DashboardContent() {
           </div>
         </div>
       )}
+
+      {/* AI Suggestions Panel */}
+      <AiSuggestionsPanel
+        isOpen={showAiPanel}
+        onClose={() => setShowAiPanel(false)}
+        signatureData={signatureData}
+        currentTemplate={template}
+        userId={user?.id || ""}
+        isPremium={isPremium || false}
+        userEmail={user?.email}
+        onApplySuggestion={(suggestion) => {
+          // Apply suggestion based on type
+          if (suggestion.type === "add_field") {
+            if (suggestion.field === "businessHours" && suggestion.example) {
+              setSignatureData({ ...signatureData, horario: suggestion.example });
+              showToast("Business hours added!", "success");
+            } else if (suggestion.field === "mobile" && suggestion.example) {
+              setSignatureData({ ...signatureData, telefonoMovil: suggestion.example });
+              showToast("Mobile number added!", "success");
+            } else if (suggestion.field === "address" && suggestion.example) {
+              setSignatureData({ ...signatureData, direccion: suggestion.example });
+              showToast("Address added!", "success");
+            } else if (suggestion.field === "callToAction" && suggestion.example) {
+              setSignatureData({ ...signatureData, ctaTexto: suggestion.example });
+              showToast("Call-to-action added!", "success");
+            }
+          } else if (suggestion.type === "add_social" && suggestion.platform) {
+            // Add social link
+            const newRed = {
+              nombre: suggestion.platform,
+              url: `https://${suggestion.platform.toLowerCase()}.com/yourprofile`,
+              icono: "",
+            };
+            setSignatureData({
+              ...signatureData,
+              redes: [...(signatureData.redes || []), newRed],
+            });
+            showToast(`${suggestion.platform} link added!`, "success");
+          } else if (suggestion.type === "improve_content" && suggestion.suggestion) {
+            if (suggestion.field === "role") {
+              setSignatureData({ ...signatureData, cargo: suggestion.suggestion });
+              showToast("Role updated!", "success");
+            }
+          }
+        }}
+        onTemplateChange={(templateId) => {
+          setTemplate(templateId);
+          showToast(`Template changed to ${templateId}`, "success");
+        }}
+      />
     </div>
     </>
   );
