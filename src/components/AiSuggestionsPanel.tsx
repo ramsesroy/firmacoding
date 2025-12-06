@@ -205,6 +205,9 @@ export default function AiSuggestionsPanel({
     try {
       const requestBody = mapSignatureDataToRequest();
       
+      console.log("[AI Helper] Sending request to:", "/api/ai-helper/suggestions");
+      console.log("[AI Helper] Request body:", requestBody);
+      
       const res = await fetch("/api/ai-helper/suggestions", {
         method: "POST",
         headers: {
@@ -213,7 +216,17 @@ export default function AiSuggestionsPanel({
         body: JSON.stringify(requestBody),
       });
 
+      console.log("[AI Helper] Response status:", res.status);
+      console.log("[AI Helper] Response ok:", res.ok);
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("[AI Helper] Error response:", errorText);
+        throw new Error(`Server returned ${res.status}: ${errorText || "Unknown error"}`);
+      }
+
       const data: AIHelperResponse = await res.json();
+      console.log("[AI Helper] Response data:", data);
 
       if (!data.success) {
         throw new Error(data.error?.message || "Failed to get suggestions");
@@ -221,8 +234,9 @@ export default function AiSuggestionsPanel({
 
       setResponse(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-      console.error("Error fetching AI suggestions:", err);
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMessage);
+      console.error("[AI Helper] Error fetching AI suggestions:", err);
     } finally {
       setLoading(false);
     }

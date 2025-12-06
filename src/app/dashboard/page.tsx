@@ -1585,8 +1585,8 @@ function DashboardContent() {
             {/* Action Buttons */}
             <div className="mt-auto pt-6 border-t-2 border-gray-100">
               <div className="flex flex-col gap-4">
-                {/* AI Helper Button - Only for Premium users */}
-                {isPremium && (
+                {/* AI Helper Button - Only for authenticated Premium users */}
+                {isAuthenticated && isPremium && (
                   <button
                     type="button"
                     onClick={() => setShowAiPanel(true)}
@@ -1772,15 +1772,16 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* AI Suggestions Panel */}
-      <AiSuggestionsPanel
-        isOpen={showAiPanel}
-        onClose={() => setShowAiPanel(false)}
-        signatureData={signatureData}
-        currentTemplate={template}
-        userId={user?.id || ""}
-        isPremium={isPremium || false}
-        userEmail={user?.email}
+      {/* AI Suggestions Panel - Only render if user is authenticated and premium */}
+      {isAuthenticated && user?.id && isPremium && (
+        <AiSuggestionsPanel
+          isOpen={showAiPanel}
+          onClose={() => setShowAiPanel(false)}
+          signatureData={signatureData}
+          currentTemplate={template}
+          userId={user.id}
+          isPremium={isPremium}
+          userEmail={user.email}
         onApplySuggestion={(suggestion) => {
           // Apply suggestion based on type
           if (suggestion.type === "add_field") {
@@ -1816,11 +1817,12 @@ function DashboardContent() {
             }
           }
         }}
-        onTemplateChange={(templateId) => {
-          setTemplate(templateId);
-          showToast(`Template changed to ${templateId}`, "success");
-        }}
-      />
+          onTemplateChange={(templateId) => {
+            setTemplate(templateId);
+            showToast(`Template changed to ${templateId}`, "success");
+          }}
+        />
+      )}
     </div>
     </>
   );

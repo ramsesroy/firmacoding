@@ -3,6 +3,18 @@ import { NextRequest, NextResponse } from "next/server";
 // n8n webhook URL for AI Signature Helper
 const N8N_WEBHOOK_URL = "https://n8n.avyris.com/webhook/webhook-test/ai-signature-helper";
 
+// OPTIONS method for CORS preflight
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
+}
+
 // GET method for health check and deployment verification
 export async function GET() {
   return NextResponse.json(
@@ -14,13 +26,23 @@ export async function GET() {
       version: "1.0.0",
       deployed: true,
     },
-    { status: 200 }
+    { 
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    }
   );
 }
 
 export async function POST(request: NextRequest) {
+  console.log("[AI Helper API] POST request received");
   try {
     const body = await request.json();
+    console.log("[AI Helper API] Request body received:", {
+      hasUserProfile: !!body.userProfile,
+      hasCurrentSignature: !!body.currentSignature,
+    });
 
     // Validate required fields
     if (!body.userProfile || !body.userProfile.fullName || !body.userProfile.role) {
@@ -98,7 +120,11 @@ export async function POST(request: NextRequest) {
       data.metadata.processingTime = processingTime;
     }
 
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
   } catch (error) {
     console.error("Error calling AI helper:", error);
     return NextResponse.json(
@@ -113,7 +139,12 @@ export async function POST(request: NextRequest) {
           generatedAt: new Date().toISOString(),
         },
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     );
   }
 }
