@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // n8n webhook URL for AI Signature Helper
-// Production URL from n8n: https://n8n.avyris.com/webhook/webhook/ai-signature-helper
+// Using specific workflow URL provided by user
 // IMPORTANT: The workflow MUST be ACTIVE in n8n for production URLs to work
 const N8N_WEBHOOK_URL = process.env.N8N_AI_HELPER_WEBHOOK_URL || 
-  "https://n8n.avyris.com/webhook/webhook/ai-signature-helper";
+  "https://n8n.avyris.com/webhook/WeRk9jNdjwjDShF8/c45b45/webhook/ai-signature-helper";
 
 // OPTIONS method for CORS preflight
 export async function OPTIONS() {
@@ -80,41 +80,97 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Forward request to n8n webhook
+    // Forward request to n8n webhook with retry logic
     const startTime = Date.now();
     console.log("[AI Helper API] Calling n8n webhook:", N8N_WEBHOOK_URL);
     console.log("[AI Helper API] Request body keys:", Object.keys(body));
     
-    const response = await fetch(N8N_WEBHOOK_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    let response: Response;
+    let lastError: string | null = null;
+    const maxRetries = 2;
     
-    console.log("[AI Helper API] n8n response status:", response.status, response.statusText);
-    console.log("[AI Helper API] n8n response URL:", response.url);
+    // Retry logic in case of temporary n8n registration issues
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      if (attempt > 0) {
+        console.log(`[AI Helper API] Retry attempt ${attempt}/${maxRetries} after 1 second...`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      try {
+        console.log(`[AI Helper API] Attempt ${attempt + 1}: Calling ${N8N_WEBHOOK_URL}`);
+        response = await fetch(N8N_WEBHOOK_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+        
+        console.log(`[AI Helper API] n8n response status (attempt ${attempt + 1}):`, response.status, response.statusText);
+        console.log(`[AI Helper API] n8n response URL:`, response.url);
+        console.log(`[AI Helper API] n8n response headers:`, Object.fromEntries(response.headers.entries()));
+        
+        // Read response body first
+        const responseText = await response.text();
+        console.log(`[AI Helper API] n8n response body (attempt ${attempt + 1}):`, responseText);
+        
+        // If successful or non-404 error, break retry loop
+        if (response.ok || response.status !== 404) {
+          break;
+        }
+        
+        // If 404, store error and retry
+        lastError = responseText;
+        console.log(`[AI Helper API] n8n 404 error (attempt ${attempt + 1}):`, responseText);
+        
+        // If this was the last attempt, return error
+        if (attempt === maxRetries) {
+          const processingTime = (Date.now() - startTime) / 1000;
+          return NextResponse.json(
+            {
+              success: false,
+              error: {
+                code: "AI_SERVICE_ERROR",
+                message: "Unable to generate suggestions at this time. The n8n workflow may need to be reactivated.",
+                details: `n8n webhook returned ${response.status} after ${maxRetries + 1} attempts: ${errorText}`,
+              },
+              metadata: {
+                generatedAt: new Date().toISOString(),
+                processingTime,
+              },
+            },
+            { status: response.status }
+          );
+        }
+      } catch (fetchError) {
+        lastError = fetchError instanceof Error ? fetchError.message : "Unknown error";
+        console.error(`[AI Helper API] Fetch error (attempt ${attempt + 1}):`, fetchError);
+        
+        if (attempt === maxRetries) {
+          throw fetchError;
+        }
+      }
+    }
     
     const processingTime = (Date.now() - startTime) / 1000;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.log("[AI Helper API] n8n error response:", errorText);
+    if (!response!.ok) {
+      const errorText = lastError || await response!.text();
+      console.log("[AI Helper API] n8n final error response:", errorText);
       return NextResponse.json(
         {
           success: false,
           error: {
             code: "AI_SERVICE_ERROR",
             message: "Unable to generate suggestions at this time",
-            details: `n8n webhook returned ${response.status}: ${errorText}`,
+            details: `n8n webhook returned ${response!.status}: ${errorText}`,
           },
           metadata: {
             generatedAt: new Date().toISOString(),
             processingTime,
           },
         },
-        { status: response.status }
+        { status: response!.status }
       );
     }
 
