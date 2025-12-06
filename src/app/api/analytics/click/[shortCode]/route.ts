@@ -73,10 +73,10 @@ async function getCountryFromIP(ip: string | null): Promise<{ country?: string; 
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { shortCode: string } }
+  { params }: { params: Promise<{ shortCode: string }> }
 ) {
   try {
-    const { shortCode } = params;
+    const { shortCode } = await params;
 
     if (!shortCode || shortCode.length < 6) {
       return NextResponse.json({ error: "Invalid short code" }, { status: 400 });
