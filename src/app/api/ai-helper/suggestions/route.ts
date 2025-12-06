@@ -2,6 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 
 const N8N_WEBHOOK_URL = "https://n8n.avyris.com/webhook/webhook-test/ai-signature-helper";
 
+// GET method for health check
+export async function GET() {
+  return NextResponse.json(
+    {
+      status: "ok",
+      service: "AI Signature Helper API",
+      endpoint: "/api/ai-helper/suggestions",
+      method: "POST",
+    },
+    { status: 200 }
+  );
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
