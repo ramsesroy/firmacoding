@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // n8n webhook URL for AI Signature Helper
 // Production URL from n8n: https://n8n.avyris.com/webhook/webhook/ai-signature-helper
-// The workflow must be ACTIVE in n8n for production URLs to work
+// IMPORTANT: The workflow MUST be ACTIVE in n8n for production URLs to work
 const N8N_WEBHOOK_URL = process.env.N8N_AI_HELPER_WEBHOOK_URL || 
   "https://n8n.avyris.com/webhook/webhook/ai-signature-helper";
 
@@ -82,6 +82,7 @@ export async function POST(request: NextRequest) {
 
     // Forward request to n8n webhook
     const startTime = Date.now();
+    console.log("[AI Helper API] Calling n8n webhook:", N8N_WEBHOOK_URL);
     const response = await fetch(N8N_WEBHOOK_URL, {
       method: "POST",
       headers: {
@@ -89,6 +90,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify(body),
     });
+    console.log("[AI Helper API] n8n response status:", response.status, response.statusText);
 
     const processingTime = (Date.now() - startTime) / 1000;
 
