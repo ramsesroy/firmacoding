@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // n8n webhook URL for AI Signature Helper
-// Production URL from n8n: https://n8n.avyris.com/webhook/webhook/ai-signature-helper
+// Production URL: https://n8n.avyris.com/webhook/webhook/ai-signature-helper
+// Test URL: https://n8n.avyris.com/webhook/webhook-test/ai-signature-helper
 // IMPORTANT: The workflow MUST be ACTIVE in n8n for production URLs to work
+// If production URL doesn't work, try using the test URL temporarily
 const N8N_WEBHOOK_URL = process.env.N8N_AI_HELPER_WEBHOOK_URL || 
-  "https://n8n.avyris.com/webhook/webhook/ai-signature-helper";
+  "https://n8n.avyris.com/webhook/webhook-test/ai-signature-helper";
 
 // OPTIONS method for CORS preflight
 export async function OPTIONS() {
@@ -83,6 +85,8 @@ export async function POST(request: NextRequest) {
     // Forward request to n8n webhook
     const startTime = Date.now();
     console.log("[AI Helper API] Calling n8n webhook:", N8N_WEBHOOK_URL);
+    console.log("[AI Helper API] Request body keys:", Object.keys(body));
+    
     const response = await fetch(N8N_WEBHOOK_URL, {
       method: "POST",
       headers: {
@@ -90,7 +94,9 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify(body),
     });
+    
     console.log("[AI Helper API] n8n response status:", response.status, response.statusText);
+    console.log("[AI Helper API] n8n response headers:", Object.fromEntries(response.headers.entries()));
 
     const processingTime = (Date.now() - startTime) / 1000;
 
