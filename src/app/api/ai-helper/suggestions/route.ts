@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // n8n webhook URL for AI Signature Helper
-const N8N_WEBHOOK_URL = "https://n8n.avyris.com/webhook/webhook-test/ai-signature-helper";
+// Production URL from n8n: https://n8n.avyris.com/webhook/webhook/ai-signature-helper
+// The workflow must be ACTIVE in n8n for production URLs to work
+const N8N_WEBHOOK_URL = process.env.N8N_AI_HELPER_WEBHOOK_URL || 
+  "https://n8n.avyris.com/webhook/webhook/ai-signature-helper";
 
 // OPTIONS method for CORS preflight
 export async function OPTIONS() {
