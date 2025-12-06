@@ -1,5 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
+import { createClient } from "@supabase/supabase-js";
+
+// Create server-side Supabase client for API routes
+// This bypasses RLS for reading tracked links (needed for public link clicks)
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+  {
+    auth: {
+      persistSession: false,
+    },
+  }
+);
 
 // Get user's IP address from request
 function getClientIP(request: NextRequest): string | null {

@@ -85,6 +85,13 @@ CREATE POLICY "Users can view their own tracked links"
   FOR SELECT
   USING (auth.uid() = user_id);
 
+-- Policy: Allow public read access to tracked_links by short_code (for link redirection)
+-- This is needed so the API endpoint can redirect clicks without authentication
+CREATE POLICY "Public can read tracked links by short_code"
+  ON tracked_links
+  FOR SELECT
+  USING (true);
+
 -- Policy: Users can insert their own tracked links
 CREATE POLICY "Users can insert their own tracked links"
   ON tracked_links
