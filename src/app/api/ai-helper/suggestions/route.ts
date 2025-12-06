@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 // n8n webhook URL for AI Signature Helper
 const N8N_WEBHOOK_URL = "https://n8n.avyris.com/webhook/webhook-test/ai-signature-helper";
 
-// GET method for health check
+// GET method for health check and deployment verification
 export async function GET() {
   return NextResponse.json(
     {
@@ -11,6 +11,8 @@ export async function GET() {
       service: "AI Signature Helper API",
       endpoint: "/api/ai-helper/suggestions",
       method: "POST",
+      version: "1.0.0",
+      deployed: true,
     },
     { status: 200 }
   );
