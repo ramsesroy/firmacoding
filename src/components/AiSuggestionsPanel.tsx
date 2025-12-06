@@ -205,10 +205,15 @@ export default function AiSuggestionsPanel({
     try {
       const requestBody = mapSignatureDataToRequest();
       
-      console.log("[AI Helper] Sending request to:", "/api/ai-helper/suggestions");
+      // Use absolute URL to ensure correct routing
+      const apiUrl = typeof window !== "undefined" 
+        ? `${window.location.origin}/api/ai-helper/suggestions`
+        : "/api/ai-helper/suggestions";
+      
+      console.log("[AI Helper] Sending request to:", apiUrl);
       console.log("[AI Helper] Request body:", requestBody);
       
-      const res = await fetch("/api/ai-helper/suggestions", {
+      const res = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
