@@ -94,12 +94,13 @@ export async function POST(request: NextRequest) {
     });
     
     console.log("[AI Helper API] n8n response status:", response.status, response.statusText);
-    console.log("[AI Helper API] n8n response headers:", Object.fromEntries(response.headers.entries()));
-
+    console.log("[AI Helper API] n8n response URL:", response.url);
+    
     const processingTime = (Date.now() - startTime) / 1000;
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.log("[AI Helper API] n8n error response:", errorText);
       return NextResponse.json(
         {
           success: false,
