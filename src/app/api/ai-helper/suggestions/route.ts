@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// n8n webhook URL for AI Signature Helper
 const N8N_WEBHOOK_URL = "https://n8n.avyris.com/webhook/webhook-test/ai-signature-helper";
 
 // GET method for health check
