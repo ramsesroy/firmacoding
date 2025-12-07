@@ -135,34 +135,57 @@ export async function POST(request: NextRequest) {
       if (n8nResponse.ok) {
         try {
           // 1. Obtener el cuerpo de la respuesta crudo
-          const rawData = await n8nResponse.json();
-          console.log("📦 Raw n8n response:", JSON.stringify(rawData, null, 2));
+          const data = await n8nResponse.json();
+          console.log("📦 Raw n8n response:", JSON.stringify(data, null, 2));
           
-          let finalData = rawData;
+          let rawJsonString = "";
+          let finalData: any = null;
           
-          // 2. DETECTOR DE ENVOLTORIO:
-          // Si recibimos un objeto que tiene una propiedad 'text' que parece un JSON...
-          if (rawData && typeof rawData === 'object' && rawData.text && typeof rawData.text === 'string') {
-            try {
-              console.log("🔓 Desempaquetando propiedad .text ...");
-              // Limpiamos posibles bloques de markdown ```json
-              const cleanText = rawData.text.replace(/```json/g, "").replace(/```/g, "").trim();
-              finalData = JSON.parse(cleanText);
-              console.log("✅ JSON desempaquetado exitosamente");
-              console.log("📋 Final data keys:", Object.keys(finalData));
-            } catch (e) {
-              console.error("❌ Error parseando el texto interno:", e);
-              // Si falla, seguimos con rawData por si acaso
-              finalData = rawData;
-            }
-          } 
-          // Si recibimos un array (otro caso común de n8n)
-          else if (Array.isArray(rawData) && rawData.length > 0) {
+          // 2. CASCADA DE INTENTOS DE EXTRACCIÓN:
+          
+          // CASO 1: Formato Crudo de Gemini (parts[0].text) <- ESTE ES EL QUE ESTÁ OCURRIENDO
+          if (data.parts && Array.isArray(data.parts) && data.parts[0] && data.parts[0].text) {
+            console.log("🔓 Detectado formato Gemini (parts[0].text)");
+            rawJsonString = data.parts[0].text;
+          }
+          // CASO 2: Formato n8n Text (text)
+          else if (data.text && typeof data.text === 'string') {
+            console.log("🔓 Detectado formato n8n (text)");
+            rawJsonString = data.text;
+          }
+          // CASO 3: El objeto ya viene listo o es un array
+          else if (Array.isArray(data) && data.length > 0) {
             console.log("📦 n8n devolvió un array, usando el primer elemento");
-            finalData = rawData[0];
+            finalData = data[0];
+          }
+          // CASO 4: El objeto ya es el JSON final (tiene success, suggestions, etc.)
+          else if (data && typeof data === 'object' && (data.success !== undefined || data.suggestions !== undefined)) {
+            console.log("✅ El objeto ya viene listo (formato directo)");
+            finalData = data;
           }
           
-          // 3. Validación final
+          // 3. Limpieza y Parsing del string extraído
+          if (rawJsonString) {
+            try {
+              console.log("🧹 Limpiando y parseando JSON string...");
+              // Limpiar markdown ```json ... ```
+              const cleanString = rawJsonString.replace(/```json/g, "").replace(/```/g, "").trim();
+              finalData = JSON.parse(cleanString);
+              console.log("✅ JSON parseado exitosamente");
+              console.log("📋 Final data keys:", Object.keys(finalData));
+            } catch (e) {
+              console.error("❌ Error parseando el string extraído:", e);
+              // Fallback: usar el objeto original
+              finalData = data;
+            }
+          }
+          
+          // 4. Validación final
+          if (!finalData) {
+            console.warn("⚠️ No se pudo extraer datos finales, usando respuesta original");
+            finalData = data;
+          }
+          
           if (!finalData.success) {
             console.warn("⚠️ La respuesta final no tiene success: true", finalData);
           } else {
