@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import SignaturePreview from "@/components/SignaturePreview";
 import IconPicker from "@/components/IconPicker";
-import { TemplateType, RedSocial } from "@/types/signature";
+import { TemplateType, RedSocial, SignatureProps } from "@/types/signature";
 import { copyToClipboard } from "@/lib/signatureUtils";
 import { uploadImage, getTempImages, getRemainingSessionUploads } from "@/lib/imageUtils";
 import { supabase } from "@/lib/supabaseClient";
