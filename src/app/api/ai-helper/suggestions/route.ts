@@ -138,7 +138,25 @@ export async function POST(request: NextRequest) {
       // If successful, parse JSON and break retry loop
       if (n8nResponse.ok) {
         try {
-          n8nResponseData = JSON.parse(responseText);
+          // Parse the response JSON
+          const parsedResponse = JSON.parse(responseText);
+          
+          // n8n may return the actual JSON in a "text" property (as escaped string)
+          // If "text" exists and is a string, parse it again
+          if (parsedResponse.text && typeof parsedResponse.text === 'string') {
+            try {
+              n8nResponseData = JSON.parse(parsedResponse.text);
+              console.log("[AI Helper API] Parsed nested JSON from 'text' property");
+            } catch (nestedParseError) {
+              // If nested parse fails, use the outer response
+              console.log("[AI Helper API] 'text' property is not valid JSON, using outer response");
+              n8nResponseData = parsedResponse;
+            }
+          } else {
+            // Use the parsed response directly
+            n8nResponseData = parsedResponse;
+          }
+          
           break;
         } catch (parseError) {
           console.error("[AI Helper API] Failed to parse n8n response as JSON:", parseError);
