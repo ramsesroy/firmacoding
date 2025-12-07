@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 // n8n webhook URL for AI Signature Helper
 // Using specific workflow URL provided by user
+// Based on error message, n8n expects: WeRk9jNdjwjDShF8/c45b45/webhook/ai-signature-helper
+// The error shows n8n is looking for the path without the leading /webhook/
 // IMPORTANT: The workflow MUST be ACTIVE in n8n for production URLs to work
 const N8N_WEBHOOK_URL = process.env.N8N_AI_HELPER_WEBHOOK_URL || 
-  "https://n8n.avyris.com/webhook/WeRk9jNdjwjDShF8/c45b45/webhook/ai-signature-helper";
+  "https://n8n.avyris.com/WeRk9jNdjwjDShF8/c45b45/webhook/ai-signature-helper";
 
 // OPTIONS method for CORS preflight
 export async function OPTIONS() {
