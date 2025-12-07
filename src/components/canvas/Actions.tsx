@@ -61,13 +61,13 @@ export const Actions = () => {
         if (!previewContainerRef.current) return;
         const element = previewContainerRef.current;
         try {
-            // @ts-expect-error - scale is a valid html2canvas option but not in TypeScript types
+            // Type cast includes scale option which is valid but not in TypeScript types
             const canvas = await html2canvas(element, { 
                 scale: 2, 
                 useCORS: true, 
                 backgroundColor: null,
                 logging: false,
-            });
+            } as Parameters<typeof html2canvas>[1] & { scale?: number });
             const link = document.createElement('a');
             link.download = 'signature.png';
             link.href = canvas.toDataURL('image/png');
@@ -81,13 +81,13 @@ export const Actions = () => {
         if (!previewContainerRef.current) return;
         const element = previewContainerRef.current;
         try {
-            // @ts-expect-error - scale is a valid html2canvas option but not in TypeScript types
+            // Type cast includes scale option which is valid but not in TypeScript types
             const canvas = await html2canvas(element, { 
                 scale: 2, 
                 useCORS: true, 
                 backgroundColor: null, 
                 logging: false,
-            });
+            } as Parameters<typeof html2canvas>[1] & { scale?: number });
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF({
                 orientation: 'landscape',
