@@ -574,11 +574,14 @@ function DashboardContent() {
         }
 
         // Insert new signature
-        signatureRecord.user_id = session.user.id; // Associate signature with authenticated user
+        const signatureToInsert = {
+          ...signatureRecord,
+          user_id: session.user.id, // Associate signature with authenticated user
+        };
         
         const { data: insertData, error: insertError } = await supabase
           .from("signatures")
-          .insert([signatureRecord])
+          .insert([signatureToInsert])
           .select()
           .single();
         
