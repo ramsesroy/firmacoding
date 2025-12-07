@@ -42,7 +42,7 @@ NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 
 # n8n Webhooks (Optional - For AI Signature Helper)
 # N8N_AI_HELPER_WEBHOOK_URL=https://n8n.avyris.com/webhook/ai-signature-helper
-# Get your production webhook URL from your n8n workflow (not webhook-test)
+# IMPORTANT: Use the clean production URL (without session IDs or temporary codes)
 # IMPORTANT: The workflow must be ACTIVE in n8n for production URLs to work
 ```
 
