@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { logger } from "@/lib/logger";
 
 // Force dynamic rendering for this page
 export const dynamic = "force-dynamic";
@@ -44,7 +45,7 @@ function AuthCallbackContent() {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
-          console.error("Error getting session:", sessionError);
+          logger.error("Error getting session", sessionError, "Auth Callback");
           setError("Error processing authentication. Please try again.");
           setTimeout(() => {
             router.push("/login");
@@ -58,7 +59,7 @@ function AuthCallbackContent() {
             const { migrateTempImages } = await import("@/lib/imageUtils");
             await migrateTempImages(session.user.id);
           } catch (error) {
-            console.error("Error migrating temp images:", error);
+            logger.error("Error migrating temp images", error instanceof Error ? error : new Error(String(error)), "Auth Callback");
             // Don't block auth if migration fails
           }
           
@@ -70,8 +71,9 @@ function AuthCallbackContent() {
             router.push("/login");
           }, 3000);
         }
-      } catch (error: any) {
-        console.error("Error in auth callback:", error);
+      } catch (error: unknown) {
+        const err = error instanceof Error ? error : new Error(String(error));
+        logger.error("Error in auth callback", err, "Auth Callback");
         setError("Unexpected error during authentication.");
         setTimeout(() => {
           router.push("/login");

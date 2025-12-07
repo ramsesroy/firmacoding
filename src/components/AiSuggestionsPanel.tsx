@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { TemplateType, SignatureProps } from "@/types/signature";
+import { logger } from "@/lib/logger";
 
 interface AIHelperRequest {
   userProfile: {
@@ -210,8 +211,8 @@ export default function AiSuggestionsPanel({
         ? `${window.location.origin}/api/ai-helper/suggestions`
         : "/api/ai-helper/suggestions";
       
-      console.log("[AI Helper] Sending request to:", apiUrl);
-      console.log("[AI Helper] Request body:", requestBody);
+      logger.log(`Sending request to: ${apiUrl}`, undefined, "AI Helper");
+      logger.debug("Request body", requestBody, "AI Helper");
       
       const res = await fetch(apiUrl, {
         method: "POST",
@@ -221,18 +222,17 @@ export default function AiSuggestionsPanel({
         body: JSON.stringify(requestBody),
       });
 
-      console.log("[AI Helper] Response status:", res.status);
-      console.log("[AI Helper] Response ok:", res.ok);
+      logger.log(`Response status: ${res.status}, ok: ${res.ok}`, undefined, "AI Helper");
 
       if (!res.ok) {
         const errorText = await res.text();
-        console.error("[AI Helper] Error response:", errorText);
+        logger.error("Error response", new Error(errorText), "AI Helper");
         throw new Error(`Server returned ${res.status}: ${errorText || "Unknown error"}`);
       }
 
       const data: AIHelperResponse = await res.json();
-      console.log("[AI Helper] Response data:", data);
-      console.log("[AI Helper] Response structure check:", {
+      logger.debug("Response data", data, "AI Helper");
+      logger.debug("Response structure check", {
         hasSuggestions: !!data.suggestions,
         hasContentSuggestions: !!data.suggestions?.contentSuggestions,
         contentSuggestionsLength: data.suggestions?.contentSuggestions?.length,
@@ -240,7 +240,7 @@ export default function AiSuggestionsPanel({
         bestPracticesLength: data.suggestions?.bestPractices?.length,
         hasProfileAnalysis: !!data.suggestions?.profileAnalysis,
         hasTemplateRecommendation: !!data.suggestions?.templateRecommendation,
-      });
+      }, "AI Helper");
 
       if (!data.success) {
         throw new Error(data.error?.message || "Failed to get suggestions");
@@ -248,9 +248,10 @@ export default function AiSuggestionsPanel({
 
       setResponse(data);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      const error = err instanceof Error ? err : new Error(String(err));
+      const errorMessage = error.message || "An error occurred";
       setError(errorMessage);
-      console.error("[AI Helper] Error fetching AI suggestions:", err);
+      logger.error("Error fetching AI suggestions", error, "AI Helper");
     } finally {
       setLoading(false);
     }

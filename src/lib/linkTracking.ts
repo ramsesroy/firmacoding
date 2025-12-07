@@ -2,6 +2,7 @@
 // Converts regular links to tracked links and manages analytics
 
 import { supabase } from "./supabaseClient";
+import { logger } from "./logger";
 
 export interface TrackedLink {
   id: string;
@@ -170,13 +171,13 @@ export async function createTrackedLink(
       .single();
 
     if (error) {
-      console.error("Error creating tracked link:", error);
+      logger.error("Error creating tracked link", error, "Link Tracking");
       return null;
     }
 
     return data as TrackedLink;
   } catch (error) {
-    console.error("Error creating tracked link:", error);
+    logger.error("Error creating tracked link", error instanceof Error ? error : new Error(String(error)), "Link Tracking");
     return null;
   }
 }
@@ -207,7 +208,7 @@ export async function getOrCreateTrackedLink(
 
     if (findError && findError.code !== "PGRST116") {
       // PGRST116 = no rows returned, which is fine
-      console.error("Error finding tracked link:", findError);
+      logger.error("Error finding tracked link", findError, "Link Tracking");
     }
 
     if (existing) {
@@ -217,7 +218,7 @@ export async function getOrCreateTrackedLink(
     // Create new tracked link
     return await createTrackedLink(userId, originalUrl, signatureId, linkLabel);
   } catch (error) {
-    console.error("Error getting or creating tracked link:", error);
+    logger.error("Error getting or creating tracked link", error instanceof Error ? error : new Error(String(error)), "Link Tracking");
     return null;
   }
 }
@@ -248,13 +249,13 @@ export async function getLinkAnalyticsSummary(
     });
 
     if (error) {
-      console.error("Error getting analytics summary:", error);
+      logger.error("Error getting analytics summary", error, "Link Tracking");
       return null;
     }
 
     return data?.[0] as LinkAnalyticsSummary | null;
   } catch (error) {
-    console.error("Error getting analytics summary:", error);
+    logger.error("Error getting analytics summary", error instanceof Error ? error : new Error(String(error)), "Link Tracking");
     return null;
   }
 }
@@ -280,13 +281,13 @@ export async function getUserTrackedLinks(
     const { data, error } = await query;
 
     if (error) {
-      console.error("Error getting tracked links:", error);
+      logger.error("Error getting tracked links", error, "Link Tracking");
       return [];
     }
 
     return (data || []) as TrackedLink[];
   } catch (error) {
-    console.error("Error getting tracked links:", error);
+    logger.error("Error getting tracked links", error instanceof Error ? error : new Error(String(error)), "Link Tracking");
     return [];
   }
 }
@@ -307,13 +308,13 @@ export async function getLinkClickHistory(
       .limit(limit);
 
     if (error) {
-      console.error("Error getting click history:", error);
+      logger.error("Error getting click history", error, "Link Tracking");
       return [];
     }
 
     return (data || []) as LinkClick[];
   } catch (error) {
-    console.error("Error getting click history:", error);
+    logger.error("Error getting click history", error instanceof Error ? error : new Error(String(error)), "Link Tracking");
     return [];
   }
 }
@@ -381,7 +382,7 @@ export async function convertLinksToTracked(
         );
       }
     } catch (error) {
-      console.error("[Link Tracking] Error processing link:", link.url, error);
+      logger.error(`Error processing link: ${link.url}`, error instanceof Error ? error : new Error(String(error)), "Link Tracking");
     }
   }
   

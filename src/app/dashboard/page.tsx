@@ -19,6 +19,7 @@ import { canSaveSignature, incrementSavedSignatures, decrementSavedSignatures } 
 import { analytics } from "@/lib/analytics";
 import { Icon3D } from "@/components/Icon3D";
 import AiSuggestionsPanel from "@/components/AiSuggestionsPanel";
+import { logger } from "@/lib/logger";
 
 // Force dynamic rendering for this page to support search params
 export const dynamic = "force-dynamic";
@@ -93,7 +94,7 @@ function DashboardContent() {
             );
           }
         } catch (error) {
-          console.error("Error migrating temp images:", error);
+          logger.error("Error migrating temp images", error instanceof Error ? error : new Error(String(error)), "Dashboard");
           // Don't show error to user - migration is not critical
         }
       }
@@ -328,9 +329,10 @@ function DashboardContent() {
         // Remove edit parameter from URL
         router.replace("/dashboard", { scroll: false });
       }
-    } catch (err: any) {
-      console.error("Error loading signature:", err);
-      showToast(err.message || "Error loading signature. Please try again.", "error");
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      logger.error("Error loading signature", error, "Dashboard");
+      showToast(error.message || "Error loading signature. Please try again.", "error");
       router.replace("/dashboard", { scroll: false });
     } finally {
       setLoadingSignature(false);
@@ -348,7 +350,7 @@ function DashboardContent() {
     const templatesWithLogo = ["professional", "corporateConsultant", "interiorDesign", "universityProfessor", "churchProfessional", "universityPresident", "pastorSignature"];
     
     setSignatureData((prev) => {
-      const updates: any = {};
+      const updates: Partial<SignatureProps> = {};
       
       // Add example photo if template requires it and no photo exists
       if (templatesWithPhoto.includes(template) && !prev.foto) {
@@ -526,7 +528,14 @@ function DashboardContent() {
 
       // Prepare data for insertion/update
       // Ensure properties match exactly with the database structure
-      const signatureRecord: any = {
+      const signatureRecord: {
+        name: string;
+        role: string;
+        phone: string | null;
+        image_url: string | null;
+        social_links: RedSocial[] | null;
+        template_id: TemplateType;
+      } = {
         name: signatureData.nombre,
         role: signatureData.cargo,
         phone: signatureData.telefono || null,
@@ -616,11 +625,12 @@ function DashboardContent() {
       
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (error) {
-      console.error("Error saving signature:", error);
+      const err = error instanceof Error ? error : new Error(String(error));
+      logger.error("Error saving signature", err, "Dashboard");
       
       setSaveMessage({
         type: "error",
-        text: error instanceof Error ? error.message : "Error saving signature. Please try again.",
+        text: err.message || "Error saving signature. Please try again.",
       });
       setTimeout(() => setSaveMessage(null), 5000);
     } finally {
@@ -1585,6 +1595,15 @@ function DashboardContent() {
             {/* Action Buttons */}
             <div className="mt-auto pt-6 border-t-2 border-gray-100">
               <div className="flex flex-col gap-4">
+                {/* Canvas Editor Button */}
+                <button
+                  type="button"
+                  onClick={() => router.push('/dashboard/canvas')}
+                  className="group w-full px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 text-white hover:from-indigo-700 hover:via-purple-700 hover:to-indigo-700 shadow-xl shadow-indigo-500/40 hover:shadow-2xl hover:shadow-indigo-500/50 hover:scale-[1.02]"
+                >
+                  <span className="material-symbols-outlined text-xl">palette</span>
+                  <span>🎨 Open Canvas Editor</span>
+                </button>
                 {/* AI Helper Button - Only for authenticated Premium users */}
                 {isAuthenticated && isPremium && (
                   <button

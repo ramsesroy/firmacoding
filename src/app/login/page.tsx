@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { MetadataHead } from "@/components/MetadataHead";
 import { analytics } from "@/lib/analytics";
+import { logger } from "@/lib/logger";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -42,7 +43,7 @@ export default function LoginPage() {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         if (sessionError) {
-          console.error("Error checking session:", sessionError);
+          logger.error("Error checking session", sessionError, "Login");
           // If error is configuration-related, show clearer message
           if (sessionError.message?.includes("fetch") || sessionError.message?.includes("network")) {
             setError("Supabase connection error. Please verify that NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are correctly configured in your .env.local file");
@@ -59,7 +60,7 @@ export default function LoginPage() {
           }
         }
       } catch (err) {
-        console.error("Error checking user:", err);
+        logger.error("Error checking user", err instanceof Error ? err : new Error(String(err)), "Login");
       }
     };
     checkUser();
@@ -100,7 +101,7 @@ export default function LoginPage() {
             const { migrateTempImages } = await import("@/lib/imageUtils");
             await migrateTempImages(data.user.id);
           } catch (error) {
-            console.error("Error migrating temp images:", error);
+            logger.error("Error migrating temp images", error instanceof Error ? error : new Error(String(error)), "Login");
             // Don't block registration if migration fails
           }
           
@@ -128,7 +129,7 @@ export default function LoginPage() {
             const { migrateTempImages } = await import("@/lib/imageUtils");
             await migrateTempImages(data.user.id);
           } catch (error) {
-            console.error("Error migrating temp images:", error);
+            logger.error("Error migrating temp images", error instanceof Error ? error : new Error(String(error)), "Login");
             // Don't block login if migration fails
           }
           
@@ -142,21 +143,22 @@ export default function LoginPage() {
           router.refresh(); // Refresh to ensure session loads
         }
       }
-    } catch (err: any) {
-      console.error("Authentication error:", err);
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      logger.error("Authentication error", error, "Login");
       
       // More descriptive error messages
       let errorMessage = "An error occurred. Please try again.";
       
-      if (err.message) {
+      if (error.message) {
         if (err.message?.includes("Invalid login credentials")) {
           errorMessage = "Incorrect email or password. Please verify your credentials.";
         } else if (err.message?.includes("Email rate limit exceeded")) {
           errorMessage = "Too many attempts. Please wait a few minutes before trying again.";
-        } else if (err.message?.includes("fetch") || err.message?.includes("Failed to fetch") || err.message?.includes("network")) {
+        } else if (error.message?.includes("fetch") || error.message?.includes("Failed to fetch") || error.message?.includes("network")) {
           errorMessage = "Supabase connection error. Verify that:\n1. NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are in your .env.local file\n2. Values are correct (no spaces)\n3. You've restarted the server after adding the variables\n4. Your internet connection is working";
         } else {
-          errorMessage = err.message || "Unknown error";
+          errorMessage = error.message || "Unknown error";
         }
       }
       
@@ -188,9 +190,10 @@ export default function LoginPage() {
 
       // OAuth redirects automatically, no need to do anything else here
       // Loading will remain until redirect
-    } catch (err: any) {
-      console.error("Google OAuth error:", err);
-      setError(err.message || "Error signing in with Google. Please try again.");
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      logger.error("Google OAuth error", error, "Login");
+      setError(error.message || "Error signing in with Google. Please try again.");
       setLoading(false);
     }
   };

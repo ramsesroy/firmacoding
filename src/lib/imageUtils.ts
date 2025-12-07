@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient";
+import { logger } from "./logger";
 
 // ============================================
 // RATE LIMITING
@@ -200,7 +201,7 @@ async function compressImage(file: File, maxSizeMB: number = 1): Promise<File> {
     } catch (importError: any) {
       // Module not found - return original file without blocking
       if (importError?.message?.includes("Cannot find module") || importError?.code === "MODULE_NOT_FOUND") {
-        console.warn("browser-image-compression not available. Install with: npm install browser-image-compression");
+        logger.warn("browser-image-compression not available. Install with: npm install browser-image-compression", undefined, "Image Utils");
       }
       return file;
     }
@@ -208,7 +209,7 @@ async function compressImage(file: File, maxSizeMB: number = 1): Promise<File> {
     const imageCompression = imageCompressionModule.default || imageCompressionModule;
 
     if (!imageCompression || typeof imageCompression !== "function") {
-      console.warn("browser-image-compression default export not found, skipping compression");
+      logger.warn("browser-image-compression default export not found, skipping compression", undefined, "Image Utils");
       return file;
     }
 
@@ -223,7 +224,7 @@ async function compressImage(file: File, maxSizeMB: number = 1): Promise<File> {
     return compressedFile;
   } catch (error: any) {
     // Any other error during compression - return original file
-    console.warn("Compression failed, using original file:", error?.message || error);
+    logger.warn("Compression failed, using original file", error?.message || error, "Image Utils");
     return file;
   }
 }
@@ -313,8 +314,10 @@ export async function uploadImage(file: File): Promise<string> {
       // Only use compressed file if it's actually smaller and valid
       if (compressed && compressed instanceof File && compressed.size < file.size) {
         fileToUpload = compressed;
-        console.log(
-          `Image compressed: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`
+        logger.log(
+          `Image compressed: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB`,
+          undefined,
+          "Image Utils"
         );
       } else {
         // Compression returned original file or failed silently
@@ -322,7 +325,7 @@ export async function uploadImage(file: File): Promise<string> {
       }
     } catch (error) {
       // Compression failed, continue with original file - don't block upload
-      console.warn("Compression failed, using original file:", error);
+      logger.warn("Compression failed, using original file", error, "Image Utils");
       fileToUpload = file;
     }
   }
@@ -378,19 +381,19 @@ export async function uploadImage(file: File): Promise<string> {
 
   if (cloudflareAccountId && cloudflareApiToken && typeof window !== "undefined") {
     try {
-      console.log("🔄 Attempting to upload to Cloudflare Images...");
+      logger.log("Attempting to upload to Cloudflare Images...", undefined, "Image Utils");
       // Upload to Cloudflare Images in the background (non-blocking)
       // Now uses Next.js API route to avoid CORS issues
       uploadToCloudflareImages(fileToUpload, fileName)
         .then((cloudflareUrl) => {
           if (cloudflareUrl) {
-            console.log("✅ Image also uploaded to Cloudflare Images:", cloudflareUrl);
-            console.log("📦 Storing Cloudflare URL mapping in localStorage");
+            logger.log(`Image also uploaded to Cloudflare Images: ${cloudflareUrl}`, undefined, "Image Utils");
+            logger.log("Storing Cloudflare URL mapping in localStorage", undefined, "Image Utils");
             // Store Cloudflare URL in localStorage for future use
             const cloudflareUrls = JSON.parse(localStorage.getItem("cloudflare_image_urls") || "{}");
             cloudflareUrls[publicUrl] = cloudflareUrl;
             localStorage.setItem("cloudflare_image_urls", JSON.stringify(cloudflareUrls));
-            console.log("✅ Cloudflare URL stored. Total images in Cloudflare:", Object.keys(cloudflareUrls).length);
+            logger.log(`Cloudflare URL stored. Total images in Cloudflare: ${Object.keys(cloudflareUrls).length}`, undefined, "Image Utils");
           }
           // If cloudflareUrl is null, it's silently skipped (plan limitation or not configured)
         })
@@ -399,7 +402,7 @@ export async function uploadImage(file: File): Promise<string> {
           // The image is already uploaded to Supabase successfully
         });
     } catch (error) {
-      console.warn("Error initiating Cloudflare Images upload:", error);
+      logger.warn("Error initiating Cloudflare Images upload", error, "Image Utils");
       // Continue with Supabase URL
     }
   } else {
@@ -407,8 +410,8 @@ export async function uploadImage(file: File): Promise<string> {
       const missing = [];
       if (!cloudflareAccountId) missing.push("ACCOUNT_ID");
       if (!cloudflareApiToken) missing.push("API_TOKEN");
-      console.log(`ℹ️ Cloudflare Images not configured. Missing: ${missing.join(", ")}`);
-      console.log("ℹ️ Image uploaded to Supabase only (this is normal if Cloudflare is not configured)");
+      logger.log(`Cloudflare Images not configured. Missing: ${missing.join(", ")}`, undefined, "Image Utils");
+      logger.log("Image uploaded to Supabase only (this is normal if Cloudflare is not configured)", undefined, "Image Utils");
     }
   }
 
@@ -443,7 +446,7 @@ async function uploadToCloudflareImages(
   fileName: string
 ): Promise<string | null> {
   try {
-    console.log(`📤 Uploading to Cloudflare Images via API route...`);
+    logger.log("Uploading to Cloudflare Images via API route...", undefined, "Image Utils");
     
     // Upload via Next.js API route to avoid CORS and protect API token
     const formData = new FormData();
@@ -460,30 +463,30 @@ async function uploadToCloudflareImages(
       
       // Handle 403 (plan limitations) gracefully
       if (response.status === 403) {
-        console.log("ℹ️ Cloudflare Images storage not available (Free plan limitation). Using Supabase only.");
-        console.log("ℹ️ This is normal - Cloudflare Free plan doesn't support image storage.");
+        logger.log("Cloudflare Images storage not available (Free plan limitation). Using Supabase only.", undefined, "Image Utils");
+        logger.log("This is normal - Cloudflare Free plan doesn't support image storage.", undefined, "Image Utils");
         return null; // Return null silently, don't throw error
       }
       
       // For other errors, log but don't block
       const errorMessage = `Cloudflare Images upload failed: ${response.status}`;
-      console.warn("⚠️", errorMessage, errorData.reason === "plan_limitation" ? "- Plan limitation" : "");
+      logger.warn(errorMessage, errorData.reason === "plan_limitation" ? "- Plan limitation" : undefined, "Image Utils");
       return null; // Don't throw, just return null
     }
 
     const data = await response.json();
-    console.log("📥 Cloudflare API response:", { success: data.success, imageId: data.imageId });
+    logger.log("Cloudflare API response", { success: data.success, imageId: data.imageId }, "Image Utils");
     
     if (data.success && data.url) {
-      console.log("🔗 Generated Cloudflare delivery URL:", data.url);
+      logger.log(`Generated Cloudflare delivery URL: ${data.url}`, undefined, "Image Utils");
       return data.url;
     }
 
-    console.warn("⚠️ Cloudflare API returned success=false or no URL");
+    logger.warn("Cloudflare API returned success=false or no URL", undefined, "Image Utils");
     return null;
   } catch (error) {
     // Don't log errors as critical - Cloudflare is optional
-    console.log("ℹ️ Cloudflare Images upload skipped (optional feature)");
+    logger.log("Cloudflare Images upload skipped (optional feature)", undefined, "Image Utils");
     return null;
   }
 }
@@ -528,7 +531,7 @@ export async function migrateTempImages(userId: string): Promise<Array<{ oldUrl:
         });
 
       if (checkError || !fileData || fileData.length === 0) {
-        console.warn(`Image not found in temp/: ${fileName}`);
+        logger.warn(`Image not found in temp/: ${fileName}`, undefined, "Image Utils");
         continue;
       }
 
@@ -538,7 +541,7 @@ export async function migrateTempImages(userId: string): Promise<Array<{ oldUrl:
         .download(oldPath);
 
       if (downloadError || !fileContent) {
-        console.error(`Error downloading image: ${downloadError?.message}`);
+        logger.error(`Error downloading image: ${downloadError?.message}`, downloadError, "Image Utils");
         errors.push(`Failed to download ${fileName}`);
         continue;
       }
@@ -552,7 +555,7 @@ export async function migrateTempImages(userId: string): Promise<Array<{ oldUrl:
         });
 
       if (uploadError) {
-        console.error(`Error uploading to signatures/: ${uploadError.message}`);
+        logger.error(`Error uploading to signatures/: ${uploadError.message}`, uploadError, "Image Utils");
         errors.push(`Failed to upload ${fileName}`);
         continue;
       }
@@ -568,7 +571,7 @@ export async function migrateTempImages(userId: string): Promise<Array<{ oldUrl:
         .remove([oldPath]);
 
       if (deleteError) {
-        console.warn(`Warning: Could not delete old file ${oldPath}:`, deleteError.message);
+        logger.warn(`Warning: Could not delete old file ${oldPath}: ${deleteError.message}`, undefined, "Image Utils");
         // Continue anyway - the file will be cleaned up by the cleanup function
       }
 
@@ -577,7 +580,7 @@ export async function migrateTempImages(userId: string): Promise<Array<{ oldUrl:
         newUrl: newUrl,
       });
     } catch (error) {
-      console.error(`Error migrating image ${image.path}:`, error);
+      logger.error(`Error migrating image ${image.path}`, error instanceof Error ? error : new Error(String(error)), "Image Utils");
       errors.push(`Error migrating ${image.path}`);
     }
   }
@@ -585,11 +588,11 @@ export async function migrateTempImages(userId: string): Promise<Array<{ oldUrl:
   // Clear temp images from localStorage after migration
   if (migrated.length > 0) {
     localStorage.removeItem(TEMP_IMAGES_KEY);
-    console.log(`Migrated ${migrated.length} temporary image(s) to permanent storage`);
+    logger.log(`Migrated ${migrated.length} temporary image(s) to permanent storage`, undefined, "Image Utils");
   }
 
   if (errors.length > 0) {
-    console.warn("Some images could not be migrated:", errors);
+    logger.warn("Some images could not be migrated", errors, "Image Utils");
   }
 
   return migrated;
@@ -611,12 +614,12 @@ export function getTempImages(): string[] {
       .filter((img: any) => img && typeof img === "object" && typeof img.url === "string" && img.url.trim().length > 0)
       .map((img: any) => img.url);
   } catch (error) {
-    console.error("Error parsing temp images from localStorage:", error);
+    logger.error("Error parsing temp images from localStorage", error instanceof Error ? error : new Error(String(error)), "Image Utils");
     // If localStorage is corrupted, clear it and return empty array
     try {
       localStorage.removeItem(TEMP_IMAGES_KEY);
     } catch (clearError) {
-      console.error("Error clearing corrupted temp images:", clearError);
+      logger.error("Error clearing corrupted temp images", clearError instanceof Error ? clearError : new Error(String(clearError)), "Image Utils");
     }
     return [];
   }
@@ -678,7 +681,7 @@ export function getOptimizedImageUrl(
       
       return urlObj.toString();
     } catch (error) {
-      console.warn("Error building Supabase Storage transformation URL:", error);
+      logger.warn("Error building Supabase Storage transformation URL", error, "Image Utils");
       // Fall through to other options
     }
   }
@@ -719,7 +722,7 @@ export function getOptimizedImageUrl(
         return `https://${cloudflareResizingDomain}/cdn-cgi/image/${optionsStr}/${imageUrl}`;
       }
     } catch (error) {
-      console.warn("Error building Cloudflare Image Resizing URL:", error);
+      logger.warn("Error building Cloudflare Image Resizing URL", error, "Image Utils");
       // Fall through to other options
     }
   }
@@ -763,7 +766,7 @@ export function getOptimizedImageUrl(
         }
       }
     } catch (error) {
-      console.warn("Error building Cloudflare Images URL:", error);
+      logger.warn("Error building Cloudflare Images URL", error, "Image Utils");
       // Fall through to default behavior
     }
   }

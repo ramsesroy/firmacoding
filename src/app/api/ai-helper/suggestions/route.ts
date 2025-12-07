@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 
 // n8n webhook URL for AI Signature Helper
 // Clean production URL (without session IDs or temporary codes)
@@ -12,7 +13,9 @@ export async function OPTIONS() {
   return NextResponse.json(null, {
     status: 200,
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": process.env.NODE_ENV === 'production' 
+        ? (process.env.NEXT_PUBLIC_APP_URL || "*")
+        : "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     },
@@ -33,14 +36,16 @@ export async function GET() {
     { 
       status: 200,
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": process.env.NODE_ENV === 'production' 
+        ? (process.env.NEXT_PUBLIC_APP_URL || "*")
+        : "*",
       },
     }
   );
 }
 
 export async function POST(request: NextRequest) {
-  console.log("[AI Helper API] POST request received");
+  // Removed console.log - use logger if needed for debugging
   
   // Read request body ONCE - request body can only be read once
   let requestBody: any;
@@ -63,10 +68,10 @@ export async function POST(request: NextRequest) {
     );
   }
   
-  console.log("[AI Helper API] Request body received:", {
+  logger.log("Request body received", {
     hasUserProfile: !!requestBody.userProfile,
     hasCurrentSignature: !!requestBody.currentSignature,
-  });
+  }, "AI Helper API");
 
   // Validate required fields
   if (!requestBody.userProfile || !requestBody.userProfile.fullName || !requestBody.userProfile.role) {
@@ -103,8 +108,8 @@ export async function POST(request: NextRequest) {
 
   // Forward request to n8n webhook with retry logic
   const startTime = Date.now();
-  console.log("[AI Helper API] Calling n8n webhook:", N8N_WEBHOOK_URL);
-  console.log("[AI Helper API] Request body keys:", Object.keys(requestBody));
+  logger.log(`Calling n8n webhook: ${N8N_WEBHOOK_URL}`, undefined, "AI Helper API");
+  logger.log("Request body keys", Object.keys(requestBody), "AI Helper API");
   
   let n8nResponse: Response | null = null;
   let lastError: string | null = null;
@@ -114,12 +119,12 @@ export async function POST(request: NextRequest) {
   // Retry logic in case of temporary n8n registration issues
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     if (attempt > 0) {
-      console.log(`[AI Helper API] Retry attempt ${attempt}/${maxRetries} after 1 second...`);
+      logger.log(`Retry attempt ${attempt}/${maxRetries} after 1 second...`, undefined, "AI Helper API");
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
     
     try {
-      console.log(`[AI Helper API] Attempt ${attempt + 1}: Calling ${N8N_WEBHOOK_URL}`);
+      logger.log(`Attempt ${attempt + 1}: Calling ${N8N_WEBHOOK_URL}`, undefined, "AI Helper API");
       n8nResponse = await fetch(N8N_WEBHOOK_URL, {
         method: "POST",
         headers: {
@@ -128,15 +133,15 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify(requestBody), // Use the body variable we read once
       });
       
-      console.log(`[AI Helper API] n8n response status (attempt ${attempt + 1}):`, n8nResponse.status, n8nResponse.statusText);
-      console.log(`[AI Helper API] n8n response URL:`, n8nResponse.url);
+      logger.log(`n8n response status (attempt ${attempt + 1}): ${n8nResponse.status} ${n8nResponse.statusText}`, undefined, "AI Helper API");
+      logger.log(`n8n response URL: ${n8nResponse.url}`, undefined, "AI Helper API");
       
       // If successful, parse JSON and break retry loop
       if (n8nResponse.ok) {
         try {
           // 1. Obtener el cuerpo de la respuesta crudo
           const data = await n8nResponse.json();
-          console.log("📦 Raw n8n response:", JSON.stringify(data, null, 2));
+          logger.debug("Raw n8n response", data, "AI Helper API");
           
           let rawJsonString = "";
           let finalData: any = null;
@@ -145,29 +150,29 @@ export async function POST(request: NextRequest) {
           
           // CASO 1: Formato Crudo de Gemini (parts[0].text) <- ESTE ES EL QUE ESTÁ OCURRIENDO
           if (data.parts && Array.isArray(data.parts) && data.parts[0] && data.parts[0].text) {
-            console.log("🔓 Detectado formato Gemini (parts[0].text)");
+            logger.debug("Detectado formato Gemini (parts[0].text)", undefined, "AI Helper API");
             rawJsonString = data.parts[0].text;
           }
           // CASO 2: Formato n8n Text (text)
           else if (data.text && typeof data.text === 'string') {
-            console.log("🔓 Detectado formato n8n (text)");
+            logger.debug("Detectado formato n8n (text)", undefined, "AI Helper API");
             rawJsonString = data.text;
           }
           // CASO 3: El objeto ya viene listo o es un array
           else if (Array.isArray(data) && data.length > 0) {
-            console.log("📦 n8n devolvió un array, usando el primer elemento");
+            logger.debug("n8n devolvió un array, usando el primer elemento", undefined, "AI Helper API");
             finalData = data[0];
           }
           // CASO 4: El objeto ya es el JSON final (tiene success, suggestions, etc.)
           else if (data && typeof data === 'object' && (data.success !== undefined || data.suggestions !== undefined)) {
-            console.log("✅ El objeto ya viene listo (formato directo)");
+            logger.debug("El objeto ya viene listo (formato directo)", undefined, "AI Helper API");
             finalData = data;
           }
           
           // 3. Limpieza y Parsing del string extraído
           if (rawJsonString) {
             try {
-              console.log("🧹 Limpiando y parseando JSON string...");
+              logger.debug("Limpiando y parseando JSON string...", undefined, "AI Helper API");
               // Limpiar markdown ```json ... ``` y también \n escapados
               let cleanString = rawJsonString
                 .replace(/```json/gi, "")
@@ -180,10 +185,10 @@ export async function POST(request: NextRequest) {
               
               // Intentar parsear
               finalData = JSON.parse(cleanString);
-              console.log("✅ JSON parseado exitosamente");
-              console.log("📋 Final data keys:", Object.keys(finalData));
+              logger.debug("JSON parseado exitosamente", undefined, "AI Helper API");
+              logger.debug("Final data keys", Object.keys(finalData), "AI Helper API");
             } catch (e) {
-              console.error("❌ Error parseando el string extraído:", e);
+              logger.error("Error parseando el string extraído", e instanceof Error ? e : new Error(String(e)), "AI Helper API");
               // Fallback: usar el objeto original
               finalData = data;
             }
@@ -193,7 +198,7 @@ export async function POST(request: NextRequest) {
           if (finalData) {
             // Si viene con "recommendations" en lugar de "suggestions", transformarlo
             if (finalData.recommendations && !finalData.suggestions) {
-              console.log("🔄 Transformando formato: recommendations -> suggestions");
+              logger.debug("Transformando formato: recommendations -> suggestions", undefined, "AI Helper API");
               // Transformar recommendations a contentSuggestions
               const contentSuggestions = Array.isArray(finalData.recommendations)
                 ? finalData.recommendations.map((rec: any) => ({
@@ -236,7 +241,7 @@ export async function POST(request: NextRequest) {
             }
             // Si no tiene suggestions pero tiene otros datos, crear estructura básica
             else if (!finalData.suggestions && !finalData.success) {
-              console.log("⚠️ Respuesta no tiene estructura esperada, creando estructura básica");
+              logger.warn("Respuesta no tiene estructura esperada, creando estructura básica", undefined, "AI Helper API");
               finalData = {
                 success: true,
                 suggestions: {
@@ -265,18 +270,18 @@ export async function POST(request: NextRequest) {
           
           // 5. Validación final
           if (!finalData) {
-            console.warn("⚠️ No se pudo extraer datos finales, usando respuesta original");
+            logger.warn("No se pudo extraer datos finales, usando respuesta original", undefined, "AI Helper API");
             finalData = data;
           }
           
           if (!finalData.success) {
-            console.warn("⚠️ La respuesta final no tiene success: true", finalData);
+            logger.warn("La respuesta final no tiene success: true", finalData, "AI Helper API");
             // Forzar success si tiene suggestions
             if (finalData.suggestions) {
               finalData.success = true;
             }
           } else {
-            console.log("✅ Respuesta validada: success = true");
+            logger.debug("Respuesta validada: success = true", undefined, "AI Helper API");
           }
           
           // Guardar los datos finales
@@ -310,14 +315,14 @@ export async function POST(request: NextRequest) {
         try {
           const errorText = await n8nResponse.text();
           lastError = errorText;
-          console.log(`[AI Helper API] n8n error response (attempt ${attempt + 1}):`, errorText);
+          logger.log(`n8n error response (attempt ${attempt + 1}): ${errorText}`, undefined, "AI Helper API");
         } catch (textError) {
           lastError = `HTTP ${n8nResponse.status}: ${n8nResponse.statusText}`;
         }
         
         // If 404, retry
         if (n8nResponse.status === 404) {
-          console.log(`[AI Helper API] n8n 404 error (attempt ${attempt + 1}):`, lastError);
+          logger.log(`n8n 404 error (attempt ${attempt + 1}): ${lastError}`, undefined, "AI Helper API");
           
           // If this was the last attempt, return error
           if (attempt === maxRetries) {
@@ -345,7 +350,7 @@ export async function POST(request: NextRequest) {
       }
     } catch (fetchError) {
       lastError = fetchError instanceof Error ? fetchError.message : "Unknown error";
-      console.error(`[AI Helper API] Fetch error (attempt ${attempt + 1}):`, fetchError);
+      logger.error(`Fetch error (attempt ${attempt + 1})`, fetchError instanceof Error ? fetchError : new Error(String(fetchError)), "AI Helper API");
       
       if (attempt === maxRetries) {
         const processingTime = (Date.now() - startTime) / 1000;
@@ -391,7 +396,7 @@ export async function POST(request: NextRequest) {
 
   // If response was not OK, return error (we already read the body in the loop)
   if (!n8nResponse.ok) {
-    console.log("[AI Helper API] n8n final error response:", lastError);
+    logger.log(`n8n final error response: ${lastError}`, undefined, "AI Helper API");
     return NextResponse.json(
       {
         success: false,
@@ -440,7 +445,9 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json(n8nResponseData, {
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": process.env.NODE_ENV === 'production' 
+        ? (process.env.NEXT_PUBLIC_APP_URL || "*")
+        : "*",
     },
   });
 }

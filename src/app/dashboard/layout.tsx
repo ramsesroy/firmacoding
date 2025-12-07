@@ -51,6 +51,12 @@ export default function DashboardLayout({
       active: pathname === "/dashboard",
     },
     {
+      href: "/dashboard/canvas",
+      label: "Canvas Editor",
+      icon: "palette",
+      active: pathname === "/dashboard/canvas",
+    },
+    {
       href: "/dashboard/signatures",
       label: "My Signatures",
       icon: "badge",

@@ -2,6 +2,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { SignatureProps, TemplateType } from "@/types/signature";
 import { getOptimizedImageUrl } from "./imageUtils";
+import { logger } from "./logger";
 
 export type ExportSize = "auto" | "small" | "medium" | "large";
 
@@ -36,14 +37,14 @@ async function waitForImagesToLoad(element: HTMLElement, timeout: number = 10000
 
       // If image has an error, resolve anyway (don't block export)
       if (img.complete && img.naturalWidth === 0) {
-        console.warn("Image failed to load:", img.src);
+        logger.warn(`Image failed to load: ${img.src}`, undefined, "Export Utils");
         resolve(); // Resolve anyway to not block export
         return;
       }
 
       // Wait for load or error
       const timeoutId = setTimeout(() => {
-        console.warn("Image load timeout:", img.src);
+        logger.warn(`Image load timeout: ${img.src}`, undefined, "Export Utils");
         resolve(); // Resolve anyway to not block export
       }, timeout);
 
@@ -54,7 +55,7 @@ async function waitForImagesToLoad(element: HTMLElement, timeout: number = 10000
 
       img.onerror = () => {
         clearTimeout(timeoutId);
-        console.warn("Image load error:", img.src);
+        logger.warn(`Image load error: ${img.src}`, undefined, "Export Utils");
         resolve(); // Resolve anyway to not block export
       };
     });
@@ -273,7 +274,7 @@ export async function exportToPNGHQ(
       1.0 // Maximum quality
     );
   } catch (error) {
-    console.error("Error exporting to PNG HQ:", error);
+    logger.error("Error exporting to PNG HQ", error instanceof Error ? error : new Error(String(error)), "Export Utils");
     throw new Error("Failed to export signature to PNG. Please try again.");
   }
 }
@@ -559,7 +560,7 @@ export async function exportToPDFHQ(
     pdf.save(filename);
     onProgress?.(100);
   } catch (error) {
-    console.error("Error exporting to PDF HQ:", error);
+    logger.error("Error exporting to PDF HQ", error instanceof Error ? error : new Error(String(error)), "Export Utils");
     throw new Error("Failed to export signature to PDF. Please try again.");
   }
 }
@@ -666,7 +667,7 @@ export async function exportToPDF(
     pdf.addImage(imgData, "PNG", x, y, imageWidth, imageHeight);
     pdf.save(filename);
   } catch (error) {
-    console.error("Error exporting to PDF:", error);
+    logger.error("Error exporting to PDF", error instanceof Error ? error : new Error(String(error)), "Export Utils");
     throw new Error("Failed to export signature to PDF");
   }
 }
@@ -713,7 +714,7 @@ export async function exportToSVG(
     URL.revokeObjectURL(url);
     onProgress?.(100);
   } catch (error) {
-    console.error("Error exporting to SVG:", error);
+    logger.error("Error exporting to SVG", error instanceof Error ? error : new Error(String(error)), "Export Utils");
     throw new Error("Failed to export signature to SVG");
   }
 }
@@ -781,7 +782,7 @@ export async function exportSignaturePack(
     saveAs(zipBlob, `${baseFilename}-pack.zip`);
     onProgress?.(100);
   } catch (error) {
-    console.error("Error exporting pack:", error);
+    logger.error("Error exporting pack", error instanceof Error ? error : new Error(String(error)), "Export Utils");
     throw new Error("Failed to export signature pack");
   }
 }
