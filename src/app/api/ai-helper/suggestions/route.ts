@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
         
         // If 404, retry
         if (n8nResponse.status === 404) {
-          console.log(`[AI Helper API] n8n 404 error (attempt ${attempt + 1}):`, responseText);
+          console.log(`[AI Helper API] n8n 404 error (attempt ${attempt + 1}):`, lastError);
           
           // If this was the last attempt, return error
           if (attempt === maxRetries) {
