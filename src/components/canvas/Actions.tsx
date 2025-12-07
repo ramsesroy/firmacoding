@@ -61,6 +61,7 @@ export const Actions = () => {
         if (!previewContainerRef.current) return;
         const element = previewContainerRef.current;
         try {
+            // @ts-expect-error - scale is a valid html2canvas option but not in TypeScript types
             const canvas = await html2canvas(element, { 
                 scale: 2, 
                 useCORS: true, 
@@ -80,6 +81,7 @@ export const Actions = () => {
         if (!previewContainerRef.current) return;
         const element = previewContainerRef.current;
         try {
+            // @ts-expect-error - scale is a valid html2canvas option but not in TypeScript types
             const canvas = await html2canvas(element, { 
                 scale: 2, 
                 useCORS: true, 
