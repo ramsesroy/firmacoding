@@ -9,7 +9,7 @@ const N8N_WEBHOOK_URL = process.env.N8N_AI_HELPER_WEBHOOK_URL ||
 
 // OPTIONS method for CORS preflight
 export async function OPTIONS() {
-  return new NextResponse(null, {
+  return NextResponse.json(null, {
     status: 200,
     headers: {
       "Access-Control-Allow-Origin": "*",
@@ -41,88 +41,133 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   console.log("[AI Helper API] POST request received");
+  
+  // Read request body ONCE - request body can only be read once
+  let requestBody: any;
   try {
-    const body = await request.json();
-    console.log("[AI Helper API] Request body received:", {
-      hasUserProfile: !!body.userProfile,
-      hasCurrentSignature: !!body.currentSignature,
-    });
-
-    // Validate required fields
-    if (!body.userProfile || !body.userProfile.fullName || !body.userProfile.role) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: "INVALID_REQUEST",
-            message: "Missing required fields: userProfile.fullName and userProfile.role are required",
-          },
-          metadata: {
-            generatedAt: new Date().toISOString(),
-          },
+    requestBody = await request.json();
+  } catch (parseError) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: "INVALID_REQUEST",
+          message: "Invalid JSON in request body",
+          details: parseError instanceof Error ? parseError.message : "Unknown error",
         },
-        { status: 400 }
-      );
-    }
-
-    if (!body.currentSignature || !body.currentSignature.templateId) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: "INVALID_REQUEST",
-            message: "Missing required field: currentSignature.templateId",
-          },
-          metadata: {
-            generatedAt: new Date().toISOString(),
-          },
+        metadata: {
+          generatedAt: new Date().toISOString(),
         },
-        { status: 400 }
-      );
-    }
+      },
+      { status: 400 }
+    );
+  }
+  
+  console.log("[AI Helper API] Request body received:", {
+    hasUserProfile: !!requestBody.userProfile,
+    hasCurrentSignature: !!requestBody.currentSignature,
+  });
 
-    // Forward request to n8n webhook with retry logic
-    const startTime = Date.now();
-    console.log("[AI Helper API] Calling n8n webhook:", N8N_WEBHOOK_URL);
-    console.log("[AI Helper API] Request body keys:", Object.keys(body));
+  // Validate required fields
+  if (!requestBody.userProfile || !requestBody.userProfile.fullName || !requestBody.userProfile.role) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: "INVALID_REQUEST",
+          message: "Missing required fields: userProfile.fullName and userProfile.role are required",
+        },
+        metadata: {
+          generatedAt: new Date().toISOString(),
+        },
+      },
+      { status: 400 }
+    );
+  }
+
+  if (!requestBody.currentSignature || !requestBody.currentSignature.templateId) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: "INVALID_REQUEST",
+          message: "Missing required field: currentSignature.templateId",
+        },
+        metadata: {
+          generatedAt: new Date().toISOString(),
+        },
+      },
+      { status: 400 }
+    );
+  }
+
+  // Forward request to n8n webhook with retry logic
+  const startTime = Date.now();
+  console.log("[AI Helper API] Calling n8n webhook:", N8N_WEBHOOK_URL);
+  console.log("[AI Helper API] Request body keys:", Object.keys(requestBody));
+  
+  let n8nResponse: Response | null = null;
+  let lastError: string | null = null;
+  let n8nResponseData: any = null;
+  const maxRetries = 2;
+  
+  // Retry logic in case of temporary n8n registration issues
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    if (attempt > 0) {
+      console.log(`[AI Helper API] Retry attempt ${attempt}/${maxRetries} after 1 second...`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
     
-    let response: Response | null = null;
-    let lastError: string | null = null;
-    const maxRetries = 2;
-    
-    // Retry logic in case of temporary n8n registration issues
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
-      if (attempt > 0) {
-        console.log(`[AI Helper API] Retry attempt ${attempt}/${maxRetries} after 1 second...`);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
+    try {
+      console.log(`[AI Helper API] Attempt ${attempt + 1}: Calling ${N8N_WEBHOOK_URL}`);
+      n8nResponse = await fetch(N8N_WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody), // Use the body variable we read once
+      });
       
-      try {
-        console.log(`[AI Helper API] Attempt ${attempt + 1}: Calling ${N8N_WEBHOOK_URL}`);
-        response = await fetch(N8N_WEBHOOK_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        });
-        
-        console.log(`[AI Helper API] n8n response status (attempt ${attempt + 1}):`, response.status, response.statusText);
-        console.log(`[AI Helper API] n8n response URL:`, response.url);
-        console.log(`[AI Helper API] n8n response headers:`, Object.fromEntries(response.headers.entries()));
-        
-        // Read response body first
-        const responseText = await response.text();
-        console.log(`[AI Helper API] n8n response body (attempt ${attempt + 1}):`, responseText);
-        
-        // If successful, break retry loop
-        if (response.ok) {
+      console.log(`[AI Helper API] n8n response status (attempt ${attempt + 1}):`, n8nResponse.status, n8nResponse.statusText);
+      console.log(`[AI Helper API] n8n response URL:`, n8nResponse.url);
+      
+      // Read response body ONCE and store it
+      const responseText = await n8nResponse.text();
+      console.log(`[AI Helper API] n8n response body (attempt ${attempt + 1}):`, responseText);
+      
+      // If successful, parse JSON and break retry loop
+      if (n8nResponse.ok) {
+        try {
+          n8nResponseData = JSON.parse(responseText);
           break;
+        } catch (parseError) {
+          console.error("[AI Helper API] Failed to parse n8n response as JSON:", parseError);
+          lastError = "Invalid JSON response from n8n";
+          if (attempt === maxRetries) {
+            const processingTime = (Date.now() - startTime) / 1000;
+            return NextResponse.json(
+              {
+                success: false,
+                error: {
+                  code: "AI_SERVICE_ERROR",
+                  message: "Invalid response format from AI service",
+                  details: lastError,
+                },
+                metadata: {
+                  generatedAt: new Date().toISOString(),
+                  processingTime,
+                },
+              },
+              { status: 500 }
+            );
+          }
         }
+      } else {
+        // Store error text for non-200 responses
+        lastError = responseText;
         
-        // If 404, store error and retry
-        if (response.status === 404) {
-          lastError = responseText;
+        // If 404, retry
+        if (n8nResponse.status === 404) {
           console.log(`[AI Helper API] n8n 404 error (attempt ${attempt + 1}):`, responseText);
           
           // If this was the last attempt, return error
@@ -134,124 +179,119 @@ export async function POST(request: NextRequest) {
                 error: {
                   code: "AI_SERVICE_ERROR",
                   message: "Unable to generate suggestions at this time. The n8n workflow may need to be reactivated.",
-                  details: `n8n webhook returned ${response.status} after ${maxRetries + 1} attempts: ${lastError}`,
+                  details: `n8n webhook returned ${n8nResponse.status} after ${maxRetries + 1} attempts: ${lastError}`,
                 },
                 metadata: {
                   generatedAt: new Date().toISOString(),
                   processingTime,
                 },
               },
-              { status: response.status }
+              { status: n8nResponse.status }
             );
           }
         } else {
           // Non-404 error, break and handle below
-          lastError = responseText;
           break;
         }
-      } catch (fetchError) {
-        lastError = fetchError instanceof Error ? fetchError.message : "Unknown error";
-        console.error(`[AI Helper API] Fetch error (attempt ${attempt + 1}):`, fetchError);
-        
-        if (attempt === maxRetries) {
-          const processingTime = (Date.now() - startTime) / 1000;
-          return NextResponse.json(
-            {
-              success: false,
-              error: {
-                code: "SERVICE_UNAVAILABLE",
-                message: "Unable to connect to AI service",
-                details: lastError,
-              },
-              metadata: {
-                generatedAt: new Date().toISOString(),
-                processingTime,
-              },
+      }
+    } catch (fetchError) {
+      lastError = fetchError instanceof Error ? fetchError.message : "Unknown error";
+      console.error(`[AI Helper API] Fetch error (attempt ${attempt + 1}):`, fetchError);
+      
+      if (attempt === maxRetries) {
+        const processingTime = (Date.now() - startTime) / 1000;
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: "SERVICE_UNAVAILABLE",
+              message: "Unable to connect to AI service",
+              details: lastError,
             },
-            { status: 500 }
-          );
-        }
+            metadata: {
+              generatedAt: new Date().toISOString(),
+              processingTime,
+            },
+          },
+          { status: 500 }
+        );
       }
     }
-    
-    const processingTime = (Date.now() - startTime) / 1000;
+  }
+  
+  const processingTime = (Date.now() - startTime) / 1000;
 
-    // Ensure response exists
-    if (!response) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: "SERVICE_UNAVAILABLE",
-            message: "Unable to connect to AI service",
-            details: "No response received from n8n webhook",
-          },
-          metadata: {
-            generatedAt: new Date().toISOString(),
-            processingTime,
-          },
-        },
-        { status: 500 }
-      );
-    }
-
-    if (!response.ok) {
-      const errorText = lastError || await response.text();
-      console.log("[AI Helper API] n8n final error response:", errorText);
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: "AI_SERVICE_ERROR",
-            message: "Unable to generate suggestions at this time",
-            details: `n8n webhook returned ${response.status}: ${errorText}`,
-          },
-          metadata: {
-            generatedAt: new Date().toISOString(),
-            processingTime,
-          },
-        },
-        { status: response.status }
-      );
-    }
-
-    const data = await response.json();
-
-    // Ensure metadata is present
-    if (!data.metadata) {
-      data.metadata = {
-        generatedAt: new Date().toISOString(),
-        processingTime,
-      };
-    } else {
-      data.metadata.processingTime = processingTime;
-    }
-
-    return NextResponse.json(data, {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
-  } catch (error) {
-    console.error("Error calling AI helper:", error);
+  // Ensure response exists
+  if (!n8nResponse) {
     return NextResponse.json(
       {
         success: false,
         error: {
           code: "SERVICE_UNAVAILABLE",
           message: "Unable to connect to AI service",
-          details: error instanceof Error ? error.message : "Unknown error",
+          details: "No response received from n8n webhook",
         },
         metadata: {
           generatedAt: new Date().toISOString(),
+          processingTime,
         },
       },
-      { 
-        status: 500,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-        },
-      }
+      { status: 500 }
     );
   }
+
+  // If response was not OK, return error (we already read the body in the loop)
+  if (!n8nResponse.ok) {
+    console.log("[AI Helper API] n8n final error response:", lastError);
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: "AI_SERVICE_ERROR",
+          message: "Unable to generate suggestions at this time",
+          details: `n8n webhook returned ${n8nResponse.status}: ${lastError || "Unknown error"}`,
+        },
+        metadata: {
+          generatedAt: new Date().toISOString(),
+          processingTime,
+        },
+      },
+      { status: n8nResponse.status }
+    );
+  }
+
+  // If we have parsed response data, use it; otherwise return error
+  if (!n8nResponseData) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: "AI_SERVICE_ERROR",
+          message: "Invalid response from AI service",
+          details: "Response body could not be parsed",
+        },
+        metadata: {
+          generatedAt: new Date().toISOString(),
+          processingTime,
+        },
+      },
+      { status: 500 }
+    );
+  }
+
+  // Ensure metadata is present
+  if (!n8nResponseData.metadata) {
+    n8nResponseData.metadata = {
+      generatedAt: new Date().toISOString(),
+      processingTime,
+    };
+  } else {
+    n8nResponseData.metadata.processingTime = processingTime;
+  }
+
+  return NextResponse.json(n8nResponseData, {
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
 }
