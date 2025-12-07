@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
               error: {
                 code: "AI_SERVICE_ERROR",
                 message: "Unable to generate suggestions at this time. The n8n workflow may need to be reactivated.",
-                details: `n8n webhook returned ${response.status} after ${maxRetries + 1} attempts: ${errorText}`,
+                details: `n8n webhook returned ${response.status} after ${maxRetries + 1} attempts: ${lastError || responseText}`,
               },
               metadata: {
                 generatedAt: new Date().toISOString(),
