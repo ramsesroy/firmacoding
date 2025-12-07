@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     console.log("[AI Helper API] Calling n8n webhook:", N8N_WEBHOOK_URL);
     console.log("[AI Helper API] Request body keys:", Object.keys(body));
     
-    let response: Response;
+    let response: Response | null = null;
     let lastError: string | null = null;
     const maxRetries = 2;
     
@@ -114,48 +114,88 @@ export async function POST(request: NextRequest) {
         const responseText = await response.text();
         console.log(`[AI Helper API] n8n response body (attempt ${attempt + 1}):`, responseText);
         
-        // If successful or non-404 error, break retry loop
-        if (response.ok || response.status !== 404) {
+        // If successful, break retry loop
+        if (response.ok) {
           break;
         }
         
         // If 404, store error and retry
-        lastError = responseText;
-        console.log(`[AI Helper API] n8n 404 error (attempt ${attempt + 1}):`, responseText);
-        
-        // If this was the last attempt, return error
-        if (attempt === maxRetries) {
-          const processingTime = (Date.now() - startTime) / 1000;
-          return NextResponse.json(
-            {
-              success: false,
-              error: {
-                code: "AI_SERVICE_ERROR",
-                message: "Unable to generate suggestions at this time. The n8n workflow may need to be reactivated.",
-                details: `n8n webhook returned ${response.status} after ${maxRetries + 1} attempts: ${lastError || responseText}`,
+        if (response.status === 404) {
+          lastError = responseText;
+          console.log(`[AI Helper API] n8n 404 error (attempt ${attempt + 1}):`, responseText);
+          
+          // If this was the last attempt, return error
+          if (attempt === maxRetries) {
+            const processingTime = (Date.now() - startTime) / 1000;
+            return NextResponse.json(
+              {
+                success: false,
+                error: {
+                  code: "AI_SERVICE_ERROR",
+                  message: "Unable to generate suggestions at this time. The n8n workflow may need to be reactivated.",
+                  details: `n8n webhook returned ${response.status} after ${maxRetries + 1} attempts: ${lastError}`,
+                },
+                metadata: {
+                  generatedAt: new Date().toISOString(),
+                  processingTime,
+                },
               },
-              metadata: {
-                generatedAt: new Date().toISOString(),
-                processingTime,
-              },
-            },
-            { status: response.status }
-          );
+              { status: response.status }
+            );
+          }
+        } else {
+          // Non-404 error, break and handle below
+          lastError = responseText;
+          break;
         }
       } catch (fetchError) {
         lastError = fetchError instanceof Error ? fetchError.message : "Unknown error";
         console.error(`[AI Helper API] Fetch error (attempt ${attempt + 1}):`, fetchError);
         
         if (attempt === maxRetries) {
-          throw fetchError;
+          const processingTime = (Date.now() - startTime) / 1000;
+          return NextResponse.json(
+            {
+              success: false,
+              error: {
+                code: "SERVICE_UNAVAILABLE",
+                message: "Unable to connect to AI service",
+                details: lastError,
+              },
+              metadata: {
+                generatedAt: new Date().toISOString(),
+                processingTime,
+              },
+            },
+            { status: 500 }
+          );
         }
       }
     }
     
     const processingTime = (Date.now() - startTime) / 1000;
 
-    if (!response!.ok) {
-      const errorText = lastError || await response!.text();
+    // Ensure response exists
+    if (!response) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: "SERVICE_UNAVAILABLE",
+            message: "Unable to connect to AI service",
+            details: "No response received from n8n webhook",
+          },
+          metadata: {
+            generatedAt: new Date().toISOString(),
+            processingTime,
+          },
+        },
+        { status: 500 }
+      );
+    }
+
+    if (!response.ok) {
+      const errorText = lastError || await response.text();
       console.log("[AI Helper API] n8n final error response:", errorText);
       return NextResponse.json(
         {
@@ -163,14 +203,14 @@ export async function POST(request: NextRequest) {
           error: {
             code: "AI_SERVICE_ERROR",
             message: "Unable to generate suggestions at this time",
-            details: `n8n webhook returned ${response!.status}: ${errorText}`,
+            details: `n8n webhook returned ${response.status}: ${errorText}`,
           },
           metadata: {
             generatedAt: new Date().toISOString(),
             processingTime,
           },
         },
-        { status: response!.status }
+        { status: response.status }
       );
     }
 
