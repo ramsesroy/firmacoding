@@ -131,39 +131,51 @@ export async function POST(request: NextRequest) {
       console.log(`[AI Helper API] n8n response status (attempt ${attempt + 1}):`, n8nResponse.status, n8nResponse.statusText);
       console.log(`[AI Helper API] n8n response URL:`, n8nResponse.url);
       
-      // Read response body ONCE and store it
-      const responseText = await n8nResponse.text();
-      console.log(`[AI Helper API] n8n response body (attempt ${attempt + 1}):`, responseText);
-      
       // If successful, parse JSON and break retry loop
       if (n8nResponse.ok) {
         try {
-          // Parse the response JSON
-          const parsedResponse = JSON.parse(responseText);
+          // 1. Obtener el cuerpo de la respuesta crudo
+          const rawData = await n8nResponse.json();
+          console.log("📦 Raw n8n response:", JSON.stringify(rawData, null, 2));
           
-          // n8n returns the actual JSON in a "text" property as a serialized string
-          // Example: { "text": "{\"success\": true, \"suggestions\": {...}" }
-          if (parsedResponse.text && typeof parsedResponse.text === 'string') {
+          let finalData = rawData;
+          
+          // 2. DETECTOR DE ENVOLTORIO:
+          // Si recibimos un objeto que tiene una propiedad 'text' que parece un JSON...
+          if (rawData && typeof rawData === 'object' && rawData.text && typeof rawData.text === 'string') {
             try {
-              n8nResponseData = JSON.parse(parsedResponse.text);
-              console.log("[AI Helper API] Successfully parsed nested JSON from 'text' property");
-              console.log("[AI Helper API] Parsed data keys:", Object.keys(n8nResponseData));
-            } catch (nestedParseError) {
-              // If nested parse fails, log error and use the outer response as fallback
-              console.error("[AI Helper API] Failed to parse 'text' property:", nestedParseError);
-              console.log("[AI Helper API] Using outer response as fallback");
-              n8nResponseData = parsedResponse;
+              console.log("🔓 Desempaquetando propiedad .text ...");
+              // Limpiamos posibles bloques de markdown ```json
+              const cleanText = rawData.text.replace(/```json/g, "").replace(/```/g, "").trim();
+              finalData = JSON.parse(cleanText);
+              console.log("✅ JSON desempaquetado exitosamente");
+              console.log("📋 Final data keys:", Object.keys(finalData));
+            } catch (e) {
+              console.error("❌ Error parseando el texto interno:", e);
+              // Si falla, seguimos con rawData por si acaso
+              finalData = rawData;
             }
-          } else {
-            // Use the parsed response directly (n8n returned JSON directly, not in 'text')
-            console.log("[AI Helper API] No 'text' property found, using response directly");
-            n8nResponseData = parsedResponse;
+          } 
+          // Si recibimos un array (otro caso común de n8n)
+          else if (Array.isArray(rawData) && rawData.length > 0) {
+            console.log("📦 n8n devolvió un array, usando el primer elemento");
+            finalData = rawData[0];
           }
+          
+          // 3. Validación final
+          if (!finalData.success) {
+            console.warn("⚠️ La respuesta final no tiene success: true", finalData);
+          } else {
+            console.log("✅ Respuesta validada: success = true");
+          }
+          
+          // Guardar los datos finales
+          n8nResponseData = finalData;
           
           break;
         } catch (parseError) {
           console.error("[AI Helper API] Failed to parse n8n response as JSON:", parseError);
-          lastError = "Invalid JSON response from n8n";
+          lastError = parseError instanceof Error ? parseError.message : "Invalid JSON response from n8n";
           if (attempt === maxRetries) {
             const processingTime = (Date.now() - startTime) / 1000;
             return NextResponse.json(
@@ -185,7 +197,13 @@ export async function POST(request: NextRequest) {
         }
       } else {
         // Store error text for non-200 responses
-        lastError = responseText;
+        try {
+          const errorText = await n8nResponse.text();
+          lastError = errorText;
+          console.log(`[AI Helper API] n8n error response (attempt ${attempt + 1}):`, errorText);
+        } catch (textError) {
+          lastError = `HTTP ${n8nResponse.status}: ${n8nResponse.statusText}`;
+        }
         
         // If 404, retry
         if (n8nResponse.status === 404) {
