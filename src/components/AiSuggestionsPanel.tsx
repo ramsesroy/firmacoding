@@ -232,6 +232,15 @@ export default function AiSuggestionsPanel({
 
       const data: AIHelperResponse = await res.json();
       console.log("[AI Helper] Response data:", data);
+      console.log("[AI Helper] Response structure check:", {
+        hasSuggestions: !!data.suggestions,
+        hasContentSuggestions: !!data.suggestions?.contentSuggestions,
+        contentSuggestionsLength: data.suggestions?.contentSuggestions?.length,
+        hasBestPractices: !!data.suggestions?.bestPractices,
+        bestPracticesLength: data.suggestions?.bestPractices?.length,
+        hasProfileAnalysis: !!data.suggestions?.profileAnalysis,
+        hasTemplateRecommendation: !!data.suggestions?.templateRecommendation,
+      });
 
       if (!data.success) {
         throw new Error(data.error?.message || "Failed to get suggestions");
@@ -342,37 +351,40 @@ export default function AiSuggestionsPanel({
           {response?.suggestions && !loading && (
             <div className="space-y-6">
               {/* Profile Analysis */}
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-blue-600">analytics</span>
-                  Profile Analysis
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Industry</p>
-                    <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.industry}</p>
+              {response.suggestions.profileAnalysis && (
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-blue-600">analytics</span>
+                    Profile Analysis
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Industry</p>
+                      <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.industry || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Role Category</p>
+                      <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.roleCategory || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Seniority</p>
+                      <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.seniority || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Recommended Tone</p>
+                      <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.recommendedTone || "N/A"}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Role Category</p>
-                    <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.roleCategory}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Seniority</p>
-                    <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.seniority}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Recommended Tone</p>
-                    <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.recommendedTone}</p>
+                  <div className="mt-4 pt-4 border-t border-blue-200">
+                    <p className="text-sm text-gray-600 mb-1">Target Audience</p>
+                    <p className="text-gray-900">{response.suggestions.profileAnalysis.targetAudience || "N/A"}</p>
                   </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-blue-200">
-                  <p className="text-sm text-gray-600 mb-1">Target Audience</p>
-                  <p className="text-gray-900">{response.suggestions.profileAnalysis.targetAudience}</p>
-                </div>
-              </div>
+              )}
 
               {/* Template Recommendation */}
-              {response.suggestions.templateRecommendation.recommendedTemplate !== currentTemplate && (
+              {response.suggestions.templateRecommendation && 
+               response.suggestions.templateRecommendation.recommendedTemplate !== currentTemplate && (
                 <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
                   <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
                     <span className="material-symbols-outlined text-purple-600">palette</span>
@@ -398,6 +410,7 @@ export default function AiSuggestionsPanel({
                     </button>
                   )}
                   {response.suggestions.templateRecommendation.alternativeTemplates &&
+                    Array.isArray(response.suggestions.templateRecommendation.alternativeTemplates) &&
                     response.suggestions.templateRecommendation.alternativeTemplates.length > 0 && (
                       <div className="mt-4 pt-4 border-t border-purple-200">
                         <p className="text-sm font-medium text-gray-700 mb-2">Alternative Templates:</p>
@@ -418,7 +431,9 @@ export default function AiSuggestionsPanel({
               )}
 
               {/* Content Suggestions */}
-              {response.suggestions.contentSuggestions.length > 0 && (
+              {response.suggestions.contentSuggestions && 
+               Array.isArray(response.suggestions.contentSuggestions) &&
+               response.suggestions.contentSuggestions.length > 0 && (
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <span className="material-symbols-outlined text-green-600">lightbulb</span>
@@ -476,7 +491,9 @@ export default function AiSuggestionsPanel({
               )}
 
               {/* Best Practices */}
-              {response.suggestions.bestPractices.length > 0 && (
+              {response.suggestions.bestPractices && 
+               Array.isArray(response.suggestions.bestPractices) &&
+               response.suggestions.bestPractices.length > 0 && (
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <span className="material-symbols-outlined text-amber-600">star</span>
@@ -523,8 +540,8 @@ export default function AiSuggestionsPanel({
         <div className="border-t border-gray-200 p-4 bg-gray-50">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-600">
-              Powered by AI • {response?.metadata?.processingTime
-                ? `${response.metadata.processingTime.toFixed(1)}s`
+              Powered by AI • {response?.metadata?.processingTime !== undefined
+                ? `${Number(response.metadata.processingTime).toFixed(1)}s`
                 : "Analyzing..."}
             </p>
             <button
