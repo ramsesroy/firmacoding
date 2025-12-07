@@ -1797,12 +1797,45 @@ function DashboardContent() {
             } else if (suggestion.field === "callToAction" && suggestion.example) {
               setSignatureData({ ...signatureData, ctaTexto: suggestion.example });
               showToast("Call-to-action added!", "success");
+            } else if (suggestion.field === "website" || suggestion.field === "hasWebsite") {
+              // Add website link to redes (social links array)
+              const websiteUrl = suggestion.example || suggestion.suggestion || "https://yourwebsite.com";
+              // Ensure URL has protocol
+              const fullUrl = websiteUrl.startsWith("http") ? websiteUrl : `https://${websiteUrl}`;
+              
+              const newRed = {
+                nombre: "Website",
+                url: fullUrl,
+                icono: "",
+              };
+              
+              // Check if website already exists
+              const existingWebsite = signatureData.redes?.find(
+                (r) => r.nombre.toLowerCase() === "website" || 
+                       (r.url.includes("http") && !r.url.match(/(linkedin|twitter|x|github|facebook|instagram|youtube|tiktok|behance|dribbble)\.com/))
+              );
+              
+              if (existingWebsite) {
+                // Update existing website
+                const updatedRedes = signatureData.redes?.map((r) =>
+                  r === existingWebsite ? newRed : r
+                ) || [newRed];
+                setSignatureData({ ...signatureData, redes: updatedRedes });
+                showToast("Website updated!", "success");
+              } else {
+                // Add new website
+                setSignatureData({
+                  ...signatureData,
+                  redes: [...(signatureData.redes || []), newRed],
+                });
+                showToast("Website added!", "success");
+              }
             }
           } else if (suggestion.type === "add_social" && suggestion.platform) {
             // Add social link
             const newRed = {
               nombre: suggestion.platform,
-              url: `https://${suggestion.platform.toLowerCase()}.com/yourprofile`,
+              url: suggestion.example || `https://${suggestion.platform.toLowerCase()}.com/yourprofile`,
               icono: "",
             };
             setSignatureData({
@@ -1814,6 +1847,15 @@ function DashboardContent() {
             if (suggestion.field === "role") {
               setSignatureData({ ...signatureData, cargo: suggestion.suggestion });
               showToast("Role updated!", "success");
+            } else if (suggestion.field === "name" || suggestion.field === "fullName") {
+              setSignatureData({ ...signatureData, nombre: suggestion.suggestion });
+              showToast("Name updated!", "success");
+            }
+          } else if (suggestion.type === "add_feature" && suggestion.feature) {
+            // Handle feature additions (e.g., QR code, business hours toggle)
+            if (suggestion.feature === "qrCode") {
+              setSignatureData({ ...signatureData, qrLink: suggestion.example || "https://example.com" });
+              showToast("QR Code feature enabled!", "success");
             }
           }
         }}

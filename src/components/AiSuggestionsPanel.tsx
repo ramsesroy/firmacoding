@@ -285,6 +285,28 @@ export default function AiSuggestionsPanel({
     }
   };
 
+  const getTemplateDisplayName = (templateId: string): string => {
+    const templateNames: Record<string, string> = {
+      "modern-v1": "Modern",
+      "modern-v2": "Modern V2",
+      "modern-tech-v1": "Modern Tech",
+      "classic-v1": "Classic",
+      "minimal-v1": "Minimal",
+      "corporate-v1": "Corporate",
+      "creative-v1": "Creative",
+    };
+    return templateNames[templateId] || templateId.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  };
+
+  const safeParseConfidence = (confidence: any): number => {
+    if (typeof confidence === "number") return confidence;
+    if (typeof confidence === "string") {
+      const parsed = parseFloat(confidence);
+      if (!isNaN(parsed)) return parsed;
+    }
+    return 0.85; // Default confidence if invalid
+  };
+
   const handleApplySuggestion = (suggestion: any) => {
     if (onApplySuggestion) {
       onApplySuggestion(suggestion);
@@ -358,27 +380,37 @@ export default function AiSuggestionsPanel({
                     Profile Analysis
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Industry</p>
-                      <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.industry || "N/A"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Role Category</p>
-                      <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.roleCategory || "N/A"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Seniority</p>
-                      <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.seniority || "N/A"}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Recommended Tone</p>
-                      <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.recommendedTone || "N/A"}</p>
-                    </div>
+                    {response.suggestions.profileAnalysis.industry && (
+                      <div>
+                        <p className="text-sm text-gray-600 mb-1">Industry</p>
+                        <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.industry}</p>
+                      </div>
+                    )}
+                    {response.suggestions.profileAnalysis.roleCategory && (
+                      <div>
+                        <p className="text-sm text-gray-600 mb-1">Role Category</p>
+                        <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.roleCategory}</p>
+                      </div>
+                    )}
+                    {response.suggestions.profileAnalysis.seniority && (
+                      <div>
+                        <p className="text-sm text-gray-600 mb-1">Seniority</p>
+                        <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.seniority}</p>
+                      </div>
+                    )}
+                    {response.suggestions.profileAnalysis.recommendedTone && (
+                      <div>
+                        <p className="text-sm text-gray-600 mb-1">Recommended Tone</p>
+                        <p className="font-semibold text-gray-900">{response.suggestions.profileAnalysis.recommendedTone}</p>
+                      </div>
+                    )}
                   </div>
-                  <div className="mt-4 pt-4 border-t border-blue-200">
-                    <p className="text-sm text-gray-600 mb-1">Target Audience</p>
-                    <p className="text-gray-900">{response.suggestions.profileAnalysis.targetAudience || "N/A"}</p>
-                  </div>
+                  {response.suggestions.profileAnalysis.targetAudience && (
+                    <div className="mt-4 pt-4 border-t border-blue-200">
+                      <p className="text-sm text-gray-600 mb-1">Target Audience</p>
+                      <p className="text-gray-900">{response.suggestions.profileAnalysis.targetAudience}</p>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -393,13 +425,13 @@ export default function AiSuggestionsPanel({
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <p className="font-semibold text-gray-900">
-                        {response.suggestions.templateRecommendation.recommendedTemplate}
+                        {getTemplateDisplayName(response.suggestions.templateRecommendation.recommendedTemplate)}
                       </p>
                       <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
-                        {Math.round(response.suggestions.templateRecommendation.confidence * 100)}% match
+                        {Math.round(safeParseConfidence(response.suggestions.templateRecommendation.confidence) * 100)}% match
                       </span>
                     </div>
-                    <p className="text-gray-700">{response.suggestions.templateRecommendation.reason}</p>
+                    <p className="text-gray-700">{response.suggestions.templateRecommendation.reason || "This template matches your professional profile."}</p>
                   </div>
                   {onTemplateChange && (
                     <button
@@ -419,8 +451,8 @@ export default function AiSuggestionsPanel({
                             <div key={alt.id} className="flex items-start gap-2">
                               <span className="material-symbols-outlined text-purple-600 text-sm">arrow_right</span>
                               <div>
-                                <p className="font-medium text-gray-900">{alt.name}</p>
-                                <p className="text-sm text-gray-600">{alt.reason}</p>
+                                <p className="font-medium text-gray-900">{alt.name || getTemplateDisplayName(alt.id)}</p>
+                                <p className="text-sm text-gray-600">{alt.reason || "Alternative option"}</p>
                               </div>
                             </div>
                           ))}
@@ -456,7 +488,11 @@ export default function AiSuggestionsPanel({
                             </span>
                             <h4 className="font-semibold text-gray-900">{suggestion.title}</h4>
                           </div>
-                          {suggestion.type === "add_field" && onApplySuggestion && (
+                          {(suggestion.type === "add_field" || 
+                            suggestion.type === "add_social" || 
+                            suggestion.type === "improve_content" ||
+                            suggestion.type === "add_feature") && 
+                           onApplySuggestion && (
                             <button
                               onClick={() => handleApplySuggestion(suggestion)}
                               className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
