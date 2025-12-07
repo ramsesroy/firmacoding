@@ -151,11 +151,11 @@ export default function LoginPage() {
       let errorMessage = "An error occurred. Please try again.";
       
       if (error.message) {
-        if (err.message?.includes("Invalid login credentials")) {
+        if (error.message.includes("Invalid login credentials")) {
           errorMessage = "Incorrect email or password. Please verify your credentials.";
-        } else if (err.message?.includes("Email rate limit exceeded")) {
+        } else if (error.message.includes("Email rate limit exceeded")) {
           errorMessage = "Too many attempts. Please wait a few minutes before trying again.";
-        } else if (error.message?.includes("fetch") || error.message?.includes("Failed to fetch") || error.message?.includes("network")) {
+        } else if (error.message.includes("fetch") || error.message.includes("Failed to fetch") || error.message.includes("network")) {
           errorMessage = "Supabase connection error. Verify that:\n1. NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are in your .env.local file\n2. Values are correct (no spaces)\n3. You've restarted the server after adding the variables\n4. Your internet connection is working";
         } else {
           errorMessage = error.message || "Unknown error";
