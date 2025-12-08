@@ -20,6 +20,8 @@ import { analytics } from "@/lib/analytics";
 import { Icon3D } from "@/components/Icon3D";
 import AiSuggestionsPanel from "@/components/AiSuggestionsPanel";
 import { logger } from "@/lib/logger";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 // Force dynamic rendering for this page to support search params
 export const dynamic = "force-dynamic";
@@ -228,6 +230,53 @@ function DashboardContent() {
     }
   }, [signatureData.foto, signatureData.logoEmpresa, isAuthenticated]);
 
+  // Auto-save to localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    setAutosaveStatus('saving');
+    
+    const autosaveData = {
+      signatureData,
+      template,
+      timestamp: Date.now(),
+    };
+    
+    try {
+      localStorage.setItem('dashboard_signature_autosave', JSON.stringify(autosaveData));
+      setAutosaveStatus('saved');
+      
+      // Reset to idle after 2 seconds
+      setTimeout(() => setAutosaveStatus('idle'), 2000);
+    } catch (error) {
+      logger.error('Error saving to localStorage', error instanceof Error ? error : new Error(String(error)), 'Dashboard Autosave');
+      setAutosaveStatus('idle');
+    }
+  }, [signatureData, template]);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (editingSignatureId) return; // Don't load autosave if editing existing signature
+    
+    try {
+      const saved = localStorage.getItem('dashboard_signature_autosave');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Only load if saved data is less than 24 hours old
+        const age = Date.now() - (parsed.timestamp || 0);
+        if (age < 24 * 60 * 60 * 1000) {
+          setSignatureData(parsed.signatureData || signatureData);
+          if (parsed.template) {
+            setTemplate(parsed.template);
+          }
+        }
+      }
+    } catch (error) {
+      logger.error('Error loading from localStorage', error instanceof Error ? error : new Error(String(error)), 'Dashboard Autosave');
+    }
+  }, []); // Only run on mount
+
   const [template, setTemplate] = useState<TemplateType>("professional");
 
   // Define free templates (first 6)
@@ -269,6 +318,7 @@ function DashboardContent() {
   
   // AI Suggestions Panel
   const [showAiPanel, setShowAiPanel] = useState(false);
+  const [autosaveStatus, setAutosaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
   // Load signature for editing if edit query parameter exists
   useEffect(() => {
@@ -365,6 +415,54 @@ function DashboardContent() {
       return Object.keys(updates).length > 0 ? { ...prev, ...updates } : prev;
     });
   }, [template, loadingSignature, editingSignatureId]);
+
+  const handleDownloadPNG = async () => {
+    if (!previewRef.current) return;
+    const element = previewRef.current;
+    try {
+      // Type cast includes scale option which is valid but not in TypeScript types
+      const canvas = await html2canvas(element, { 
+        scale: 2, 
+        useCORS: true, 
+        backgroundColor: null,
+        logging: false,
+      } as Parameters<typeof html2canvas>[1] & { scale?: number });
+      const link = document.createElement('a');
+      link.download = 'signature.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('PNG downloaded successfully!', 'success');
+    } catch (error) {
+      logger.error('Error generating PNG', error instanceof Error ? error : new Error(String(error)), 'Dashboard Export');
+      showToast('Could not generate PNG. Please try again.', 'error');
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!previewRef.current) return;
+    const element = previewRef.current;
+    try {
+      // Type cast includes scale option which is valid but not in TypeScript types
+      const canvas = await html2canvas(element, { 
+        scale: 2, 
+        useCORS: true, 
+        backgroundColor: null, 
+        logging: false,
+      } as Parameters<typeof html2canvas>[1] & { scale?: number });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'px',
+        format: [canvas.width, canvas.height]
+      });
+      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      pdf.save('signature.pdf');
+      showToast('PDF downloaded successfully!', 'success');
+    } catch (error) {
+      logger.error('Error generating PDF', error instanceof Error ? error : new Error(String(error)), 'Dashboard Export');
+      showToast('Could not generate PDF. Please try again.', 'error');
+    }
+  };
 
   const handleCopyToClipboard = async () => {
     const success = await copyToClipboard(
@@ -1547,9 +1645,30 @@ function DashboardContent() {
           {/* Preview - Card */}
           <div className="lg:col-span-7 bg-white rounded-2xl border border-gray-200/80 shadow-lg shadow-gray-900/5 p-6 sm:p-8 overflow-y-auto flex flex-col custom-scrollbar">
             <div className="mb-6 pb-6 border-b border-gray-100">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-100 rounded-full mb-4">
-                <span className="material-symbols-outlined text-base text-green-600">visibility</span>
-                <span className="text-sm font-semibold text-green-900">Live Preview</span>
+              <div className="flex items-center justify-between mb-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-100 rounded-full">
+                  <span className="material-symbols-outlined text-base text-green-600">visibility</span>
+                  <span className="text-sm font-semibold text-green-900">Live Preview</span>
+                </div>
+                {autosaveStatus !== 'idle' && (
+                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${
+                    autosaveStatus === 'saving' 
+                      ? 'bg-blue-50 border border-blue-100 text-blue-700' 
+                      : 'bg-green-50 border border-green-100 text-green-700'
+                  }`}>
+                    {autosaveStatus === 'saving' ? (
+                      <>
+                        <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-xs">check_circle</span>
+                        <span>Saved</span>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
@@ -1564,14 +1683,14 @@ function DashboardContent() {
 
             {/* Main Preview */}
             <div 
-              className="flex-1 bg-gradient-to-br from-gray-50 via-white to-gray-50 rounded-2xl p-6 sm:p-10 border-2 border-gray-100 mb-6 shadow-inner" 
+              className="flex-1 bg-gradient-to-br from-gray-50 via-white to-gray-50 rounded-2xl p-4 sm:p-6 md:p-10 border-2 border-gray-100 mb-6 shadow-inner overflow-auto" 
               style={{
                 backgroundImage: `linear-gradient(45deg, transparent 25%, rgba(0,0,0,.02) 25%, rgba(0,0,0,.02) 50%, transparent 50%, transparent 75%, rgba(0,0,0,.02) 75%, rgba(0,0,0,.02)), linear-gradient(45deg, transparent 25%, rgba(0,0,0,.02) 25%, rgba(0,0,0,.02) 50%, transparent 50%, transparent 75%, rgba(0,0,0,.02) 75%, rgba(0,0,0,.02))`,
                 backgroundSize: '30px 30px',
                 backgroundPosition: '0 0, 15px 15px'
               }}
             >
-              <div ref={previewRef} className="relative flex items-center justify-center min-h-[350px] bg-white rounded-xl shadow-lg border border-gray-100 p-6 overflow-hidden">
+              <div ref={previewRef} className="relative flex items-center justify-center min-h-[300px] sm:min-h-[350px] bg-white rounded-xl shadow-lg border border-gray-100 p-4 sm:p-6 overflow-x-auto overflow-y-auto w-full">
                 {/* Watermark removed - free users can use all features without watermark */}
                 <SignaturePreview
                   nombre={signatureData.nombre}
@@ -1654,6 +1773,25 @@ function DashboardContent() {
                       {saving ? "hourglass_empty" : "save"}
                     </span>
                     <span>{saving ? "Saving..." : editingSignatureId ? "Update Signature" : "Save Signature"}</span>
+                  </button>
+                </div>
+                {/* Export Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button
+                    type="button"
+                    onClick={handleDownloadPNG}
+                    className="group flex-1 px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 shadow-xl shadow-purple-500/40 hover:shadow-2xl hover:shadow-purple-500/50 hover:scale-[1.02]"
+                  >
+                    <span className="material-symbols-outlined text-xl">image</span>
+                    <span>Export PNG</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDownloadPDF}
+                    className="group flex-1 px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 bg-gradient-to-r from-red-600 via-orange-600 to-red-600 text-white hover:from-red-700 hover:via-orange-700 hover:to-red-700 shadow-xl shadow-red-500/40 hover:shadow-2xl hover:shadow-red-500/50 hover:scale-[1.02]"
+                  >
+                    <span className="material-symbols-outlined text-xl">picture_as_pdf</span>
+                    <span>Export PDF</span>
                   </button>
                 </div>
                 {saveLimit && !isPremium && (

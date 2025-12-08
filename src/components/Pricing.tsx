@@ -85,6 +85,7 @@ export default function Pricing() {
       features: [
         { text: "Unlimited signature creation" },
         { text: "Save up to 3 signatures (registered users only)" },
+        { text: "Canvas Editor (drag & drop signature builder)" },
         { text: "Export as HTML" },
         { text: "Export PNG & PDF (standard quality, registered users only)" },
         { text: "Basic templates" },

@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
-import { useStore } from '@/lib/canvas/store';
+import { useStore, useAutosaveStatus } from '@/lib/canvas/store';
 import { generateSignatureHTML, exportSignature } from '@/lib/canvas/htmlGenerator';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
 export const Actions = () => {
     const { state, dispatch } = useStore();
+    const { status: autosaveStatus } = useAutosaveStatus();
     const [htmlPreview, setHtmlPreview] = useState<string | null>(null);
     const [exportTab, setExportTab] = useState<'preview' | 'gmail' | 'outlook'>('preview');
     const previewContainerRef = useRef<HTMLDivElement>(null);
@@ -104,7 +105,29 @@ export const Actions = () => {
     return (
         <>
             {/* Top Bar with Undo/Redo & Export */}
-            <div className="absolute top-2 sm:top-4 md:top-6 right-2 sm:right-4 md:right-6 z-20 flex gap-1.5 sm:gap-2 md:gap-3 flex-wrap justify-end">
+            <div className="absolute top-2 sm:top-4 md:top-6 right-2 sm:right-4 md:right-6 z-20 flex gap-1.5 sm:gap-2 md:gap-3 flex-wrap justify-end items-center">
+                {/* Autosave Status Indicator */}
+                {autosaveStatus !== 'idle' && (
+                    <div className={`inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium ${
+                        autosaveStatus === 'saving' 
+                            ? 'bg-blue-50 border border-blue-200 text-blue-700' 
+                            : 'bg-green-50 border border-green-200 text-green-700'
+                    }`}>
+                        {autosaveStatus === 'saving' ? (
+                            <>
+                                <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
+                                <span className="hidden sm:inline">Saving...</span>
+                            </>
+                        ) : (
+                            <>
+                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span className="hidden sm:inline">Saved</span>
+                            </>
+                        )}
+                    </div>
+                )}
                  {/* Clear Canvas Button */}
                  <button 
                     onClick={() => {

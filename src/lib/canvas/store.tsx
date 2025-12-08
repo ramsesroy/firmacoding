@@ -1,7 +1,9 @@
 "use client";
 
-import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, ReactNode, useEffect, useRef, useState } from 'react';
 import { SignatureState, SignatureRow, SignatureColumn, SignatureElement, ElementType, GlobalStyles } from '@/types/canvas';
+import { supabase } from '@/lib/supabaseClient';
+import { logger } from '@/lib/logger';
 
 // Initial Global Styles
 const initialGlobalStyles: GlobalStyles = {
@@ -423,22 +425,154 @@ const reducer = (state: SignatureState, action: Action): SignatureState => {
 // Context
 const StoreContext = createContext<{ state: SignatureState; dispatch: React.Dispatch<Action> } | null>(null);
 
+// Autosave status context
+const AutosaveStatusContext = createContext<{
+  status: 'idle' | 'saving' | 'saved';
+  setStatus: (status: 'idle' | 'saving' | 'saved') => void;
+}>({
+  status: 'idle',
+  setStatus: () => {},
+});
+
+export const useAutosaveStatus = () => {
+  const context = useContext(AutosaveStatusContext);
+  return context;
+};
+
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, getInitialState());
+  const [autosaveStatus, setAutosaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const autosaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSupabaseSaveRef = useRef<number>(0);
+  const autosaveIdRef = useRef<string | null>(null);
 
   // Auto-Save Effect (only on client)
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
+    // Clear previous timer
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current);
+    }
+    
     // Debounce saving slightly to avoid thrashing storage
-    const timer = setTimeout(() => {
-        const stateToSave = getCurrentStateSnapshot(state);
+    autosaveTimerRef.current = setTimeout(async () => {
+      setAutosaveStatus('saving');
+      const stateToSave = getCurrentStateSnapshot(state);
+      
+      // Always save to localStorage
+      try {
         localStorage.setItem('signature_state', JSON.stringify(stateToSave));
+      } catch (error) {
+        logger.error('Error saving to localStorage', error instanceof Error ? error : new Error(String(error)), 'Canvas Autosave');
+      }
+      
+      // Also save to Supabase if user is authenticated (but throttle to every 10 seconds)
+      const now = Date.now();
+      if (now - lastSupabaseSaveRef.current > 10000) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user) {
+            // Try to update existing autosave or create new one
+            const autosaveName = 'Autosave';
+            const autosaveData = {
+              name: autosaveName,
+              description: 'Auto-saved signature',
+              canvasData: stateToSave,
+              isFavorite: false,
+            };
+            
+            // If we have a saved autosave ID, try to update it
+            if (autosaveIdRef.current) {
+              try {
+                const { error: updateError } = await supabase
+                  .from('canvas_signatures')
+                  .update({
+                    canvas_data: stateToSave,
+                    updated_at: new Date().toISOString(),
+                  })
+                  .eq('id', autosaveIdRef.current)
+                  .eq('user_id', session.user.id);
+                
+                if (updateError) {
+                  // If update fails, try to create new one
+                  autosaveIdRef.current = null;
+                }
+              } catch (updateErr) {
+                autosaveIdRef.current = null;
+              }
+            }
+            
+            // If no autosave ID or update failed, create/update autosave
+            if (!autosaveIdRef.current) {
+              // First, try to find existing autosave
+              const { data: existing } = await supabase
+                .from('canvas_signatures')
+                .select('id')
+                .eq('user_id', session.user.id)
+                .eq('name', autosaveName)
+                .maybeSingle();
+              
+              if (existing) {
+                // Update existing autosave
+                const { error: updateError } = await supabase
+                  .from('canvas_signatures')
+                  .update({
+                    canvas_data: stateToSave,
+                    updated_at: new Date().toISOString(),
+                  })
+                  .eq('id', existing.id);
+                
+                if (!updateError) {
+                  autosaveIdRef.current = existing.id;
+                }
+              } else {
+                // Create new autosave
+                const { data: newAutosave, error: createError } = await supabase
+                  .from('canvas_signatures')
+                  .insert({
+                    user_id: session.user.id,
+                    name: autosaveName,
+                    description: 'Auto-saved signature',
+                    canvas_data: stateToSave,
+                    is_favorite: false,
+                  })
+                  .select('id')
+                  .single();
+                
+                if (!createError && newAutosave) {
+                  autosaveIdRef.current = newAutosave.id;
+                }
+              }
+            }
+            
+            lastSupabaseSaveRef.current = now;
+          }
+        } catch (error) {
+          // Silently fail Supabase autosave - localStorage is the fallback
+          logger.debug('Supabase autosave failed (non-critical)', error instanceof Error ? error : new Error(String(error)), 'Canvas Autosave');
+        }
+      }
+      
+      setAutosaveStatus('saved');
+      // Reset to idle after 2 seconds
+      setTimeout(() => setAutosaveStatus('idle'), 2000);
     }, 500);
-    return () => clearTimeout(timer);
+    
+    return () => {
+      if (autosaveTimerRef.current) {
+        clearTimeout(autosaveTimerRef.current);
+      }
+    };
   }, [state.rows, state.globalStyles]);
 
-  return <StoreContext.Provider value={{ state, dispatch }}>{children}</StoreContext.Provider>;
+  return (
+    <StoreContext.Provider value={{ state, dispatch }}>
+      <AutosaveStatusContext.Provider value={{ status: autosaveStatus, setStatus: setAutosaveStatus }}>
+        {children}
+      </AutosaveStatusContext.Provider>
+    </StoreContext.Provider>
+  );
 };
 
 export const useStore = () => {
