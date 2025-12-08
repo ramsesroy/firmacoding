@@ -230,6 +230,8 @@ function DashboardContent() {
     }
   }, [signatureData.foto, signatureData.logoEmpresa, isAuthenticated]);
 
+  const [template, setTemplate] = useState<TemplateType>("professional");
+
   // Auto-save to localStorage
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -276,8 +278,6 @@ function DashboardContent() {
       logger.error('Error loading from localStorage', error instanceof Error ? error : new Error(String(error)), 'Dashboard Autosave');
     }
   }, []); // Only run on mount
-
-  const [template, setTemplate] = useState<TemplateType>("professional");
 
   // Define free templates (first 6)
   const freeTemplates: TemplateType[] = [
