@@ -62,15 +62,35 @@ export const Actions = () => {
         if (!previewContainerRef.current) return;
         const element = previewContainerRef.current;
         try {
+            // Force consistent dimensions for export (same across all devices)
+            const fixedWidth = 600; // Standard email signature width
+            const originalWidth = element.style.width || '';
+            const originalMaxWidth = element.style.maxWidth || '';
+            const originalMinWidth = element.style.minWidth || '';
+            
+            // Temporarily set fixed width for consistent export
+            element.style.width = `${fixedWidth}px`;
+            element.style.maxWidth = `${fixedWidth}px`;
+            element.style.minWidth = `${fixedWidth}px`;
+            
+            // Wait a frame to ensure styles are applied
+            await new Promise(resolve => requestAnimationFrame(resolve));
+            
             // Type cast includes scale option which is valid but not in TypeScript types
             const canvas = await html2canvas(element, { 
                 scale: 2, 
                 useCORS: true, 
                 backgroundColor: null,
                 logging: false,
-                windowWidth: element.scrollWidth,
+                width: fixedWidth,
+                windowWidth: fixedWidth,
                 windowHeight: element.scrollHeight,
-            } as Parameters<typeof html2canvas>[1] & { scale?: number });
+            } as Parameters<typeof html2canvas>[1] & { scale?: number; width?: number });
+            
+            // Restore original styles
+            element.style.width = originalWidth;
+            element.style.maxWidth = originalMaxWidth;
+            element.style.minWidth = originalMinWidth;
             
             // Get the actual content bounds by finding non-transparent pixels
             const ctx = canvas.getContext('2d');
@@ -123,6 +143,14 @@ export const Actions = () => {
         } catch (error) {
             console.error('PNG export error:', error);
             alert("Could not generate PNG.");
+        } finally {
+            // Ensure styles are restored even if there's an error
+            if (previewContainerRef.current) {
+                const element = previewContainerRef.current;
+                element.style.width = '';
+                element.style.maxWidth = '';
+                element.style.minWidth = '';
+            }
         }
     };
 
@@ -130,15 +158,35 @@ export const Actions = () => {
         if (!previewContainerRef.current) return;
         const element = previewContainerRef.current;
         try {
+            // Force consistent dimensions for export (same across all devices)
+            const fixedWidth = 600; // Standard email signature width
+            const originalWidth = element.style.width || '';
+            const originalMaxWidth = element.style.maxWidth || '';
+            const originalMinWidth = element.style.minWidth || '';
+            
+            // Temporarily set fixed width for consistent export
+            element.style.width = `${fixedWidth}px`;
+            element.style.maxWidth = `${fixedWidth}px`;
+            element.style.minWidth = `${fixedWidth}px`;
+            
+            // Wait a frame to ensure styles are applied
+            await new Promise(resolve => requestAnimationFrame(resolve));
+            
             // Type cast includes scale option which is valid but not in TypeScript types
             const canvas = await html2canvas(element, { 
                 scale: 2, 
                 useCORS: true, 
                 backgroundColor: null, 
                 logging: false,
-                windowWidth: element.scrollWidth,
+                width: fixedWidth,
+                windowWidth: fixedWidth,
                 windowHeight: element.scrollHeight,
-            } as Parameters<typeof html2canvas>[1] & { scale?: number });
+            } as Parameters<typeof html2canvas>[1] & { scale?: number; width?: number });
+            
+            // Restore original styles
+            element.style.width = originalWidth;
+            element.style.maxWidth = originalMaxWidth;
+            element.style.minWidth = originalMinWidth;
             
             // Get the actual content bounds by finding non-transparent pixels
             const ctx = canvas.getContext('2d');
@@ -195,6 +243,14 @@ export const Actions = () => {
         } catch (error) {
             console.error('PDF export error:', error);
             alert("Could not generate PDF.");
+        } finally {
+            // Ensure styles are restored even if there's an error
+            if (previewContainerRef.current) {
+                const element = previewContainerRef.current;
+                element.style.width = '';
+                element.style.maxWidth = '';
+                element.style.minWidth = '';
+            }
         }
     };
 
@@ -348,15 +404,16 @@ export const Actions = () => {
                                         </button>
                                     </div>
 
-                                    {/* Preview Card */}
+                                    {/* Preview Card - Fixed width for consistent exports */}
                                     <div className="w-full flex justify-center mb-2 sm:mb-4 px-2">
                                         <div className="bg-white shadow-2xl shadow-slate-200/50 rounded-lg sm:rounded-xl p-4 sm:p-8 md:p-12 overflow-auto border border-slate-100 w-full max-w-full">
                                             <div 
                                                 ref={previewContainerRef}
-                                                className="inline-block min-w-[250px] sm:min-w-[300px]"
+                                                className="inline-block"
                                                 style={{ 
-                                                    width: 'fit-content',
-                                                    maxWidth: '100%'
+                                                    width: '600px',
+                                                    maxWidth: '100%',
+                                                    minWidth: '300px'
                                                 }}
                                                 dangerouslySetInnerHTML={{ __html: htmlPreview }} 
                                             />
