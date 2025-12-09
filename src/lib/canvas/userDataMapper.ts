@@ -160,6 +160,7 @@ function replaceContent(content: string, userData: UserData): string {
   }
 
   if (userData.email) {
+    const userEmail = userData.email; // Store in const for TypeScript narrowing
     // Replace email patterns in text and mailto links
     const emailPatterns = [
       /\b[a-z]+@[a-z]+\.[a-z]+\b/gi,
@@ -168,22 +169,23 @@ function replaceContent(content: string, userData: UserData): string {
       /\b[a-z]+@[a-z-]+\.(?:com|org|net|io)\b/gi,
     ];
     emailPatterns.forEach(pattern => {
-      if (pattern.test(processed) && !processed.includes(userData.email!)) {
-        processed = processed.replace(pattern, userData.email);
+      if (pattern.test(processed) && !processed.includes(userEmail)) {
+        processed = processed.replace(pattern, userEmail);
       }
     });
     
     // Replace in HTML spans (like "E: alex@corp.com")
     const htmlEmailPattern = /(<span[^>]*>E:<\/span>)\s*[a-z]+@[a-z]+\.[a-z]+/gi;
     if (htmlEmailPattern.test(processed)) {
-      processed = processed.replace(htmlEmailPattern, `$1 ${userData.email}`);
+      processed = processed.replace(htmlEmailPattern, `$1 ${userEmail}`);
     }
     
     // Also replace in mailto: links
-    processed = processed.replace(/mailto:[^"'\s<>]+/gi, `mailto:${userData.email}`);
+    processed = processed.replace(/mailto:[^"'\s<>]+/gi, `mailto:${userEmail}`);
   }
 
   if (userData.role) {
+    const userRole = userData.role; // Store in const for TypeScript narrowing
     // Replace common role patterns (case-insensitive)
     const rolePatterns = [
       /\bExecutive Director\b/gi,
@@ -199,13 +201,14 @@ function replaceContent(content: string, userData: UserData): string {
       /\bCFO\b/gi,
     ];
     rolePatterns.forEach(pattern => {
-      if (pattern.test(processed) && !processed.includes(userData.role!)) {
-        processed = processed.replace(pattern, userData.role);
+      if (pattern.test(processed) && !processed.includes(userRole)) {
+        processed = processed.replace(pattern, userRole);
       }
     });
   }
 
   if (userData.phone) {
+    const userPhone = userData.phone; // Store in const for TypeScript narrowing
     // Replace phone patterns in HTML content
     const phonePatterns = [
       /\+1\s*555\s*[0-9\s-]+/g,
@@ -216,15 +219,15 @@ function replaceContent(content: string, userData: UserData): string {
     
     // Replace in HTML spans (like "M: +1 555...")
     phonePatterns.forEach(pattern => {
-      if (pattern.test(processed) && !processed.includes(userData.phone!)) {
-        processed = processed.replace(pattern, userData.phone);
+      if (pattern.test(processed) && !processed.includes(userPhone)) {
+        processed = processed.replace(pattern, userPhone);
       }
     });
     
     // Also replace in structured HTML like <span>M:</span> +1 555...
     const htmlPhonePattern = /(<span[^>]*>M:<\/span>)\s*\+1\s*[0-9\s()-]+/gi;
     if (htmlPhonePattern.test(processed)) {
-      processed = processed.replace(htmlPhonePattern, `$1 ${userData.phone}`);
+      processed = processed.replace(htmlPhonePattern, `$1 ${userPhone}`);
     }
   }
 
@@ -237,9 +240,11 @@ function replaceContent(content: string, userData: UserData): string {
 function replaceImageUrl(url: string, userData: UserData): string {
   if (!url || !userData.name) return url;
 
+  const userName = userData.name; // Store in const for TypeScript narrowing
+
   // Replace UI Avatars API placeholders
   if (url.includes('ui-avatars.com')) {
-    const nameParam = userData.name.replace(/\s+/g, '+');
+    const nameParam = userName.replace(/\s+/g, '+');
     return url.replace(/name=[^&]+/, `name=${nameParam}`);
   }
 
@@ -273,7 +278,8 @@ function applyUserDataToRow(row: SignatureRow, userData: UserData): SignatureRow
             updatedEl.url = el.url.replace(/{{email}}/gi, userData.email || '');
           } else if (userData.email && el.url.startsWith('mailto:')) {
             // Replace any email in mailto: link
-            updatedEl.url = `mailto:${userData.email}`;
+            const userEmail = userData.email; // Store in const for TypeScript narrowing
+            updatedEl.url = `mailto:${userEmail}`;
           }
         }
 
