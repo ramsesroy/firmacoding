@@ -175,25 +175,14 @@ export const Toolbar = ({ onClose }: { onClose?: () => void }) => {
     const categories = Object.keys(groupedTemplates);
 
     return (
-        <div className="w-full sm:w-80 max-w-[85vw] bg-white border-r border-slate-200 flex flex-col z-10 flex-shrink-0 h-full shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-            <div className="p-4 sm:p-6 border-b border-slate-100 flex-shrink-0">
+        <div className="w-full md:w-80 bg-white md:border-r border-slate-200 flex flex-col z-10 flex-shrink-0 h-full md:shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
+            {/* Header - Hidden in mobile bottom sheet (handled by parent) */}
+            <div className="hidden md:block p-4 sm:p-6 border-b border-slate-100 flex-shrink-0">
                 <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2 sm:gap-2">
                         <div className="w-6 h-6 sm:w-6 sm:h-6 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-xs shadow-sm">S</div>
                         <h1 className="text-base sm:text-base md:text-lg font-bold text-slate-800 tracking-tight">Signature<span className="text-blue-600">Builder</span></h1>
                     </div>
-                    {/* Close button for mobile - Improved */}
-                    {onClose && (
-                        <button
-                            onClick={onClose}
-                            className="md:hidden p-2 -mr-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors active:scale-95"
-                            aria-label="Close toolbar"
-                        >
-                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    )}
                 </div>
                 <p className="text-xs sm:text-xs text-slate-400 font-medium">Professional Email Editor</p>
             </div>

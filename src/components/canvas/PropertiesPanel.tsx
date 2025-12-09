@@ -256,25 +256,14 @@ export const PropertiesPanel = ({ onClose }: { onClose?: () => void }) => {
   // --- RENDER GLOBAL SETTINGS PANEL ---
   if (!selectedId || !selectedItem) {
       return (
-        <div className="w-full sm:w-80 max-w-[85vw] bg-white border-l border-slate-200 flex flex-col h-full overflow-hidden shadow-[-4px_0_24px_rgba(0,0,0,0.02)] z-20">
-             <div className="p-4 sm:p-6 border-b border-slate-100 flex-shrink-0">
+        <div className="w-full md:w-80 bg-white md:border-l border-slate-200 flex flex-col h-full overflow-hidden md:shadow-[-4px_0_24px_rgba(0,0,0,0.02)] z-20">
+             {/* Header - Hidden in mobile bottom sheet (handled by parent) */}
+             <div className="hidden md:block p-4 sm:p-6 border-b border-slate-100 flex-shrink-0">
                  <div className="flex items-center justify-between">
                      <div className="min-w-0 flex-1 pr-2">
                          <h2 className="text-base sm:text-base md:text-lg font-bold text-slate-800 tracking-tight truncate">Global Design</h2>
                          <p className="text-xs sm:text-xs text-slate-400 mt-1 sm:mt-1">Default styles for your signature</p>
                      </div>
-                     {/* Close button for mobile - Improved */}
-                     {onClose && (
-                         <button
-                             onClick={onClose}
-                             className="md:hidden p-2 -mr-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors active:scale-95"
-                             aria-label="Close properties panel"
-                         >
-                             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                             </svg>
-                         </button>
-                     )}
                  </div>
              </div>
              
@@ -347,8 +336,8 @@ export const PropertiesPanel = ({ onClose }: { onClose?: () => void }) => {
 
   // --- RENDER SELECTED ITEM PANEL ---
   return (
-    <div className="w-full sm:w-80 max-w-[85vw] bg-white border-l border-slate-200 flex flex-col h-full overflow-hidden shadow-[-4px_0_24px_rgba(0,0,0,0.02)] z-20">
-        {/* Back Button - Improved for mobile */}
+    <div className="w-full md:w-80 bg-white md:border-l border-slate-200 flex flex-col h-full overflow-hidden md:shadow-[-4px_0_24px_rgba(0,0,0,0.02)] z-20">
+        {/* Back Button */}
         <div className="p-3 sm:p-3 border-b border-slate-100 flex-shrink-0">
             <div className="flex items-center justify-between gap-2">
                 <button 
@@ -359,18 +348,6 @@ export const PropertiesPanel = ({ onClose }: { onClose?: () => void }) => {
                     <span className="hidden sm:inline">Back to Global Settings</span>
                     <span className="sm:hidden">Back</span>
                 </button>
-                {/* Close button for mobile - Improved */}
-                {onClose && (
-                    <button
-                        onClick={onClose}
-                        className="md:hidden p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors active:scale-95"
-                        aria-label="Close properties panel"
-                    >
-                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                )}
             </div>
         </div>
 

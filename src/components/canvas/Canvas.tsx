@@ -281,16 +281,16 @@ const RowRenderer: React.FC<{ row: SignatureRow }> = ({ row }) => {
             </button>
         </div>
         
-        {/* Mobile Row Actions - Bottom bar when selected */}
+        {/* Mobile Row Actions - Floating buttons when selected */}
         {isSelected && (
-            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t-2 border-blue-500 shadow-2xl z-50 p-3 flex gap-3 items-center justify-center">
+            <div className="md:hidden fixed bottom-24 right-4 z-50 flex flex-col gap-2">
                 <button 
                     onClick={(e) => { e.stopPropagation(); dispatch({ type: 'DUPLICATE_ITEM', id: row.id, itemType: 'row' }); }}
-                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 touch-manipulation shadow-lg"
+                    className="w-12 h-12 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center active:scale-95 touch-manipulation"
                     aria-label="Duplicate Row"
+                    title="Duplicate"
                 >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg>
-                    <span>Duplicate</span>
                 </button>
                 <button 
                     onClick={(e) => { 
@@ -299,11 +299,11 @@ const RowRenderer: React.FC<{ row: SignatureRow }> = ({ row }) => {
                             dispatch({ type: 'DELETE_ITEM', id: row.id }); 
                         }
                     }}
-                    className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 touch-manipulation shadow-lg"
+                    className="w-12 h-12 bg-red-600 text-white rounded-full shadow-2xl flex items-center justify-center active:scale-95 touch-manipulation"
                     aria-label="Delete Row"
+                    title="Delete"
                 >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    <span>Delete</span>
                 </button>
             </div>
         )}
@@ -413,7 +413,7 @@ export const Canvas = () => {
 
   return (
     <div 
-        className="w-full h-full overflow-auto flex flex-col items-center p-3 sm:p-4 md:p-6 lg:p-8 relative bg-[#F8FAFC]"
+        className="w-full h-full overflow-auto flex flex-col items-center p-2 md:p-4 lg:p-6 lg:p-8 relative bg-[#F8FAFC]"
         style={{
             backgroundImage: 'radial-gradient(#E2E8F0 1px, transparent 1px)',
             backgroundSize: '24px 24px'
@@ -421,8 +421,8 @@ export const Canvas = () => {
         onClick={() => dispatch({ type: 'SELECT_ITEM', id: null, itemType: null })}
     >
         
-        {/* Client Selector & Tools - Improved for mobile */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 mb-4 sm:mb-4 md:mb-6 lg:mb-8 sticky top-0 z-30 mx-auto max-w-2xl w-full items-center px-2 sm:px-2 bg-[#F8FAFC]/95 backdrop-blur-sm py-3 sm:py-2">
+        {/* Client Selector & Tools - Optimized for mobile */}
+        <div className="flex flex-col sm:flex-row gap-2 mb-2 sm:mb-4 md:mb-6 lg:mb-8 sticky top-0 z-30 mx-auto max-w-2xl w-full items-center px-2 bg-[#F8FAFC]/95 backdrop-blur-sm py-2">
              <div className="bg-white p-1.5 sm:p-1 rounded-xl sm:rounded-xl shadow-lg sm:shadow-sm border-2 sm:border border-slate-200 flex gap-1 sm:gap-1 flex-1 w-full sm:w-auto">
                  {[
                      { id: 'gmail', label: 'Gmail', icon: 'M' },
@@ -485,15 +485,15 @@ export const Canvas = () => {
             </div>
         </div>
 
-        {/* Simulator Stage - Improved for mobile */}
-        <div className="flex-1 flex justify-center w-full pb-16 sm:pb-16 md:pb-20 items-start px-2 sm:px-4">
+        {/* Simulator Stage - Optimized for mobile */}
+        <div className="flex-1 flex justify-center w-full pb-20 md:pb-20 items-start px-2 sm:px-4">
             
             {/* The Frame Wrapper */}
             <div 
                 className={`transition-all duration-500 ease-out relative shadow-2xl w-full ${
                     previewMode === 'apple' 
                     ? 'max-w-[320px] sm:max-w-[375px] rounded-[2rem] sm:rounded-[3rem] border-[6px] sm:border-[8px] md:border-[12px] border-slate-900 bg-black' 
-                    : `max-w-[98%] sm:max-w-[600px] md:max-w-[750px] rounded-xl sm:rounded-xl border-2 sm:border ${darkMode ? 'border-slate-700 bg-[#121212]' : 'border-slate-200 bg-white'} ring-1 ring-slate-900/5`
+                    : `max-w-full sm:max-w-[600px] md:max-w-[750px] rounded-lg sm:rounded-xl border sm:border ${darkMode ? 'border-slate-700 bg-[#121212]' : 'border-slate-200 bg-white'} ring-1 ring-slate-900/5`
                 }`}
             >
                 {/* Notch for iPhone */}
@@ -523,9 +523,9 @@ export const Canvas = () => {
                           <p className={`text-xs md:text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Best regards,</p>
                      </div>
 
-                    {/* Signature Area (The Real Canvas) - Improved for mobile */}
+                    {/* Signature Area (The Real Canvas) - Optimized for mobile */}
                     <div 
-                        className="relative border-2 sm:border border-dashed border-slate-300 rounded-xl p-3 sm:p-2 md:p-4 hover:border-blue-400 hover:bg-blue-50/10 transition-all duration-300 group touch-manipulation"
+                        className="relative border border-dashed border-slate-300 rounded-lg sm:rounded-xl p-2 sm:p-2 md:p-4 hover:border-blue-400 hover:bg-blue-50/10 transition-all duration-300 group touch-manipulation"
                         style={{ backgroundColor: globalStyles.backgroundColor }}
                     >
                         {/* Photoshop-style Grid Overlay */}

@@ -68,12 +68,60 @@ export const Actions = () => {
                 useCORS: true, 
                 backgroundColor: null,
                 logging: false,
+                windowWidth: element.scrollWidth,
+                windowHeight: element.scrollHeight,
             } as Parameters<typeof html2canvas>[1] & { scale?: number });
+            
+            // Get the actual content bounds by finding non-transparent pixels
+            const ctx = canvas.getContext('2d');
+            if (!ctx) throw new Error('Could not get canvas context');
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            let minX = canvas.width;
+            let minY = canvas.height;
+            let maxX = 0;
+            let maxY = 0;
+            
+            // Find bounding box of non-transparent pixels
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const alpha = data[(y * canvas.width + x) * 4 + 3];
+                    if (alpha > 0) {
+                        minX = Math.min(minX, x);
+                        minY = Math.min(minY, y);
+                        maxX = Math.max(maxX, x);
+                        maxY = Math.max(maxY, y);
+                    }
+                }
+            }
+            
+            // Add small padding (20px scaled)
+            const padding = 40; // 20px * scale 2
+            minX = Math.max(0, minX - padding);
+            minY = Math.max(0, minY - padding);
+            maxX = Math.min(canvas.width, maxX + padding);
+            maxY = Math.min(canvas.height, maxY + padding);
+            
+            const width = maxX - minX;
+            const height = maxY - minY;
+            
+            // Create new canvas with cropped content
+            const croppedCanvas = document.createElement('canvas');
+            croppedCanvas.width = width;
+            croppedCanvas.height = height;
+            const croppedCtx = croppedCanvas.getContext('2d');
+            if (!croppedCtx) throw new Error('Could not get cropped canvas context');
+            
+            croppedCtx.drawImage(canvas, minX, minY, width, height, 0, 0, width, height);
+            
             const link = document.createElement('a');
             link.download = 'signature.png';
-            link.href = canvas.toDataURL('image/png');
+            link.href = croppedCanvas.toDataURL('image/png');
             link.click();
         } catch (error) {
+            console.error('PNG export error:', error);
             alert("Could not generate PNG.");
         }
     };
@@ -88,24 +136,72 @@ export const Actions = () => {
                 useCORS: true, 
                 backgroundColor: null, 
                 logging: false,
+                windowWidth: element.scrollWidth,
+                windowHeight: element.scrollHeight,
             } as Parameters<typeof html2canvas>[1] & { scale?: number });
-            const imgData = canvas.toDataURL('image/png');
+            
+            // Get the actual content bounds by finding non-transparent pixels
+            const ctx = canvas.getContext('2d');
+            if (!ctx) throw new Error('Could not get canvas context');
+            
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            let minX = canvas.width;
+            let minY = canvas.height;
+            let maxX = 0;
+            let maxY = 0;
+            
+            // Find bounding box of non-transparent pixels
+            for (let y = 0; y < canvas.height; y++) {
+                for (let x = 0; x < canvas.width; x++) {
+                    const alpha = data[(y * canvas.width + x) * 4 + 3];
+                    if (alpha > 0) {
+                        minX = Math.min(minX, x);
+                        minY = Math.min(minY, y);
+                        maxX = Math.max(maxX, x);
+                        maxY = Math.max(maxY, y);
+                    }
+                }
+            }
+            
+            // Add small padding (20px scaled)
+            const padding = 40; // 20px * scale 2
+            minX = Math.max(0, minX - padding);
+            minY = Math.max(0, minY - padding);
+            maxX = Math.min(canvas.width, maxX + padding);
+            maxY = Math.min(canvas.height, maxY + padding);
+            
+            const width = maxX - minX;
+            const height = maxY - minY;
+            
+            // Create new canvas with cropped content
+            const croppedCanvas = document.createElement('canvas');
+            croppedCanvas.width = width;
+            croppedCanvas.height = height;
+            const croppedCtx = croppedCanvas.getContext('2d');
+            if (!croppedCtx) throw new Error('Could not get cropped canvas context');
+            
+            croppedCtx.drawImage(canvas, minX, minY, width, height, 0, 0, width, height);
+            
+            const imgData = croppedCanvas.toDataURL('image/png');
             const pdf = new jsPDF({
-                orientation: 'landscape',
+                orientation: width > height ? 'landscape' : 'portrait',
                 unit: 'px',
-                format: [canvas.width, canvas.height]
+                format: [width, height]
             });
-            pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+            pdf.addImage(imgData, 'PNG', 0, 0, width, height);
             pdf.save('signature.pdf');
         } catch (error) {
-             alert("Could not generate PDF.");
+            console.error('PDF export error:', error);
+            alert("Could not generate PDF.");
         }
     };
 
     return (
         <>
-            {/* Top Bar with Undo/Redo & Export - Improved for mobile */}
-            <div className="absolute top-2 sm:top-4 md:top-6 right-2 sm:right-4 md:right-6 z-20 flex gap-2 sm:gap-2 md:gap-3 flex-wrap justify-end items-center">
+            {/* Top Bar with Undo/Redo & Export - Desktop only (mobile handled in page.tsx) */}
+            <div className="hidden md:flex absolute top-2 sm:top-4 md:top-6 right-2 sm:right-4 md:right-6 z-20 gap-2 sm:gap-2 md:gap-3 flex-wrap justify-end items-center">
                 {/* Autosave Status Indicator */}
                 {autosaveStatus !== 'idle' && (
                     <div className={`inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium ${
@@ -258,6 +354,10 @@ export const Actions = () => {
                                             <div 
                                                 ref={previewContainerRef}
                                                 className="inline-block min-w-[250px] sm:min-w-[300px]"
+                                                style={{ 
+                                                    width: 'fit-content',
+                                                    maxWidth: '100%'
+                                                }}
                                                 dangerouslySetInnerHTML={{ __html: htmlPreview }} 
                                             />
                                         </div>
