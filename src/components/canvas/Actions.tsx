@@ -59,7 +59,18 @@ export const Actions = () => {
     };
 
     const handleDownloadPNG = async () => {
-        if (!previewContainerRef.current) return;
+        // Ensure export modal is open and preview is ready
+        if (!htmlPreview) {
+            handleExport();
+            // Wait for modal to open and render
+            await new Promise(resolve => setTimeout(resolve, 300));
+        }
+        
+        if (!previewContainerRef.current) {
+            alert("Please wait for the preview to load.");
+            return;
+        }
+        
         const element = previewContainerRef.current;
         try {
             // Force consistent dimensions for export (same across all devices)
@@ -73,24 +84,19 @@ export const Actions = () => {
             element.style.maxWidth = `${fixedWidth}px`;
             element.style.minWidth = `${fixedWidth}px`;
             
-            // Wait a frame to ensure styles are applied
+            // Wait for styles to apply and element to render
             await new Promise(resolve => requestAnimationFrame(resolve));
+            await new Promise(resolve => setTimeout(resolve, 100));
             
             // Type cast includes scale option which is valid but not in TypeScript types
             const canvas = await html2canvas(element, { 
-                scale: 2, 
+                scale: 3, // Higher scale for better quality
                 useCORS: true, 
                 backgroundColor: null,
                 logging: false,
-                width: fixedWidth,
-                windowWidth: fixedWidth,
-                windowHeight: element.scrollHeight,
-            } as Parameters<typeof html2canvas>[1] & { scale?: number; width?: number });
-            
-            // Restore original styles
-            element.style.width = originalWidth;
-            element.style.maxWidth = originalMaxWidth;
-            element.style.minWidth = originalMinWidth;
+                allowTaint: false,
+                removeContainer: false,
+            } as Parameters<typeof html2canvas>[1] & { scale?: number });
             
             // Get the actual content bounds by finding non-transparent pixels
             const ctx = canvas.getContext('2d');
@@ -118,7 +124,7 @@ export const Actions = () => {
             }
             
             // Add small padding (20px scaled)
-            const padding = 40; // 20px * scale 2
+            const padding = 60; // 20px * scale 3
             minX = Math.max(0, minX - padding);
             minY = Math.max(0, minY - padding);
             maxX = Math.min(canvas.width, maxX + padding);
@@ -126,6 +132,11 @@ export const Actions = () => {
             
             const width = maxX - minX;
             const height = maxY - minY;
+            
+            // Ensure minimum dimensions
+            if (width <= 0 || height <= 0) {
+                throw new Error('Invalid canvas dimensions');
+            }
             
             // Create new canvas with cropped content
             const croppedCanvas = document.createElement('canvas');
@@ -138,7 +149,7 @@ export const Actions = () => {
             
             const link = document.createElement('a');
             link.download = 'signature.png';
-            link.href = croppedCanvas.toDataURL('image/png');
+            link.href = croppedCanvas.toDataURL('image/png', 1.0); // Maximum quality
             link.click();
         } catch (error) {
             console.error('PNG export error:', error);
@@ -155,7 +166,18 @@ export const Actions = () => {
     };
 
     const handleDownloadPDF = async () => {
-        if (!previewContainerRef.current) return;
+        // Ensure export modal is open and preview is ready
+        if (!htmlPreview) {
+            handleExport();
+            // Wait for modal to open and render
+            await new Promise(resolve => setTimeout(resolve, 300));
+        }
+        
+        if (!previewContainerRef.current) {
+            alert("Please wait for the preview to load.");
+            return;
+        }
+        
         const element = previewContainerRef.current;
         try {
             // Force consistent dimensions for export (same across all devices)
@@ -169,21 +191,21 @@ export const Actions = () => {
             element.style.maxWidth = `${fixedWidth}px`;
             element.style.minWidth = `${fixedWidth}px`;
             
-            // Wait a frame to ensure styles are applied
+            // Wait for styles to apply and element to render
             await new Promise(resolve => requestAnimationFrame(resolve));
+            await new Promise(resolve => setTimeout(resolve, 100));
             
             // Type cast includes scale option which is valid but not in TypeScript types
             const canvas = await html2canvas(element, { 
-                scale: 2, 
+                scale: 3, // Higher scale for better quality
                 useCORS: true, 
                 backgroundColor: null, 
                 logging: false,
-                width: fixedWidth,
-                windowWidth: fixedWidth,
-                windowHeight: element.scrollHeight,
-            } as Parameters<typeof html2canvas>[1] & { scale?: number; width?: number });
+                allowTaint: false,
+                removeContainer: false,
+            } as Parameters<typeof html2canvas>[1] & { scale?: number });
             
-            // Restore original styles
+            // Restore original styles before cropping
             element.style.width = originalWidth;
             element.style.maxWidth = originalMaxWidth;
             element.style.minWidth = originalMinWidth;
@@ -214,7 +236,7 @@ export const Actions = () => {
             }
             
             // Add small padding (20px scaled)
-            const padding = 40; // 20px * scale 2
+            const padding = 60; // 20px * scale 3
             minX = Math.max(0, minX - padding);
             minY = Math.max(0, minY - padding);
             maxX = Math.min(canvas.width, maxX + padding);
@@ -222,6 +244,11 @@ export const Actions = () => {
             
             const width = maxX - minX;
             const height = maxY - minY;
+            
+            // Ensure minimum dimensions
+            if (width <= 0 || height <= 0) {
+                throw new Error('Invalid canvas dimensions');
+            }
             
             // Create new canvas with cropped content
             const croppedCanvas = document.createElement('canvas');
@@ -232,7 +259,7 @@ export const Actions = () => {
             
             croppedCtx.drawImage(canvas, minX, minY, width, height, 0, 0, width, height);
             
-            const imgData = croppedCanvas.toDataURL('image/png');
+            const imgData = croppedCanvas.toDataURL('image/png', 1.0); // Maximum quality
             const pdf = new jsPDF({
                 orientation: width > height ? 'landscape' : 'portrait',
                 unit: 'px',
