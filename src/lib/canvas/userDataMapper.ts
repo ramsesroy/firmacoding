@@ -142,6 +142,7 @@ function replaceContent(content: string, userData: UserData): string {
 
   // Smart detection: Replace common patterns if placeholders weren't found
   if (userData.name) {
+    const userName = userData.name; // Store in const for TypeScript narrowing
     // Detect common name patterns (all caps, title case, etc.)
     const namePatterns = [
       /\b(?:ALEX|JOHN|JANE|MORGAN|DOE|AMANDA|SARAH|HAPPY)\s+(?:MORGAN|JOHNSON|DOE|SMITH|HELP)\b/gi,
@@ -149,10 +150,10 @@ function replaceContent(content: string, userData: UserData): string {
       /\b[A-Z][A-Z\s]{3,}(?:MORGAN|JOHN|DOE|ALEX|JANE)\b/gi,
     ];
     namePatterns.forEach(pattern => {
-      if (pattern.test(processed) && !processed.includes(userData.name!)) {
+      if (pattern.test(processed) && !processed.includes(userName)) {
         // Preserve original case style if all caps
         const isAllCaps = processed.match(pattern)?.[0]?.toUpperCase() === processed.match(pattern)?.[0];
-        const replacement = isAllCaps ? userData.name.toUpperCase() : userData.name;
+        const replacement = isAllCaps ? userName.toUpperCase() : userName;
         processed = processed.replace(pattern, replacement);
       }
     });
