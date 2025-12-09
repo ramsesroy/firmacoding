@@ -261,7 +261,7 @@ const RowRenderer: React.FC<{ row: SignatureRow }> = ({ row }) => {
             </tbody>
         </table>
         
-        {/* Row Actions - Hidden on mobile, shown on hover/select */}
+        {/* Row Actions - Desktop: Hidden on mobile, shown on hover/select */}
         <div className={`absolute -right-10 sm:-right-12 top-0 hidden md:flex ${isSelected ? 'flex' : 'group-hover:flex'} flex-col gap-1.5 sm:gap-2 animate-in fade-in zoom-in duration-200`}>
             {/* Delete Button */}
             <button 
@@ -280,6 +280,33 @@ const RowRenderer: React.FC<{ row: SignatureRow }> = ({ row }) => {
                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg>
             </button>
         </div>
+        
+        {/* Mobile Row Actions - Bottom bar when selected */}
+        {isSelected && (
+            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t-2 border-blue-500 shadow-2xl z-50 p-3 flex gap-3 items-center justify-center">
+                <button 
+                    onClick={(e) => { e.stopPropagation(); dispatch({ type: 'DUPLICATE_ITEM', id: row.id, itemType: 'row' }); }}
+                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 touch-manipulation shadow-lg"
+                    aria-label="Duplicate Row"
+                >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" /></svg>
+                    <span>Duplicate</span>
+                </button>
+                <button 
+                    onClick={(e) => { 
+                        e.stopPropagation(); 
+                        if (confirm('Delete this row?')) {
+                            dispatch({ type: 'DELETE_ITEM', id: row.id }); 
+                        }
+                    }}
+                    className="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 touch-manipulation shadow-lg"
+                    aria-label="Delete Row"
+                >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    <span>Delete</span>
+                </button>
+            </div>
+        )}
     </div>
   );
 };
@@ -386,7 +413,7 @@ export const Canvas = () => {
 
   return (
     <div 
-        className="w-full h-full overflow-auto flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 relative bg-[#F8FAFC]"
+        className="w-full h-full overflow-auto flex flex-col items-center p-3 sm:p-4 md:p-6 lg:p-8 relative bg-[#F8FAFC]"
         style={{
             backgroundImage: 'radial-gradient(#E2E8F0 1px, transparent 1px)',
             backgroundSize: '24px 24px'
@@ -394,9 +421,9 @@ export const Canvas = () => {
         onClick={() => dispatch({ type: 'SELECT_ITEM', id: null, itemType: null })}
     >
         
-        {/* Client Selector & Tools */}
-        <div className="flex flex-col sm:flex-row gap-2 mb-3 sm:mb-4 md:mb-6 lg:mb-8 sticky top-0 z-30 mx-auto max-w-2xl w-full items-center px-2 bg-[#F8FAFC]/95 backdrop-blur-sm py-2">
-             <div className="bg-white p-1 rounded-lg sm:p-1.5 sm:rounded-xl shadow-sm border border-slate-200 flex gap-0.5 sm:gap-1 flex-1 w-full sm:w-auto">
+        {/* Client Selector & Tools - Improved for mobile */}
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 mb-4 sm:mb-4 md:mb-6 lg:mb-8 sticky top-0 z-30 mx-auto max-w-2xl w-full items-center px-2 sm:px-2 bg-[#F8FAFC]/95 backdrop-blur-sm py-3 sm:py-2">
+             <div className="bg-white p-1.5 sm:p-1 rounded-xl sm:rounded-xl shadow-lg sm:shadow-sm border-2 sm:border border-slate-200 flex gap-1 sm:gap-1 flex-1 w-full sm:w-auto">
                  {[
                      { id: 'gmail', label: 'Gmail', icon: 'M' },
                      { id: 'outlook', label: 'Outlook', icon: 'O' },
@@ -406,41 +433,43 @@ export const Canvas = () => {
                      <button 
                         key={mode.id}
                         onClick={() => setPreviewMode(mode.id as PreviewMode)}
-                        className={`px-2 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs font-bold rounded-md sm:rounded-lg transition-all flex items-center gap-1 sm:gap-2 flex-1 justify-center ${previewMode === mode.id ? 'bg-slate-800 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-slate-50'}`}
+                        className={`px-3 sm:px-4 py-2.5 sm:py-2 text-xs sm:text-xs font-bold rounded-lg sm:rounded-lg transition-all flex items-center gap-1 sm:gap-2 flex-1 justify-center active:scale-95 touch-manipulation ${previewMode === mode.id ? 'bg-slate-800 text-white shadow-md transform scale-105' : 'text-slate-500 hover:bg-slate-50'}`}
                      >
                         {mode.label}
                      </button>
                  ))}
             </div>
 
-            <div className="flex gap-1 sm:gap-2 items-center bg-white p-1 rounded-lg sm:p-1.5 sm:rounded-xl shadow-sm border border-slate-200">
+            <div className="flex gap-2 sm:gap-2 items-center bg-white p-1.5 sm:p-1 rounded-xl sm:rounded-xl shadow-lg sm:shadow-sm border-2 sm:border border-slate-200">
                 {/* Dark Mode Toggle */}
                 <button
                     onClick={() => setDarkMode(!darkMode)}
-                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-md sm:rounded-lg flex items-center justify-center transition-all ${darkMode ? 'bg-slate-800 text-yellow-400' : 'bg-transparent text-slate-400 hover:text-slate-600'}`}
+                    className={`w-10 h-10 sm:w-10 sm:h-10 rounded-lg sm:rounded-lg flex items-center justify-center transition-all active:scale-95 touch-manipulation ${darkMode ? 'bg-slate-800 text-yellow-400' : 'bg-transparent text-slate-400 hover:text-slate-600'}`}
                     title="Toggle Dark Mode"
+                    aria-label="Toggle Dark Mode"
                 >
                     {darkMode ? (
-                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                        <svg className="w-5 h-5 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                     ) : (
-                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                        <svg className="w-5 h-5 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
                     )}
                 </button>
 
                 {/* Grid Toggle Button */}
                 <button
                     onClick={() => setShowGrid(!showGrid)}
-                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-md sm:rounded-lg flex items-center justify-center transition-all ${showGrid ? 'bg-blue-100 text-blue-600' : 'bg-transparent text-slate-400 hover:text-slate-600'}`}
+                    className={`w-10 h-10 sm:w-10 sm:h-10 rounded-lg sm:rounded-lg flex items-center justify-center transition-all active:scale-95 touch-manipulation ${showGrid ? 'bg-blue-100 text-blue-600' : 'bg-transparent text-slate-400 hover:text-slate-600'}`}
                     title="Toggle Alignment Grid"
+                    aria-label="Toggle Alignment Grid"
                 >
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-5 h-5 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16M10 4v16M14 4v16M6 4v16M18 4v16" />
                     </svg>
                 </button>
                 
                 {/* Grid Density Slider */}
                 {showGrid && (
-                    <div className="w-16 sm:w-24 px-1 sm:px-2 animate-in fade-in slide-in-from-left-2">
+                    <div className="w-20 sm:w-24 px-2 sm:px-2 animate-in fade-in slide-in-from-left-2">
                         <input 
                             type="range" 
                             min="10" 
@@ -448,7 +477,7 @@ export const Canvas = () => {
                             step="10"
                             value={gridSize}
                             onChange={(e) => setGridSize(parseInt(e.target.value))}
-                            className="w-full h-1 sm:h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 block"
+                            className="w-full h-2 sm:h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 block touch-manipulation"
                             title="Grid Density"
                         />
                     </div>
@@ -456,15 +485,15 @@ export const Canvas = () => {
             </div>
         </div>
 
-        {/* Simulator Stage */}
-        <div className="flex-1 flex justify-center w-full pb-12 sm:pb-16 md:pb-20 items-start px-2 sm:px-4">
+        {/* Simulator Stage - Improved for mobile */}
+        <div className="flex-1 flex justify-center w-full pb-16 sm:pb-16 md:pb-20 items-start px-2 sm:px-4">
             
             {/* The Frame Wrapper */}
             <div 
                 className={`transition-all duration-500 ease-out relative shadow-2xl w-full ${
                     previewMode === 'apple' 
                     ? 'max-w-[320px] sm:max-w-[375px] rounded-[2rem] sm:rounded-[3rem] border-[6px] sm:border-[8px] md:border-[12px] border-slate-900 bg-black' 
-                    : `max-w-[95%] sm:max-w-[600px] md:max-w-[750px] rounded-lg sm:rounded-xl border ${darkMode ? 'border-slate-700 bg-[#121212]' : 'border-slate-200 bg-white'} ring-1 ring-slate-900/5`
+                    : `max-w-[98%] sm:max-w-[600px] md:max-w-[750px] rounded-xl sm:rounded-xl border-2 sm:border ${darkMode ? 'border-slate-700 bg-[#121212]' : 'border-slate-200 bg-white'} ring-1 ring-slate-900/5`
                 }`}
             >
                 {/* Notch for iPhone */}
@@ -494,9 +523,9 @@ export const Canvas = () => {
                           <p className={`text-xs md:text-sm ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Best regards,</p>
                      </div>
 
-                    {/* Signature Area (The Real Canvas) */}
+                    {/* Signature Area (The Real Canvas) - Improved for mobile */}
                     <div 
-                        className="relative border border-dashed border-slate-300 rounded-xl p-2 md:p-4 hover:border-blue-400 hover:bg-blue-50/10 transition-all duration-300 group"
+                        className="relative border-2 sm:border border-dashed border-slate-300 rounded-xl p-3 sm:p-2 md:p-4 hover:border-blue-400 hover:bg-blue-50/10 transition-all duration-300 group touch-manipulation"
                         style={{ backgroundColor: globalStyles.backgroundColor }}
                     >
                         {/* Photoshop-style Grid Overlay */}

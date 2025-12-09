@@ -6,66 +6,85 @@ import { SocialLink } from '@/types/canvas';
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
     <div className="mb-6 sm:mb-8 border-b border-slate-100 pb-4 sm:pb-6 last:border-0">
-        <h3 className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 sm:mb-4">{title}</h3>
-        <div className="space-y-3 sm:space-y-4">{children}</div>
+        <h3 className="text-xs sm:text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 sm:mb-4">{title}</h3>
+        <div className="space-y-4 sm:space-y-4">{children}</div>
     </div>
 );
 
 const Input = ({ label, value, onChange, type = "text", placeholder }: any) => (
     <div className="flex flex-col">
-        {label && <label className="text-[10px] sm:text-xs font-semibold text-slate-600 mb-1 sm:mb-1.5">{label}</label>}
+        {label && <label className="text-xs sm:text-xs font-semibold text-slate-600 mb-2 sm:mb-1.5">{label}</label>}
         <input 
             type={type} 
             value={value} 
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
-            className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-700 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none w-full transition-all duration-200 hover:border-slate-300"
+            className="bg-slate-50 border-2 border-slate-200 rounded-xl px-4 sm:px-3 py-3 sm:py-2 text-sm sm:text-sm text-slate-700 placeholder:text-slate-400 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none w-full transition-all duration-200 hover:border-slate-300 touch-manipulation"
         />
     </div>
 );
 
 const RangeInput = ({ label, value, onChange, min, max, unit = "px" }: any) => (
-    <div className="flex flex-col gap-1.5 sm:gap-2">
+    <div className="flex flex-col gap-2 sm:gap-2">
         <div className="flex justify-between items-center">
-             <label className="text-[10px] sm:text-xs font-semibold text-slate-600">{label}</label>
-             <span className="text-[9px] sm:text-[10px] font-bold text-slate-500 bg-slate-100 px-1 sm:px-1.5 py-0.5 rounded border border-slate-200">{value}{unit}</span>
+             <label className="text-xs sm:text-xs font-semibold text-slate-600">{label}</label>
+             <span className="text-xs sm:text-[10px] font-bold text-slate-500 bg-slate-100 px-2 sm:px-1.5 py-1 sm:py-0.5 rounded-lg border border-slate-200">{value}{unit}</span>
         </div>
-        <div className="relative w-full h-4 flex items-center">
+        <div className="relative w-full h-6 sm:h-4 flex items-center">
              <style>{`
                 input[type=range]::-webkit-slider-thumb {
                     -webkit-appearance: none;
                     appearance: none;
-                    width: 14px;
-                    height: 14px;
+                    width: 20px;
+                    height: 20px;
                     background: #2563eb;
                     cursor: pointer;
                     border-radius: 50%;
-                    border: 2px solid white;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-                    margin-top: -5px; 
+                    border: 3px solid white;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    margin-top: -8px; 
                 }
                 input[type=range]::-moz-range-thumb {
-                    width: 14px;
-                    height: 14px;
+                    width: 20px;
+                    height: 20px;
                     background: #2563eb;
                     cursor: pointer;
                     border-radius: 50%;
-                    border: 2px solid white;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+                    border: 3px solid white;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
                 }
                 input[type=range]::-webkit-slider-runnable-track {
                     width: 100%;
-                    height: 4px;
+                    height: 6px;
                     cursor: pointer;
                     background: #e2e8f0;
-                    border-radius: 2px;
+                    border-radius: 3px;
                 }
                 input[type=range]::-moz-range-track {
                     width: 100%;
-                    height: 4px;
+                    height: 6px;
                     cursor: pointer;
                     background: #e2e8f0;
-                    border-radius: 2px;
+                    border-radius: 3px;
+                }
+                @media (min-width: 640px) {
+                    input[type=range]::-webkit-slider-thumb {
+                        width: 14px;
+                        height: 14px;
+                        border: 2px solid white;
+                        margin-top: -5px;
+                    }
+                    input[type=range]::-moz-range-thumb {
+                        width: 14px;
+                        height: 14px;
+                        border: 2px solid white;
+                    }
+                    input[type=range]::-webkit-slider-runnable-track {
+                        height: 4px;
+                    }
+                    input[type=range]::-moz-range-track {
+                        height: 4px;
+                    }
                 }
             `}</style>
             <input 
@@ -74,18 +93,18 @@ const RangeInput = ({ label, value, onChange, min, max, unit = "px" }: any) => (
                 max={max}
                 value={value || 0}
                 onChange={(e) => onChange(parseInt(e.target.value))}
-                className="w-full h-1 bg-transparent appearance-none cursor-pointer z-10"
+                className="w-full h-2 sm:h-1 bg-transparent appearance-none cursor-pointer z-10 touch-manipulation"
             />
         </div>
     </div>
 );
 
 const ColorPicker = ({ label, value, onChange }: any) => (
-    <div className="flex items-center justify-between p-1.5 sm:p-2 rounded-lg border border-slate-100 hover:border-slate-200 hover:bg-slate-50 transition-all cursor-pointer group relative">
-        <label className="text-[10px] sm:text-xs font-medium text-slate-600 pl-0.5 sm:pl-1">{label}</label>
-        <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase font-mono tracking-wider hidden sm:inline">{value}</span>
-            <div className="relative w-5 h-5 sm:w-6 sm:h-6 overflow-hidden rounded-full border border-slate-200 shadow-sm ring-2 ring-white group-hover:scale-110 transition-transform">
+    <div className="flex items-center justify-between p-3 sm:p-2 rounded-xl border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer group relative touch-manipulation active:scale-95">
+        <label className="text-xs sm:text-xs font-medium text-slate-600 pl-0.5 sm:pl-1">{label}</label>
+        <div className="flex items-center gap-3 sm:gap-3">
+            <span className="text-xs sm:text-[10px] text-slate-400 uppercase font-mono tracking-wider hidden sm:inline">{value}</span>
+            <div className="relative w-8 h-8 sm:w-6 sm:h-6 overflow-hidden rounded-full border-2 border-slate-200 shadow-sm ring-2 ring-white group-hover:scale-110 transition-transform">
                  <div className="absolute inset-0" style={{ backgroundColor: value }}></div>
                  <input 
                     type="color" 
@@ -237,20 +256,21 @@ export const PropertiesPanel = ({ onClose }: { onClose?: () => void }) => {
   // --- RENDER GLOBAL SETTINGS PANEL ---
   if (!selectedId || !selectedItem) {
       return (
-        <div className="w-80 max-w-[85vw] bg-white border-l border-slate-200 flex flex-col h-full overflow-hidden shadow-[-4px_0_24px_rgba(0,0,0,0.02)] z-20">
-             <div className="p-4 sm:p-6 border-b border-slate-100">
+        <div className="w-full sm:w-80 max-w-[85vw] bg-white border-l border-slate-200 flex flex-col h-full overflow-hidden shadow-[-4px_0_24px_rgba(0,0,0,0.02)] z-20">
+             <div className="p-4 sm:p-6 border-b border-slate-100 flex-shrink-0">
                  <div className="flex items-center justify-between">
                      <div className="min-w-0 flex-1 pr-2">
-                         <h2 className="text-sm sm:text-base md:text-lg font-bold text-slate-800 tracking-tight truncate">Global Design</h2>
-                         <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5 sm:mt-1">Default styles for your signature</p>
+                         <h2 className="text-base sm:text-base md:text-lg font-bold text-slate-800 tracking-tight truncate">Global Design</h2>
+                         <p className="text-xs sm:text-xs text-slate-400 mt-1 sm:mt-1">Default styles for your signature</p>
                      </div>
-                     {/* Close button for mobile */}
+                     {/* Close button for mobile - Improved */}
                      {onClose && (
                          <button
                              onClick={onClose}
-                             className="md:hidden p-1 text-slate-400 hover:text-slate-600"
+                             className="md:hidden p-2 -mr-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors active:scale-95"
+                             aria-label="Close properties panel"
                          >
-                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                              </svg>
                          </button>
@@ -258,7 +278,7 @@ export const PropertiesPanel = ({ onClose }: { onClose?: () => void }) => {
                  </div>
              </div>
              
-             <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
+             <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar overscroll-contain">
                 
                 {/* Font Settings */}
                 <Section title="Typography">
@@ -327,25 +347,26 @@ export const PropertiesPanel = ({ onClose }: { onClose?: () => void }) => {
 
   // --- RENDER SELECTED ITEM PANEL ---
   return (
-    <div className="w-80 max-w-[85vw] bg-white border-l border-slate-200 flex flex-col h-full overflow-hidden shadow-[-4px_0_24px_rgba(0,0,0,0.02)] z-20">
-        {/* Back Button */}
-        <div className="p-3 border-b border-slate-100">
+    <div className="w-full sm:w-80 max-w-[85vw] bg-white border-l border-slate-200 flex flex-col h-full overflow-hidden shadow-[-4px_0_24px_rgba(0,0,0,0.02)] z-20">
+        {/* Back Button - Improved for mobile */}
+        <div className="p-3 sm:p-3 border-b border-slate-100 flex-shrink-0">
             <div className="flex items-center justify-between gap-2">
                 <button 
                     onClick={() => dispatch({ type: 'SELECT_ITEM', id: null, itemType: null })}
-                    className="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors flex-1"
+                    className="flex items-center gap-2 text-sm sm:text-xs font-semibold text-slate-500 hover:text-blue-600 px-3 sm:px-3 py-2.5 sm:py-2 rounded-xl hover:bg-slate-50 transition-colors flex-1 active:scale-95 touch-manipulation"
                 >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                    <svg className="w-5 h-5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                     <span className="hidden sm:inline">Back to Global Settings</span>
                     <span className="sm:hidden">Back</span>
                 </button>
-                {/* Close button for mobile */}
+                {/* Close button for mobile - Improved */}
                 {onClose && (
                     <button
                         onClick={onClose}
-                        className="md:hidden p-2 text-slate-400 hover:text-slate-600"
+                        className="md:hidden p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors active:scale-95"
+                        aria-label="Close properties panel"
                     >
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
@@ -353,11 +374,11 @@ export const PropertiesPanel = ({ onClose }: { onClose?: () => void }) => {
             </div>
         </div>
 
-        <div className="p-4 sm:p-6 border-b border-slate-100 bg-white">
-             <h2 className="text-lg font-bold capitalize text-slate-800 tracking-tight">{selectionType} Properties</h2>
+        <div className="p-4 sm:p-6 border-b border-slate-100 bg-white flex-shrink-0">
+             <h2 className="text-base sm:text-lg font-bold capitalize text-slate-800 tracking-tight">{selectionType} Properties</h2>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar overscroll-contain">
             {/* CONTENT EDITING */}
             {(selectionType === 'element') && (
                 <Section title="Content">

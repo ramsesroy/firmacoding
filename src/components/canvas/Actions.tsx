@@ -104,8 +104,8 @@ export const Actions = () => {
 
     return (
         <>
-            {/* Top Bar with Undo/Redo & Export */}
-            <div className="absolute top-2 sm:top-4 md:top-6 right-2 sm:right-4 md:right-6 z-20 flex gap-1.5 sm:gap-2 md:gap-3 flex-wrap justify-end items-center">
+            {/* Top Bar with Undo/Redo & Export - Improved for mobile */}
+            <div className="absolute top-2 sm:top-4 md:top-6 right-2 sm:right-4 md:right-6 z-20 flex gap-2 sm:gap-2 md:gap-3 flex-wrap justify-end items-center">
                 {/* Autosave Status Indicator */}
                 {autosaveStatus !== 'idle' && (
                     <div className={`inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-full text-xs font-medium ${
@@ -128,46 +128,49 @@ export const Actions = () => {
                         )}
                     </div>
                 )}
-                 {/* Clear Canvas Button */}
+                 {/* Clear Canvas Button - Improved for mobile */}
                  <button 
                     onClick={() => {
                         if (confirm('Are you sure you want to clear the canvas? This cannot be undone.')) {
                             dispatch({ type: 'RESET_CANVAS' });
                         }
                     }}
-                    className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                    className="p-3 sm:p-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl sm:rounded-md transition-all active:scale-95 touch-manipulation bg-white border-2 border-red-200 shadow-lg sm:shadow-sm"
                     title="Clear Canvas"
+                    aria-label="Clear Canvas"
                 >
-                    <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    <svg className="w-5 h-5 sm:w-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </button>
 
-                <div className="flex bg-white rounded-lg shadow-sm border border-slate-200 p-1">
+                <div className="flex bg-white rounded-xl sm:rounded-lg shadow-lg sm:shadow-sm border-2 sm:border border-slate-200 p-1">
                     <button 
                         onClick={() => dispatch({ type: 'UNDO' })}
                         disabled={state.past.length === 0}
-                        className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-md disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                        className="p-3 sm:p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-lg sm:rounded-md disabled:opacity-30 disabled:hover:bg-transparent transition-all active:scale-95 touch-manipulation"
                         title="Undo"
+                        aria-label="Undo"
                     >
-                        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+                        <svg className="w-5 h-5 sm:w-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
                     </button>
                     <div className="w-px bg-slate-200 my-1 mx-1"></div>
                     <button 
                         onClick={() => dispatch({ type: 'REDO' })}
                         disabled={state.future.length === 0}
-                        className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-md disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                        className="p-3 sm:p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-lg sm:rounded-md disabled:opacity-30 disabled:hover:bg-transparent transition-all active:scale-95 touch-manipulation"
                         title="Redo"
+                        aria-label="Redo"
                     >
-                        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6" /></svg>
+                        <svg className="w-5 h-5 sm:w-4 md:w-5 md:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6" /></svg>
                     </button>
                 </div>
 
                 <button 
                     onClick={handleExport}
-                    className="bg-slate-900 hover:bg-black text-white px-2.5 sm:px-3 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-md sm:rounded-lg shadow-lg hover:shadow-xl font-semibold text-[10px] sm:text-xs md:text-sm transition-all transform hover:-translate-y-0.5 flex items-center gap-1 sm:gap-1.5 md:gap-2 whitespace-nowrap"
+                    className="bg-slate-900 hover:bg-black text-white px-4 sm:px-3 md:px-5 py-2.5 sm:py-2 md:py-2.5 rounded-xl sm:rounded-lg shadow-lg hover:shadow-xl font-semibold text-xs sm:text-xs md:text-sm transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center gap-2 sm:gap-1.5 md:gap-2 whitespace-nowrap touch-manipulation"
                 >
                     <span className="hidden sm:inline">Export Signature</span>
                     <span className="sm:hidden">Export</span>
-                    <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    <svg className="w-4 h-4 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                 </button>
             </div>
 

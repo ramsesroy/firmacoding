@@ -427,9 +427,54 @@ function DashboardContent() {
         backgroundColor: null,
         logging: false,
       } as Parameters<typeof html2canvas>[1] & { scale?: number });
+      
+      // Get the actual content bounds by finding non-transparent pixels
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Could not get canvas context');
+      
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      
+      let minX = canvas.width;
+      let minY = canvas.height;
+      let maxX = 0;
+      let maxY = 0;
+      
+      // Find bounding box of non-transparent pixels
+      for (let y = 0; y < canvas.height; y++) {
+        for (let x = 0; x < canvas.width; x++) {
+          const alpha = data[(y * canvas.width + x) * 4 + 3];
+          if (alpha > 0) {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+        }
+      }
+      
+      // Add small padding (10px scaled)
+      const padding = 20;
+      minX = Math.max(0, minX - padding);
+      minY = Math.max(0, minY - padding);
+      maxX = Math.min(canvas.width, maxX + padding);
+      maxY = Math.min(canvas.height, maxY + padding);
+      
+      const width = maxX - minX;
+      const height = maxY - minY;
+      
+      // Create new canvas with cropped content
+      const croppedCanvas = document.createElement('canvas');
+      croppedCanvas.width = width;
+      croppedCanvas.height = height;
+      const croppedCtx = croppedCanvas.getContext('2d');
+      if (!croppedCtx) throw new Error('Could not get cropped canvas context');
+      
+      croppedCtx.drawImage(canvas, minX, minY, width, height, 0, 0, width, height);
+      
       const link = document.createElement('a');
       link.download = 'signature.png';
-      link.href = canvas.toDataURL('image/png');
+      link.href = croppedCanvas.toDataURL('image/png');
       link.click();
       showToast('PNG downloaded successfully!', 'success');
     } catch (error) {
@@ -449,13 +494,58 @@ function DashboardContent() {
         backgroundColor: null, 
         logging: false,
       } as Parameters<typeof html2canvas>[1] & { scale?: number });
-      const imgData = canvas.toDataURL('image/png');
+      
+      // Get the actual content bounds by finding non-transparent pixels
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Could not get canvas context');
+      
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      
+      let minX = canvas.width;
+      let minY = canvas.height;
+      let maxX = 0;
+      let maxY = 0;
+      
+      // Find bounding box of non-transparent pixels
+      for (let y = 0; y < canvas.height; y++) {
+        for (let x = 0; x < canvas.width; x++) {
+          const alpha = data[(y * canvas.width + x) * 4 + 3];
+          if (alpha > 0) {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+        }
+      }
+      
+      // Add small padding (10px scaled)
+      const padding = 20;
+      minX = Math.max(0, minX - padding);
+      minY = Math.max(0, minY - padding);
+      maxX = Math.min(canvas.width, maxX + padding);
+      maxY = Math.min(canvas.height, maxY + padding);
+      
+      const width = maxX - minX;
+      const height = maxY - minY;
+      
+      // Create new canvas with cropped content
+      const croppedCanvas = document.createElement('canvas');
+      croppedCanvas.width = width;
+      croppedCanvas.height = height;
+      const croppedCtx = croppedCanvas.getContext('2d');
+      if (!croppedCtx) throw new Error('Could not get cropped canvas context');
+      
+      croppedCtx.drawImage(canvas, minX, minY, width, height, 0, 0, width, height);
+      
+      const imgData = croppedCanvas.toDataURL('image/png');
       const pdf = new jsPDF({
-        orientation: 'landscape',
+        orientation: width > height ? 'landscape' : 'portrait',
         unit: 'px',
-        format: [canvas.width, canvas.height]
+        format: [width, height]
       });
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+      pdf.addImage(imgData, 'PNG', 0, 0, width, height);
       pdf.save('signature.pdf');
       showToast('PDF downloaded successfully!', 'success');
     } catch (error) {
@@ -1717,15 +1807,6 @@ function DashboardContent() {
             {/* Action Buttons */}
             <div className="mt-auto pt-6 border-t-2 border-gray-100">
               <div className="flex flex-col gap-4">
-                {/* Canvas Editor Button */}
-                <button
-                  type="button"
-                  onClick={() => router.push('/dashboard/canvas')}
-                  className="group w-full px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 text-white hover:from-indigo-700 hover:via-purple-700 hover:to-indigo-700 shadow-xl shadow-indigo-500/40 hover:shadow-2xl hover:shadow-indigo-500/50 hover:scale-[1.02]"
-                >
-                  <span className="material-symbols-outlined text-xl">palette</span>
-                  <span>🎨 Open Canvas Editor</span>
-                </button>
                 {/* AI Helper Button - Only for authenticated Premium users */}
                 {isAuthenticated && isPremium && (
                   <button
@@ -1794,6 +1875,18 @@ function DashboardContent() {
                     <span>Export PDF</span>
                   </button>
                 </div>
+                {/* Canvas Editor Link */}
+                <button
+                  type="button"
+                  onClick={() => router.push('/dashboard/canvas')}
+                  className="group w-full px-6 py-3 rounded-xl transition-all duration-300 font-medium text-sm flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 border-2 border-indigo-200 text-indigo-700 hover:from-indigo-100 hover:via-purple-100 hover:to-indigo-100 hover:border-indigo-300 hover:scale-[1.01]"
+                >
+                  <span className="material-symbols-outlined text-lg">palette</span>
+                  <span>Need more control? Try our Signature Editor</span>
+                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
                 {saveLimit && !isPremium && (
                   <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <div className="flex items-center justify-between">
