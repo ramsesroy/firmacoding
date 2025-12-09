@@ -62,12 +62,19 @@ export const Actions = () => {
         // Ensure export modal is open and preview is ready
         if (!htmlPreview) {
             handleExport();
-            // Wait for modal to open and render
-            await new Promise(resolve => setTimeout(resolve, 300));
+            // Wait longer for modal to open and render, especially on mobile
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        // Retry mechanism for mobile devices
+        let retries = 0;
+        while (!previewContainerRef.current && retries < 5) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            retries++;
         }
         
         if (!previewContainerRef.current) {
-            alert("Please wait for the preview to load.");
+            alert("Please wait for the preview to load and try again.");
             return;
         }
         
@@ -169,12 +176,19 @@ export const Actions = () => {
         // Ensure export modal is open and preview is ready
         if (!htmlPreview) {
             handleExport();
-            // Wait for modal to open and render
-            await new Promise(resolve => setTimeout(resolve, 300));
+            // Wait longer for modal to open and render, especially on mobile
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        // Retry mechanism for mobile devices
+        let retries = 0;
+        while (!previewContainerRef.current && retries < 5) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+            retries++;
         }
         
         if (!previewContainerRef.current) {
-            alert("Please wait for the preview to load.");
+            alert("Please wait for the preview to load and try again.");
             return;
         }
         
@@ -440,7 +454,9 @@ export const Actions = () => {
                                                 style={{ 
                                                     width: '600px',
                                                     maxWidth: '100%',
-                                                    minWidth: '300px'
+                                                    minWidth: '300px',
+                                                    visibility: 'visible',
+                                                    display: 'inline-block'
                                                 }}
                                                 dangerouslySetInnerHTML={{ __html: htmlPreview }} 
                                             />

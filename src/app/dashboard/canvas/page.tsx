@@ -7,21 +7,12 @@ import { Toolbar } from '@/components/canvas/Toolbar';
 import { Canvas } from '@/components/canvas/Canvas';
 import { PropertiesPanel } from '@/components/canvas/PropertiesPanel';
 import { Actions } from '@/components/canvas/Actions';
-import { generateSignatureHTML } from '@/lib/canvas/htmlGenerator';
+import { MobileExportModal } from '@/components/canvas/MobileExportModal';
 
 
-// Mobile Header Component
-const MobileHeader = () => {
+// Mobile Header Component with Export Modal
+const MobileHeader = ({ onExportClick }: { onExportClick: () => void }) => {
   const { state, dispatch } = useStore();
-  
-  const handleExport = () => {
-    const html = generateSignatureHTML(state.rows, state.globalStyles, false);
-    const newWindow = window.open();
-    if (newWindow) {
-      newWindow.document.write(html);
-      newWindow.document.close();
-    }
-  };
 
   return (
     <div className="flex-shrink-0 bg-white border-b border-slate-200 px-3 py-2.5 flex items-center justify-between z-30">
@@ -47,7 +38,7 @@ const MobileHeader = () => {
           </svg>
         </button>
         <button
-          onClick={handleExport}
+          onClick={onExportClick}
           className="px-3 py-1.5 bg-slate-900 text-white rounded-lg font-semibold text-xs transition-colors active:scale-95"
           title="Export"
         >
@@ -60,6 +51,7 @@ const MobileHeader = () => {
 
 export default function CanvasEditorPage() {
   const [mobilePanel, setMobilePanel] = useState<'toolbar' | 'properties' | null>(null);
+  const [showMobileExport, setShowMobileExport] = useState(false);
 
   return (
     <StoreProvider>
@@ -88,11 +80,11 @@ export default function CanvasEditorPage() {
         {/* Mobile Layout - Completely redesigned with side drawers */}
         <div className="md:hidden flex flex-col h-full w-full relative overflow-hidden">
           {/* Mobile Header */}
-          <MobileHeader />
+          <MobileHeader onExportClick={() => setShowMobileExport(true)} />
 
           {/* Canvas Area - Always visible, takes full space */}
           <div className="flex-1 overflow-auto relative" style={{ minHeight: 0 }}>
-            <Canvas />
+            <Canvas onDoubleTapOpenProperties={() => setMobilePanel('properties')} />
           </div>
 
           {/* Floating Action Buttons - Bottom right corner */}
@@ -197,6 +189,12 @@ export default function CanvasEditorPage() {
               onClick={() => setMobilePanel(null)}
             />
           )}
+
+          {/* Mobile Export Modal */}
+          <MobileExportModal 
+            isOpen={showMobileExport} 
+            onClose={() => setShowMobileExport(false)} 
+          />
         </div>
       </div>
     </StoreProvider>

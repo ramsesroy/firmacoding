@@ -1,19 +1,82 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useStore } from '@/lib/canvas/store';
 import { SignatureRow, SignatureColumn, SignatureElement } from '@/types/canvas';
 
 // We import the icons via URL in the renderer, so no local imports needed for assets.
 
-const ElementRenderer: React.FC<{ element: SignatureElement; isSelected: boolean }> = ({ element, isSelected }) => {
+const ElementRenderer: React.FC<{ 
+  element: SignatureElement; 
+  isSelected: boolean;
+  onDoubleTapOpenProperties?: () => void;
+}> = ({ element, isSelected, onDoubleTapOpenProperties }) => {
   const { dispatch, state } = useStore();
   const { globalStyles } = state;
+  const lastTapRef = React.useRef<number>(0);
+  const tapTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     dispatch({ type: 'SELECT_ITEM', id: element.id, itemType: 'element' });
   };
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // On mobile/tablet, double tap opens properties panel
+    if (onDoubleTapOpenProperties && window.innerWidth < 768) {
+      dispatch({ type: 'SELECT_ITEM', id: element.id, itemType: 'element' });
+      onDoubleTapOpenProperties();
+    }
+  };
+
+  // Handle touch events for double tap detection on mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTapRef.current;
+    
+    // Clear any existing timeout
+    if (tapTimeoutRef.current) {
+      clearTimeout(tapTimeoutRef.current);
+    }
+    
+    if (tapLength < 400 && tapLength > 0 && onDoubleTapOpenProperties && window.innerWidth < 768) {
+      // Double tap detected - open properties panel
+      e.preventDefault();
+      if (tapTimeoutRef.current) {
+        clearTimeout(tapTimeoutRef.current);
+        tapTimeoutRef.current = null;
+      }
+      dispatch({ type: 'SELECT_ITEM', id: element.id, itemType: 'element' });
+      // Small delay to ensure selection is processed
+      setTimeout(() => {
+        onDoubleTapOpenProperties();
+      }, 100);
+    } else {
+      // Single tap - select item after a delay (to allow for double tap)
+      tapTimeoutRef.current = setTimeout(() => {
+        dispatch({ type: 'SELECT_ITEM', id: element.id, itemType: 'element' });
+        tapTimeoutRef.current = null;
+      }, 350);
+    }
+    
+    lastTapRef.current = currentTime;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    // Prevent default to avoid double-firing on mobile
+    e.stopPropagation();
+  };
+
+  // Cleanup timeout on unmount
+  React.useEffect(() => {
+    return () => {
+      if (tapTimeoutRef.current) {
+        clearTimeout(tapTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleDragStart = (e: React.DragEvent) => {
       e.stopPropagation();
@@ -80,6 +143,9 @@ const ElementRenderer: React.FC<{ element: SignatureElement; isSelected: boolean
 
   const commonProps = {
       onClick: handleClick,
+      onDoubleClick: handleDoubleClick,
+      onTouchStart: handleTouchStart,
+      onTouchEnd: handleTouchEnd,
       draggable: true,
       onDragStart: handleDragStart,
       onDrop: handleDrop,
@@ -166,7 +232,11 @@ const ElementRenderer: React.FC<{ element: SignatureElement; isSelected: boolean
   );
 };
 
-const ColumnRenderer: React.FC<{ col: SignatureColumn; isSelected: boolean }> = ({ col, isSelected }) => {
+const ColumnRenderer: React.FC<{ 
+  col: SignatureColumn; 
+  isSelected: boolean;
+  onDoubleTapOpenProperties?: () => void;
+}> = ({ col, isSelected, onDoubleTapOpenProperties }) => {
   const { dispatch, state } = useStore();
 
   const handleDrop = (e: React.DragEvent) => {
@@ -217,14 +287,21 @@ const ColumnRenderer: React.FC<{ col: SignatureColumn; isSelected: boolean }> = 
       )}
       {col.elements.map(el => (
           <div key={el.id} className="mb-0">
-             <ElementRenderer element={el} isSelected={state.selectedId === el.id} />
+             <ElementRenderer 
+               element={el} 
+               isSelected={state.selectedId === el.id}
+               onDoubleTapOpenProperties={onDoubleTapOpenProperties}
+             />
           </div>
       ))}
     </td>
   );
 };
 
-const RowRenderer: React.FC<{ row: SignatureRow }> = ({ row }) => {
+const RowRenderer: React.FC<{ 
+  row: SignatureRow;
+  onDoubleTapOpenProperties?: () => void;
+}> = ({ row, onDoubleTapOpenProperties }) => {
   const { state, dispatch } = useStore();
   const isSelected = state.selectedId === row.id;
 
@@ -254,7 +331,8 @@ const RowRenderer: React.FC<{ row: SignatureRow }> = ({ row }) => {
                         <ColumnRenderer 
                             key={col.id} 
                             col={col} 
-                            isSelected={state.selectedId === col.id} 
+                            isSelected={state.selectedId === col.id}
+                            onDoubleTapOpenProperties={onDoubleTapOpenProperties}
                         />
                     ))}
                 </tr>
@@ -403,7 +481,7 @@ const YahooHeader = ({ darkMode }: { darkMode: boolean }) => (
 );
 
 
-export const Canvas = () => {
+export const Canvas = ({ onDoubleTapOpenProperties }: { onDoubleTapOpenProperties?: () => void } = {}) => {
   const { state, dispatch } = useStore();
   const { globalStyles } = state;
   const [previewMode, setPreviewMode] = useState<PreviewMode>('gmail');
@@ -556,7 +634,13 @@ export const Canvas = () => {
                             </div>
                         ) : (
                             <div className="overflow-x-auto relative z-10">
-                                {state.rows.map(row => <RowRenderer key={row.id} row={row} />)}
+                                {state.rows.map(row => (
+                                  <RowRenderer 
+                                    key={row.id} 
+                                    row={row}
+                                    onDoubleTapOpenProperties={onDoubleTapOpenProperties}
+                                  />
+                                ))}
                             </div>
                         )}
                     </div>
