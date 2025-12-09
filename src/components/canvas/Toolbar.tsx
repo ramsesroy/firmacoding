@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useStore } from '@/lib/canvas/store';
 import { ElementType, SignatureRow } from '@/types/canvas';
 import { templates } from '@/lib/canvas/templates';
+import { applyUserDataToTemplate } from '@/lib/canvas/userDataMapper';
 
 export const Toolbar = ({ onClose }: { onClose?: () => void }) => {
     const { dispatch } = useStore();
@@ -331,8 +332,18 @@ export const Toolbar = ({ onClose }: { onClose?: () => void }) => {
                                         {groupedTemplates[category].map(t => (
                                             <button
                                                 key={t.id}
-                                                onClick={() => {
-                                                    dispatch({ type: 'LOAD_TEMPLATE', rows: JSON.parse(JSON.stringify(t.rows)) });
+                                                onClick={async () => {
+                                                    // Clone template rows
+                                                    const clonedRows = JSON.parse(JSON.stringify(t.rows));
+                                                    // Apply user data automatically
+                                                    try {
+                                                        const adaptedRows = await applyUserDataToTemplate(clonedRows);
+                                                        dispatch({ type: 'LOAD_TEMPLATE', rows: adaptedRows });
+                                                    } catch (error) {
+                                                        // If user data fails, load template as-is
+                                                        console.warn('Could not apply user data to template:', error);
+                                                        dispatch({ type: 'LOAD_TEMPLATE', rows: clonedRows });
+                                                    }
                                                 }}
                                                 className="w-full text-left p-3.5 sm:p-3 bg-white border-2 border-slate-200 rounded-xl hover:border-blue-400 hover:shadow-md active:scale-95 transition-all group relative overflow-hidden touch-manipulation"
                                             >

@@ -4,6 +4,7 @@ import React, { createContext, useContext, useReducer, ReactNode, useEffect, use
 import { SignatureState, SignatureRow, SignatureColumn, SignatureElement, ElementType, GlobalStyles } from '@/types/canvas';
 import { supabase } from '@/lib/supabaseClient';
 import { logger } from '@/lib/logger';
+import { applyUserDataToTemplate } from '@/lib/canvas/userDataMapper';
 
 // Initial Global Styles
 const initialGlobalStyles: GlobalStyles = {
@@ -199,8 +200,11 @@ const reducer = (state: SignatureState, action: Action): SignatureState => {
     case 'UPDATE_GLOBAL_STYLE':
       return { ...newState, globalStyles: { ...newState.globalStyles, ...action.styles } };
 
-    case 'LOAD_TEMPLATE':
+    case 'LOAD_TEMPLATE': {
+      // Apply user data to template automatically
+      // This is async, so we'll handle it in the component
       return { ...newState, rows: action.rows, selectedId: null, selectionType: null };
+    }
 
     case 'ADD_ROW': {
       const newRowId = `row-${Date.now()}`;
