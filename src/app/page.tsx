@@ -103,40 +103,50 @@ export default function LandingPage() {
           <div className="max-w-4xl mx-auto text-center">
 
             <ScrollAnimation direction="down" delay={100}>
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-                Professional Email
-                <span className="block mt-2 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent animate-gradient">
+              <h1 className="text-6xl sm:text-7xl lg:text-8xl xl:text-9xl font-extrabold text-gray-900 mb-8 leading-tight tracking-tight">
+                <span className="block">Professional Email</span>
+                <span className="block mt-3 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient drop-shadow-lg">
                   Signatures in Minutes
                 </span>
+                {/* Decorative underline */}
+                <span className="block mt-6 h-2 w-32 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mx-auto"></span>
               </h1>
             </ScrollAnimation>
 
             <ScrollAnimation direction="up" delay={200}>
-              <p className="text-xl sm:text-2xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
-                Create professional email signatures in minutes. Free, easy, and no technical skills required.
-                <span className="block mt-2 font-medium text-gray-700">Compatible with Gmail, Outlook, and more.</span>
+              <p className="text-xl sm:text-2xl lg:text-3xl text-gray-600 mb-4 max-w-3xl mx-auto leading-relaxed font-normal">
+                Create professional email signatures in minutes.
+              </p>
+              <p className="text-2xl sm:text-3xl lg:text-4xl font-semibold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent mb-12 max-w-3xl mx-auto">
+                Free, easy, and no technical skills required.
               </p>
             </ScrollAnimation>
 
             <ScrollAnimation direction="fade" delay={300}>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+                {/* Primary CTA - More prominent */}
                 <Link
                   href="/dashboard"
-                  className="group relative w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 text-lg font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:scale-105 animate-pulse-glow"
+                  className="group relative w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 text-white px-10 py-5 text-xl font-bold rounded-2xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-2xl shadow-blue-500/50 hover:shadow-3xl hover:scale-110 transform min-h-[64px] flex items-center justify-center"
                 >
-                  <span className="relative z-10">Get Started Free</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </Link>
-                <Link
-                  href="#features"
-                  className="group w-full sm:w-auto bg-white text-gray-900 px-8 py-4 text-lg font-semibold rounded-xl hover:bg-gray-50 transition-all duration-300 border-2 border-gray-300 hover:border-blue-500 hover:shadow-lg"
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    View Features
-                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <span className="relative z-10 flex items-center gap-3">
+                    Get Started Free
+                    <svg className="w-6 h-6 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </Link>
+
+                {/* Secondary CTA - More subtle */}
+                <Link
+                  href="#features"
+                  className="group w-full sm:w-auto text-gray-700 px-8 py-4 text-lg font-semibold rounded-xl hover:text-blue-600 transition-all duration-300 flex items-center justify-center gap-2 min-h-[64px]"
+                >
+                  View Features
+                  <svg className="w-5 h-5 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </Link>
               </div>
             </ScrollAnimation>
@@ -291,18 +301,27 @@ export default function LandingPage() {
                 delay={index * 100}
                 className="group"
               >
-                <div className="h-full bg-white rounded-2xl p-8 border-2 border-gray-100 hover:border-transparent hover:shadow-2xl transition-all duration-300 relative overflow-hidden">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
-                  <div className="relative z-10">
-                    <div className="mb-6">
-                      <Icon3D
-                        icon={feature.icon}
-                        gradient={feature.gradient}
-                        size="md"
-                      />
+                {/* Glow effect on hover */}
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl blur opacity-0 group-hover:opacity-25 transition duration-500"></div>
+
+                  <div className="relative h-full glass-card rounded-3xl p-10 hover:shadow-2xl transition-all duration-300 hover-tilt overflow-hidden">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+
+                    <div className="relative z-10">
+                      {/* Icon with better design */}
+                      <div className="mb-8">
+                        <div className="relative w-20 h-20 mx-auto">
+                          <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} rounded-2xl opacity-20`}></div>
+                          <div className={`relative w-full h-full bg-gradient-to-br ${feature.gradient} rounded-2xl p-4 text-white transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                            {feature.icon}
+                          </div>
+                        </div>
+                      </div>
+
+                      <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">{feature.title}</h3>
+                      <p className="text-gray-600 leading-relaxed text-center text-lg">{feature.description}</p>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                    <p className="text-gray-600 leading-relaxed">{feature.description}</p>
                   </div>
                 </div>
               </ScrollAnimation>

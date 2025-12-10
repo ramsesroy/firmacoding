@@ -355,6 +355,22 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
+  /* Enhanced glassmorphism for cards */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  }
+
+  .glass-card-dark {
+    background: rgba(17, 25, 40, 0.75);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.125);
+  }
+
   /* Glow effect */
   .glow {
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
@@ -362,6 +378,46 @@ body {
 
   .glow:hover {
     box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+  }
+
+  /* Tilt hover effect */
+  @keyframes tilt {
+    0%, 100% {
+      transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+    }
+    50% {
+      transform: perspective(1000px) rotateX(2deg) rotateY(-2deg);
+    }
+  }
+
+  .hover-tilt {
+    transition: transform 0.3s ease;
+  }
+
+  .hover-tilt:hover {
+    animation: tilt 0.6s ease-in-out;
+    transform: translateY(-8px) scale(1.02);
+  }
+
+  /* Shine effect */
+  @keyframes shine {
+    0% {
+      background-position: -200% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  .shine-effect {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shine 3s infinite;
   }
 
   /* 3D Icon Animations */
