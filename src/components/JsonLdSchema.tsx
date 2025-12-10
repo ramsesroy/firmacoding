@@ -21,7 +21,7 @@ export default function JsonLdSchema() {
             "bestRating": "5",
             "worstRating": "1"
         },
-        "description": "Generador de firmas de correo electrónico profesional. Crea firmas para Gmail, Outlook y más. Plantillas personalizables, exportación HTML. 100% gratis.",
+        "description": "Professional email signature generator. Create beautiful signatures for Gmail, Outlook, and more. Customizable templates, HTML export. 100% free.",
         "screenshot": `${typeof window !== 'undefined' ? window.location.origin : 'https://signaturefor.me'}/og-image.png`,
         "url": typeof window !== 'undefined' ? window.location.origin : "https://signaturefor.me",
         "author": {
@@ -30,12 +30,12 @@ export default function JsonLdSchema() {
             "url": typeof window !== 'undefined' ? window.location.origin : "https://signaturefor.me"
         },
         "featureList": [
-            "Generador de firmas de correo electrónico",
-            "Plantillas profesionales personalizables",
-            "Exportación HTML, PNG y PDF",
-            "Compatible con Gmail y Outlook",
-            "Sin conocimientos técnicos requeridos",
-            "100% gratis para siempre"
+            "Professional email signature generator",
+            "Customizable professional templates",
+            "HTML, PNG and PDF export",
+            "Compatible with Gmail and Outlook",
+            "No technical skills required",
+            "100% free forever"
         ]
     };
 
@@ -46,7 +46,7 @@ export default function JsonLdSchema() {
         "name": "Signature For Me",
         "url": typeof window !== 'undefined' ? window.location.origin : "https://signaturefor.me",
         "logo": `${typeof window !== 'undefined' ? window.location.origin : 'https://signaturefor.me'}/icon.svg`,
-        "description": "Generador de firmas de correo electrónico profesional",
+        "description": "Professional email signature generator",
         "sameAs": [
             "https://twitter.com/signatureforme"
         ]
@@ -59,50 +59,50 @@ export default function JsonLdSchema() {
         "mainEntity": [
             {
                 "@type": "Question",
-                "name": "¿Es Signature For Me realmente gratis?",
+                "name": "Is Signature For Me really free?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Sí! Nuestro plan básico es completamente gratis para siempre. Puedes crear firmas ilimitadas con acceso a todas las plantillas y funciones de exportación."
+                    "text": "Yes! Our basic plan is completely free forever. You can create unlimited signatures with access to all templates and export features."
                 }
             },
             {
                 "@type": "Question",
-                "name": "¿Puedo usar las firmas con Gmail?",
+                "name": "Can I use the signatures with Gmail?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "¡Absolutamente! Nuestras firmas funcionan con Gmail, Outlook, Apple Mail y prácticamente cualquier cliente de correo que soporte firmas HTML."
+                    "text": "Absolutely! Our signatures work with Gmail, Outlook, Apple Mail, and virtually any email client that supports HTML signatures."
                 }
             },
             {
                 "@type": "Question",
-                "name": "¿Necesito conocimientos técnicos?",
+                "name": "Do I need technical skills?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "¡Para nada! Nuestro editor intuitivo hace que sea fácil para cualquiera crear firmas profesionales. Solo completa tu información y personaliza."
+                    "text": "Not at all! Our intuitive editor makes it easy for anyone to create professional signatures. Just fill in your information and customize."
                 }
             },
             {
                 "@type": "Question",
-                "name": "¿Puedo personalizar las plantillas?",
+                "name": "Can I customize the templates?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Sí! Puedes personalizar colores, fuentes, diseños y agregar tu propio logo y fotos. Cada plantilla es completamente personalizable para que coincida con tu marca."
+                    "text": "Yes! You can customize colors, fonts, layouts, and add your own logo and photos. Every template is fully customizable to match your brand."
                 }
             },
             {
                 "@type": "Question",
-                "name": "¿Mis datos están seguros?",
+                "name": "Is my data secure?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Sí, tomamos la seguridad en serio. Todos tus datos están encriptados y almacenados de forma segura. Puedes eliminar tus datos en cualquier momento desde la configuración de tu cuenta."
+                    "text": "Yes, we take security seriously. All your data is encrypted and stored securely. You can delete your data anytime from your account settings."
                 }
             },
             {
                 "@type": "Question",
-                "name": "¿Puedo exportar mi firma?",
+                "name": "Can I export my signature?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "¡Sí! Puedes exportar tu firma como HTML, PNG o PDF. Copia y pega directamente en tu cliente de correo o descarga para uso offline."
+                    "text": "Yes! You can export your signature as HTML, PNG, or PDF. Copy and paste directly into your email client or download for offline use."
                 }
             }
         ]
