@@ -18,12 +18,23 @@ const siteName = 'Signature For Me';
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Signature For Me - Professional Email Signature Generator",
+    default: "Generador de Firmas de Correo Electrónico Profesional | Signature For Me",
     template: "%s | Signature For Me",
   },
-  description: "Create and manage professional email signatures in minutes. Intuitive tool with multiple templates, HTML export, and premium features. Free forever plan available.",
+  description: "Crea firmas de correo electrónico profesionales gratis en minutos. Generador de firmas para Gmail, Outlook y más. Plantillas personalizables, exportación HTML. ¡100% gratis!",
   keywords: [
-    "email signature",
+    // Español - Principal
+    "generador de firmas de correo electrónico",
+    "generador de firmas email profesional",
+    "crear firma email gratis",
+    "firma de correo profesional",
+    "firma email Gmail",
+    "firma email Outlook",
+    "plantillas firma email",
+    "generador firma HTML",
+    "firma electrónica email",
+    "diseñador de firmas email",
+    // Inglés - Secundario
     "email signature generator",
     "professional email signature",
     "Gmail signature",
@@ -44,24 +55,25 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "es_ES",
+    alternateLocale: ["en_US"],
     url: siteUrl,
     siteName: siteName,
-    title: "Signature For Me - Professional Email Signature Generator",
-    description: "Create and manage professional email signatures in minutes. Intuitive tool with multiple templates and HTML export.",
+    title: "Generador de Firmas de Correo Electrónico Profesional Gratis",
+    description: "Crea firmas de correo profesionales en minutos. Plantillas personalizables para Gmail, Outlook y más. 100% gratis, sin tarjeta de crédito.",
     images: [
       {
         url: `${siteUrl}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "Signature For Me - Professional Email Signature Generator",
+        alt: "Signature For Me - Generador de Firmas Email Profesional",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Signature For Me - Professional Email Signature Generator",
-    description: "Create and manage professional email signatures in minutes. Intuitive tool with multiple templates and HTML export.",
+    title: "Generador de Firmas de Correo Electrónico Profesional Gratis",
+    description: "Crea firmas de correo profesionales en minutos. Plantillas personalizables para Gmail, Outlook y más. 100% gratis.",
     images: [`${siteUrl}/og-image.png`],
     creator: "@signatureforme",
   },

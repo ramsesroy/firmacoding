@@ -11,6 +11,15 @@ export async function POST(request: NextRequest) {
     const body = await request.text();
     const signature = request.headers.get("x-signature");
 
+    // 🔒 SECURITY: Validate signature header presence
+    if (!signature) {
+      console.error("Missing x-signature header");
+      return NextResponse.json(
+        { error: "Missing signature" },
+        { status: 401 }
+      );
+    }
+
     // Verify webhook signature
     const webhookSecret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
     if (!webhookSecret) {
@@ -21,11 +30,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify HMAC signature
+    // 🔒 SECURITY: Timing-safe signature comparison
     const hmac = crypto.createHmac("sha256", webhookSecret);
     const digest = hmac.update(body).digest("hex");
 
-    if (signature !== digest) {
+    const signatureBuffer = Buffer.from(signature, 'hex');
+    const digestBuffer = Buffer.from(digest, 'hex');
+
+    if (signatureBuffer.length !== digestBuffer.length ||
+      !crypto.timingSafeEqual(signatureBuffer, digestBuffer)) {
       console.error("Invalid webhook signature");
       return NextResponse.json(
         { error: "Invalid signature" },
@@ -34,6 +47,41 @@ export async function POST(request: NextRequest) {
     }
 
     const event = JSON.parse(body);
+
+    // 🔒 SECURITY: Validate event structure
+    if (!event || !event.meta || !event.meta.event_name || !event.data) {
+      console.error("Invalid event structure");
+      return NextResponse.json(
+        { error: "Invalid event structure" },
+        { status: 400 }
+      );
+    }
+
+    // 🔒 SECURITY: Check for duplicate events (idempotency)
+    const eventId = event.data.id;
+    const { data: existingEvent } = await supabase
+      .from("webhook_events")
+      .select("id")
+      .eq("event_id", eventId)
+      .single();
+
+    if (existingEvent) {
+      console.log({
+        event: "webhook_duplicate",
+        eventId,
+        eventType: event.meta.event_name,
+        message: "Event already processed"
+      });
+      return NextResponse.json({ received: true });
+    }
+
+    // 🔒 SECURITY: Enhanced logging
+    console.log({
+      event: "webhook_received",
+      eventType: event.meta.event_name,
+      eventId,
+      timestamp: new Date().toISOString(),
+    });
 
     // Process different event types
     switch (event.meta.event_name) {
@@ -57,6 +105,20 @@ export async function POST(request: NextRequest) {
         console.log(`Unhandled event type: ${event.meta.event_name}`);
     }
 
+    // 🔒 SECURITY: Mark event as processed (idempotency)
+    await supabase.from("webhook_events").insert({
+      event_id: eventId,
+      event_type: event.meta.event_name,
+      event_data: event.data,
+    });
+
+    console.log({
+      event: "webhook_processed",
+      eventId,
+      eventType: event.meta.event_name,
+      timestamp: new Date().toISOString(),
+    });
+
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error("Webhook processing error:", error);
@@ -75,9 +137,15 @@ async function handleSubscriptionEvent(event: any) {
   const attributes = subscription.attributes;
   const customData = attributes.custom;
 
+  // 🔒 SECURITY: Validate user_id presence
   if (!customData?.user_id) {
-    console.error("No user_id in custom data");
-    return;
+    console.error({
+      error: "missing_user_id",
+      event: event.meta.event_name,
+      subscriptionId: subscription.id,
+      message: "No user_id in custom data"
+    });
+    throw new Error("Missing user_id in webhook data");
   }
 
   const userId = customData.user_id;
@@ -135,9 +203,15 @@ async function handleSubscriptionCancellation(event: any) {
   const attributes = subscription.attributes;
   const customData = attributes.custom;
 
+  // 🔒 SECURITY: Validate user_id presence
   if (!customData?.user_id) {
-    console.error("No user_id in custom data");
-    return;
+    console.error({
+      error: "missing_user_id",
+      event: event.meta.event_name,
+      subscriptionId: subscription.id,
+      message: "No user_id in custom data"
+    });
+    throw new Error("Missing user_id in webhook data");
   }
 
   const userId = customData.user_id;
@@ -163,9 +237,15 @@ async function handleOrderCreated(event: any) {
   const attributes = order.attributes;
   const customData = attributes.custom;
 
+  // 🔒 SECURITY: Validate user_id presence
   if (!customData?.user_id) {
-    console.error("No user_id in custom data");
-    return;
+    console.error({
+      error: "missing_user_id",
+      event: event.meta.event_name,
+      orderId: order.id,
+      message: "No user_id in custom data"
+    });
+    throw new Error("Missing user_id in webhook data");
   }
 
   const userId = customData.user_id;
@@ -214,7 +294,7 @@ function getPlanTypeFromVariantId(variantId: string | number): "free" | "premium
   if (variantIdStr === premiumVariantId) return "premium";
   if (variantIdStr === teamVariantId) return "team";
   if (variantIdStr === agencyVariantId) return "agency";
-  
+
   return "premium"; // Default
 }
 

@@ -6,10 +6,11 @@ import Footer from "@/components/Footer";
 import Pricing from "@/components/Pricing";
 import ScrollAnimation from "@/components/ScrollAnimation";
 import { Icon3D } from "@/components/Icon3D";
+import JsonLdSchema from "@/components/JsonLdSchema";
 import { useState } from "react";
-import { 
-  HiOutlineLightBulb, 
-  HiOutlineLockClosed, 
+import {
+  HiOutlineLightBulb,
+  HiOutlineLockClosed,
   HiOutlineArrowUpTray,
   HiOutlineEye,
   HiOutlinePaintBrush,
@@ -86,13 +87,14 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
+      <JsonLdSchema />
       <Header />
 
       {/* Hero Section with Animated Background */}
       <section className="relative pt-32 pb-24 sm:pt-40 sm:pb-32 lg:pt-48 lg:pb-40 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {/* Animated Background Gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50/30 to-blue-50 animate-gradient -z-10"></div>
-        
+
         {/* Floating Shapes */}
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/20 rounded-full blur-3xl animate-float -z-10"></div>
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl animate-float -z-10" style={{ animationDelay: "2s" }}></div>
@@ -102,17 +104,17 @@ export default function LandingPage() {
 
             <ScrollAnimation direction="down" delay={100}>
               <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-                Professional Email
+                Generador de Firmas de
                 <span className="block mt-2 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent animate-gradient">
-                  Signatures in Minutes
+                  Correo Electrónico Profesional
                 </span>
               </h1>
             </ScrollAnimation>
 
             <ScrollAnimation direction="up" delay={200}>
               <p className="text-xl sm:text-2xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
-                Create stunning, professional email signatures effortlessly. 
-                <span className="block mt-2 font-medium text-gray-700">No design skills required.</span>
+                Crea firmas de email profesionales en minutos. Gratis, fácil y sin conocimientos técnicos.
+                <span className="block mt-2 font-medium text-gray-700">Compatible con Gmail, Outlook y más.</span>
               </p>
             </ScrollAnimation>
 
@@ -212,7 +214,7 @@ export default function LandingPage() {
 
       {/* Stats Section */}
       <section className="py-16 sm:py-20 bg-gradient-to-r from-blue-600 to-purple-600 relative overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 opacity-20"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -293,8 +295,8 @@ export default function LandingPage() {
                   <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
                   <div className="relative z-10">
                     <div className="mb-6">
-                      <Icon3D 
-                        icon={feature.icon} 
+                      <Icon3D
+                        icon={feature.icon}
                         gradient={feature.gradient}
                         size="md"
                       />
@@ -340,8 +342,8 @@ export default function LandingPage() {
                 <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 group h-full">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <Icon3D 
-                        icon={feature.icon} 
+                      <Icon3D
+                        icon={feature.icon}
                         gradient={feature.gradient}
                         size="lg"
                       />
@@ -411,14 +413,13 @@ export default function LandingPage() {
                   className={`cursor-pointer ${activeTestimonial === index ? "scale-105" : "scale-100"} transition-transform duration-300`}
                   onClick={() => setActiveTestimonial(index)}
                 >
-                  <div className={`h-full bg-white rounded-2xl p-8 border-2 transition-all duration-300 ${
-                    activeTestimonial === index 
-                      ? "border-blue-500 shadow-2xl" 
-                      : "border-gray-100 hover:border-gray-200 hover:shadow-xl"
-                  }`}>
+                  <div className={`h-full bg-white rounded-2xl p-8 border-2 transition-all duration-300 ${activeTestimonial === index
+                    ? "border-blue-500 shadow-2xl"
+                    : "border-gray-100 hover:border-gray-200 hover:shadow-xl"
+                    }`}>
                     <div className="mb-4 flex justify-center">
-                      <Icon3D 
-                        icon={testimonial.icon} 
+                      <Icon3D
+                        icon={testimonial.icon}
                         gradient={testimonial.gradient}
                         size="lg"
                       />
@@ -486,8 +487,8 @@ export default function LandingPage() {
               <ScrollAnimation key={index} direction="up" delay={index * 200} className="relative">
                 <div className="text-center group">
                   <div className="relative inline-flex items-center justify-center mb-6 z-10">
-                    <Icon3D 
-                      icon={step.icon} 
+                    <Icon3D
+                      icon={step.icon}
                       gradient="from-blue-600 to-purple-600"
                       size="xl"
                     />
@@ -528,7 +529,7 @@ export default function LandingPage() {
 
       {/* Final CTA Section */}
       <section className="py-24 sm:py-32 lg:py-40 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -586,9 +587,8 @@ function FAQItem({ question, answer, index }: { question: string; answer: string
           </svg>
         </button>
         <div
-          className={`overflow-hidden transition-all duration-300 ${
-            isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-          }`}
+          className={`overflow-hidden transition-all duration-300 ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+            }`}
         >
           <div className="px-6 pb-5 text-gray-600 leading-relaxed">{answer}</div>
         </div>
