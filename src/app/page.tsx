@@ -104,17 +104,17 @@ export default function LandingPage() {
 
             <ScrollAnimation direction="down" delay={100}>
               <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold text-gray-900 mb-6 leading-tight tracking-tight">
-                Generador de Firmas de
+                Professional Email
                 <span className="block mt-2 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent animate-gradient">
-                  Correo Electrónico Profesional
+                  Signatures in Minutes
                 </span>
               </h1>
             </ScrollAnimation>
 
             <ScrollAnimation direction="up" delay={200}>
               <p className="text-xl sm:text-2xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
-                Crea firmas de email profesionales en minutos. Gratis, fácil y sin conocimientos técnicos.
-                <span className="block mt-2 font-medium text-gray-700">Compatible con Gmail, Outlook y más.</span>
+                Create professional email signatures in minutes. Free, easy, and no technical skills required.
+                <span className="block mt-2 font-medium text-gray-700">Compatible with Gmail, Outlook, and more.</span>
               </p>
             </ScrollAnimation>
 
@@ -262,8 +262,8 @@ export default function LandingPage() {
               },
               {
                 icon: <HiOutlineArrowUpTray className="w-full h-full" />,
-                title: "Easy Export",
-                description: "Compatible with Gmail, Outlook, Apple Mail, and any email client. One-click export in multiple formats.",
+                title: "Multiple Export Formats",
+                description: "Export your signature as HTML, PNG, or PDF with one click. Compatible with Gmail, Outlook, Apple Mail, and any email client.",
                 gradient: "from-green-500 to-emerald-500",
               },
               {
