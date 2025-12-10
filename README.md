@@ -39,11 +39,6 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 # Google Analytics (Optional)
 NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
 # Get your Measurement ID from Google Analytics 4: https://analytics.google.com
-
-# n8n Webhooks (Optional - For AI Signature Helper)
-# N8N_AI_HELPER_WEBHOOK_URL=https://n8n.avyris.com/webhook/ai-signature-helper
-# IMPORTANT: Use the clean production URL (without session IDs or temporary codes)
-# IMPORTANT: The workflow must be ACTIVE in n8n for production URLs to work
 ```
 
 **Important Notes**: 

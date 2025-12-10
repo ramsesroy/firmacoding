@@ -18,7 +18,6 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { canSaveSignature, incrementSavedSignatures, decrementSavedSignatures } from "@/lib/subscriptionUtils";
 import { analytics } from "@/lib/analytics";
 import { Icon3D } from "@/components/Icon3D";
-import AiSuggestionsPanel from "@/components/AiSuggestionsPanel";
 import { logger } from "@/lib/logger";
 // Lazy load heavy libraries only when needed for exports
 // import html2canvas from 'html2canvas'; // Removed - now loaded dynamically
@@ -317,8 +316,6 @@ function DashboardContent() {
   const [remainingSessionUploads, setRemainingSessionUploads] = useState<number | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // AI Suggestions Panel
-  const [showAiPanel, setShowAiPanel] = useState(false);
   const [autosaveStatus, setAutosaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
   // Load signature for editing if edit query parameter exists
@@ -982,8 +979,8 @@ function DashboardContent() {
                             }
                           }}
                           className={`group relative px-4 py-4 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden ${template === tpl.id
-                              ? "bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white shadow-2xl shadow-blue-500/40 ring-2 ring-blue-400 ring-offset-2 ring-offset-white transform scale-[1.02]"
-                              : "bg-white text-gray-700 hover:bg-gradient-to-br hover:from-gray-50 hover:to-gray-100 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10 hover:scale-105 active:scale-95"
+                            ? "bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white shadow-2xl shadow-blue-500/40 ring-2 ring-blue-400 ring-offset-2 ring-offset-white transform scale-[1.02]"
+                            : "bg-white text-gray-700 hover:bg-gradient-to-br hover:from-gray-50 hover:to-gray-100 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-500/10 hover:scale-105 active:scale-95"
                             }`}
                           style={template === tpl.id ? {
                             boxShadow: '0 20px 25px -5px rgba(59, 130, 246, 0.4), 0 10px 10px -5px rgba(59, 130, 246, 0.2)'
@@ -1750,8 +1747,8 @@ function DashboardContent() {
                   </div>
                   {autosaveStatus !== 'idle' && (
                     <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium ${autosaveStatus === 'saving'
-                        ? 'bg-blue-50 border border-blue-100 text-blue-700'
-                        : 'bg-green-50 border border-green-100 text-green-700'
+                      ? 'bg-blue-50 border border-blue-100 text-blue-700'
+                      : 'bg-green-50 border border-green-100 text-green-700'
                       }`}>
                       {autosaveStatus === 'saving' ? (
                         <>
@@ -1814,17 +1811,6 @@ function DashboardContent() {
               {/* Action Buttons */}
               <div className="mt-auto pt-6 border-t-2 border-gray-100">
                 <div className="flex flex-col gap-4">
-                  {/* AI Helper Button - Only for authenticated Premium users */}
-                  {isAuthenticated && isPremium && (
-                    <button
-                      type="button"
-                      onClick={() => setShowAiPanel(true)}
-                      className="group w-full px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 shadow-xl shadow-purple-500/40 hover:shadow-2xl hover:shadow-purple-500/50 hover:scale-[1.02]"
-                    >
-                      <span className="material-symbols-outlined text-xl">auto_awesome</span>
-                      <span>✨ Improve with AI</span>
-                    </button>
-                  )}
                   <div className="flex flex-col sm:flex-row gap-4">
                     <button
                       type="button"
@@ -1832,8 +1818,8 @@ function DashboardContent() {
                       aria-label={copied ? "Signature copied to clipboard" : "Copy signature HTML to clipboard"}
                       aria-pressed={copied}
                       className={`group flex-1 px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${copied
-                          ? "bg-gradient-to-r from-green-500 via-green-600 to-green-500 text-white shadow-xl shadow-green-500/40 transform scale-105"
-                          : "bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white hover:from-gray-800 hover:via-gray-700 hover:to-gray-800 shadow-xl shadow-gray-900/25 hover:shadow-2xl hover:shadow-gray-900/35 hover:scale-[1.02]"
+                        ? "bg-gradient-to-r from-green-500 via-green-600 to-green-500 text-white shadow-xl shadow-green-500/40 transform scale-105"
+                        : "bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white hover:from-gray-800 hover:via-gray-700 hover:to-gray-800 shadow-xl shadow-gray-900/25 hover:shadow-2xl hover:shadow-gray-900/35 hover:scale-[1.02]"
                         }`}
                     >
                       <span className="material-symbols-outlined text-xl">
@@ -1851,8 +1837,8 @@ function DashboardContent() {
                       aria-label={editingSignatureId ? "Update signature" : "Save signature"}
                       aria-busy={saving}
                       className={`group flex-1 px-6 py-4 rounded-xl transition-all duration-300 font-bold text-base flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:focus:ring-0 ${saving
-                          ? "bg-gray-400 text-white cursor-not-allowed shadow-md"
-                          : "bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 text-white hover:from-blue-700 hover:via-blue-800 hover:to-blue-700 shadow-xl shadow-blue-500/40 hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.02]"
+                        ? "bg-gray-400 text-white cursor-not-allowed shadow-md"
+                        : "bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 text-white hover:from-blue-700 hover:via-blue-800 hover:to-blue-700 shadow-xl shadow-blue-500/40 hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-[1.02]"
                         }`}
                     >
                       <span className={`material-symbols-outlined text-xl ${saving ? "animate-spin" : ""}`}>
@@ -1924,8 +1910,8 @@ function DashboardContent() {
                 {saveMessage && (
                   <div
                     className={`mt-4 p-4 rounded-lg border ${saveMessage.type === "success"
-                        ? "bg-green-50 border-green-200"
-                        : "bg-red-50 border-red-200"
+                      ? "bg-green-50 border-green-200"
+                      : "bg-red-50 border-red-200"
                       }`}
                   >
                     <div className="flex items-start gap-2">
@@ -1940,8 +1926,8 @@ function DashboardContent() {
                       )}
                       <p
                         className={`text-sm font-medium whitespace-pre-line ${saveMessage.type === "success"
-                            ? "text-green-600"
-                            : "text-red-600"
+                          ? "text-green-600"
+                          : "text-red-600"
                           }`}
                       >
                         {saveMessage.text}
@@ -2026,100 +2012,6 @@ function DashboardContent() {
               </div>
             </div>
           </div>
-        )}
-
-        {/* AI Suggestions Panel - Only render if user is authenticated and premium */}
-        {isAuthenticated && user?.id && isPremium && (
-          <AiSuggestionsPanel
-            isOpen={showAiPanel}
-            onClose={() => setShowAiPanel(false)}
-            signatureData={signatureData}
-            currentTemplate={template}
-            userId={user.id}
-            isPremium={isPremium}
-            userEmail={user.email}
-            onApplySuggestion={(suggestion) => {
-              // Apply suggestion based on type
-              if (suggestion.type === "add_field") {
-                if (suggestion.field === "businessHours" && suggestion.example) {
-                  setSignatureData({ ...signatureData, horario: suggestion.example });
-                  showToast("Business hours added!", "success");
-                } else if (suggestion.field === "mobile" && suggestion.example) {
-                  setSignatureData({ ...signatureData, telefonoMovil: suggestion.example });
-                  showToast("Mobile number added!", "success");
-                } else if (suggestion.field === "address" && suggestion.example) {
-                  setSignatureData({ ...signatureData, direccion: suggestion.example });
-                  showToast("Address added!", "success");
-                } else if (suggestion.field === "callToAction" && suggestion.example) {
-                  setSignatureData({ ...signatureData, ctaTexto: suggestion.example });
-                  showToast("Call-to-action added!", "success");
-                } else if (suggestion.field === "website" || suggestion.field === "hasWebsite") {
-                  // Add website link to redes (social links array)
-                  const websiteUrl = suggestion.example || suggestion.suggestion || "https://yourwebsite.com";
-                  // Ensure URL has protocol
-                  const fullUrl = websiteUrl.startsWith("http") ? websiteUrl : `https://${websiteUrl}`;
-
-                  const newRed = {
-                    nombre: "Website",
-                    url: fullUrl,
-                    icono: "",
-                  };
-
-                  // Check if website already exists
-                  const existingWebsite = signatureData.redes?.find(
-                    (r) => r.nombre.toLowerCase() === "website" ||
-                      (r.url.includes("http") && !r.url.match(/(linkedin|twitter|x|github|facebook|instagram|youtube|tiktok|behance|dribbble)\.com/))
-                  );
-
-                  if (existingWebsite) {
-                    // Update existing website
-                    const updatedRedes = signatureData.redes?.map((r) =>
-                      r === existingWebsite ? newRed : r
-                    ) || [newRed];
-                    setSignatureData({ ...signatureData, redes: updatedRedes });
-                    showToast("Website updated!", "success");
-                  } else {
-                    // Add new website
-                    setSignatureData({
-                      ...signatureData,
-                      redes: [...(signatureData.redes || []), newRed],
-                    });
-                    showToast("Website added!", "success");
-                  }
-                }
-              } else if (suggestion.type === "add_social" && suggestion.platform) {
-                // Add social link
-                const newRed = {
-                  nombre: suggestion.platform,
-                  url: suggestion.example || `https://${suggestion.platform.toLowerCase()}.com/yourprofile`,
-                  icono: "",
-                };
-                setSignatureData({
-                  ...signatureData,
-                  redes: [...(signatureData.redes || []), newRed],
-                });
-                showToast(`${suggestion.platform} link added!`, "success");
-              } else if (suggestion.type === "improve_content" && suggestion.suggestion) {
-                if (suggestion.field === "role") {
-                  setSignatureData({ ...signatureData, cargo: suggestion.suggestion });
-                  showToast("Role updated!", "success");
-                } else if (suggestion.field === "name" || suggestion.field === "fullName") {
-                  setSignatureData({ ...signatureData, nombre: suggestion.suggestion });
-                  showToast("Name updated!", "success");
-                }
-              } else if (suggestion.type === "add_feature" && suggestion.feature) {
-                // Handle feature additions (e.g., QR code, business hours toggle)
-                if (suggestion.feature === "qrCode") {
-                  setSignatureData({ ...signatureData, qrLink: suggestion.example || "https://example.com" });
-                  showToast("QR Code feature enabled!", "success");
-                }
-              }
-            }}
-            onTemplateChange={(templateId) => {
-              setTemplate(templateId);
-              showToast(`Template changed to ${templateId}`, "success");
-            }}
-          />
         )}
       </div>
     </>
