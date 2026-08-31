@@ -1,71 +1,115 @@
-# Signature For Me - Email Signature Generator SaaS
+# Signature For Me — Email Signature Generator SaaS
 
-Professional email signature generator SaaS application built with Next.js, TypeScript, and Supabase.
+A professional email signature generator SaaS built with **Next.js**, **TypeScript**, **Tailwind CSS**, **Supabase**, and **LemonSqueezy**.
 
-## Technologies
+🌐 **Live:** [firmacoding.vercel.app](https://firmacoding.vercel.app)
 
-- Next.js 16
-- TypeScript
-- Tailwind CSS
-- Supabase (Database and Authentication)
-- LemonSqueezy (Payment Processing)
+---
 
-## Setup
+## Features
 
-### Environment Variables
+- **19 professional templates** — Classic, Modern, QR, Developer, University, Church, Law, and more
+- **Canvas Editor** — Drag-and-drop signature builder with custom rows, columns, and elements
+- **Multiple export formats** — HTML, PNG (high-res), PDF, ZIP
+- **Freemium model** — Free tier with watermark, Premium without limits
+- **Authentication** — Email/password via Supabase Auth
+- **Save & manage signatures** — Per-user signature storage in Supabase
+- **Link click analytics** — Track clicks on signature links (Premium)
+- **QR code integration** — Dynamic QR codes in specific templates
+- **SEO optimized** — Sitemap, robots.txt, JSON-LD schema, Open Graph
+- **Blog** — Built-in blog with email signature guides
+- **Payment system** — LemonSqueezy integration (webhooks + checkout)
 
-Create a `.env.local` file in the root directory with the following variables:
+## Tech Stack
 
-```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_clave_anonima_de_supabase
-
-# LemonSqueezy Configuration
-LEMONSQUEEZY_API_KEY=tu_api_key_de_lemonsqueezy
-LEMONSQUEEZY_STORE_ID=tu_store_id_de_lemonsqueezy
-LEMONSQUEEZY_WEBHOOK_SECRET=tu_webhook_secret_de_lemonsqueezy
-
-# LemonSqueezy Variant IDs (IDs de los productos/planes)
-NEXT_PUBLIC_LEMONSQUEEZY_PREMIUM_VARIANT_ID=variante_id_premium
-NEXT_PUBLIC_LEMONSQUEEZY_PREMIUM_YEARLY_VARIANT_ID=variante_id_premium_anual (opcional)
-NEXT_PUBLIC_LEMONSQUEEZY_TEAM_VARIANT_ID=variante_id_team (opcional)
-NEXT_PUBLIC_LEMONSQUEEZY_AGENCY_VARIANT_ID=variante_id_agency (opcional)
-
-# Application URL
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-# En producción: NEXT_PUBLIC_APP_URL=https://tu-dominio.com
-
-# Google Analytics (Optional)
-NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX
-# Get your Measurement ID from Google Analytics 4: https://analytics.google.com
-```
-
-**Important Notes**: 
-- You can get Supabase credentials from your project at [Supabase](https://supabase.com).
-- You can get LemonSqueezy credentials from the [LemonSqueezy](https://app.lemonsqueezy.com/) dashboard.
-- See `LEMONSQUEEZY_SETUP.md` for detailed setup instructions.
-
-### Database
-
-Execute the SQL script `supabase-setup.sql` in the Supabase SQL Editor to create the `signatures` table with the necessary security policies.
-
-Also execute `supabase-subscriptions.sql` to set up the subscription system.
-
-## Development
-
-```bash
-npm install
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript 5.5 |
+| Styles | Tailwind CSS 3.4 |
+| Database / Auth | Supabase (PostgreSQL + Auth) |
+| Payments | LemonSqueezy |
+| Analytics | Google Analytics 4 |
+| Export | html2canvas, jsPDF, @react-pdf/renderer, JSZip |
 
 ## Project Structure
 
-- `/src/app` - Application pages
-- `/src/components` - Reusable components
-- `/src/lib` - Utilities and helper functions
-- `/src/types` - TypeScript type definitions
-- `/src/hooks` - Custom React hooks
+```
+src/
+├── app/               # Next.js App Router pages
+│   ├── dashboard/     # Protected user area (editor, canvas, analytics, settings)
+│   ├── api/           # API routes (LemonSqueezy, analytics, Cloudflare)
+│   ├── blog/          # Blog with SEO-optimized articles
+│   └── legal/         # Terms, Privacy, Cookies, License
+├── components/
+│   ├── SignaturePreview.tsx   # Core signature renderer (19 templates)
+│   ├── canvas/               # Canvas editor components
+│   └── Pricing.tsx           # Pricing section
+├── lib/
+│   ├── signatureUtils.ts      # Template HTML/CSS generation
+│   ├── exportUtils.ts         # PNG, PDF, HTML, ZIP export logic
+│   ├── imageUtils.ts          # Image upload + compression
+│   ├── subscriptionUtils.ts   # Plan limits and permissions
+│   └── canvas/                # Canvas state management
+├── hooks/
+│   └── useSubscription.ts     # User subscription state
+└── types/
+    ├── signature.ts           # Signature and template types
+    └── canvas.ts              # Canvas editor types
+```
 
+## Setup
+
+### 1. Clone and install
+
+```bash
+git clone https://github.com/ramsesroy/firmacoding.git
+cd firmacoding
+npm install
+```
+
+### 2. Environment variables
+
+Copy `.env.example` to `.env.local` and fill in your credentials:
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# LemonSqueezy (payments)
+LEMONSQUEEZY_API_KEY=your_api_key
+LEMONSQUEEZY_STORE_ID=your_store_id
+LEMONSQUEEZY_WEBHOOK_SECRET=your_webhook_secret
+NEXT_PUBLIC_LEMONSQUEEZY_PREMIUM_VARIANT_ID=your_variant_id
+
+# App URL
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 3. Database setup
+
+Run the SQL scripts in `/db/` in order via the Supabase SQL Editor:
+
+1. `supabase-setup.sql` — signatures table
+2. `supabase-subscriptions.sql` — subscriptions + user limits
+3. `supabase-canvas-setup.sql` — canvas signatures table
+4. `supabase-link-analytics-setup.sql` — link click analytics
+
+Also create a public Storage bucket named **`demomail`** in Supabase dashboard.
+
+### 4. Run
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+## Deployment
+
+Deployed on **Vercel**. Set all environment variables in the Vercel project settings.
+
+---
+
+Built by [Ramsés Roy](https://github.com/ramsesroy)
