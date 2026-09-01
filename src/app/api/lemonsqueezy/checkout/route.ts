@@ -106,9 +106,19 @@ export async function POST(request: NextRequest) {
 
     if (!checkoutResponse.ok) {
       const errorData = await checkoutResponse.json();
-      console.error("LemonSqueezy checkout error:", errorData);
+      console.error("LemonSqueezy checkout error:", JSON.stringify(errorData));
       return NextResponse.json(
-        { error: "Failed to create checkout", details: errorData },
+        { 
+          error: "Failed to create checkout", 
+          details: errorData,
+          debug: {
+            storeId,
+            variantId,
+            hasApiKey: !!process.env.LEMONSQUEEZY_API_KEY,
+            appUrl: process.env.NEXT_PUBLIC_APP_URL,
+            testMode: process.env.NODE_ENV !== "production",
+          }
+        },
         { status: 500 }
       );
     }
