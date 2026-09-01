@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
               },
               expires_at: null,
               preview: false,
-              test_mode: process.env.NODE_ENV !== "production",
+              test_mode: process.env.LEMONSQUEEZY_TEST_MODE !== "false", // Default to true for portfolio
             },
             relationships: {
               store: {
