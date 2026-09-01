@@ -75,8 +75,8 @@ export async function POST(request: NextRequest) {
                 logo: false,
               },
               checkout_data: {
-                email: user.email || "",
-                name: user.user_metadata?.full_name || user.email || "",
+                ...(user?.email ? { email: user.email } : {}),
+                ...(user?.user_metadata?.full_name || user?.email ? { name: user.user_metadata?.full_name || user.email } : {}),
                 custom: {
                   user_id: user.id,
                 },
