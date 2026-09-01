@@ -27,6 +27,7 @@ export async function createCheckout(
 
   if (!response.ok) {
     const error = await response.json();
+    console.error("🍋 LemonSqueezy API Error Details:", error);
     throw new Error(error.error || "Failed to create checkout");
   }
 
