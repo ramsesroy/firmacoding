@@ -16,28 +16,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TEMPORARY BYPASS FOR DEBUGGING
-    const user = {
-      id: "debug-user-123",
-      email: "debug@example.com",
-      user_metadata: { full_name: "Debug User" }
-    };
-    /*
     // Verify authentication
     const authHeader = request.headers.get("authorization");
     if (!authHeader) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { data: { user: realUser }, error: authError } = await supabase.auth.getUser(
+    const { data: { user }, error: authError } = await supabase.auth.getUser(
       authHeader.replace("Bearer ", "")
     );
 
-    if (authError || !realUser) {
+    if (authError || !user) {
       return NextResponse.json({ error: "Invalid authentication" }, { status: 401 });
     }
-    const user = realUser;
-    */
 
     const storeId = process.env.LEMONSQUEEZY_STORE_ID;
     if (!storeId) {
@@ -46,6 +37,9 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+    
+    // Fallback URL if env var is missing
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://signaturefor.me";
 
     // Create checkout in LemonSqueezy
     const checkoutResponse = await fetch(
@@ -66,9 +60,9 @@ export async function POST(request: NextRequest) {
                 name: "Signature For Me Premium",
                 description: "Upgrade to Premium plan",
                 media: [],
-                redirect_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/subscription?success=true`,
+                redirect_url: `${appUrl}/dashboard/subscription?success=true`,
                 receipt_button_text: "Go to Dashboard",
-                receipt_link_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
+                receipt_link_url: `${appUrl}/dashboard`,
                 receipt_thank_you_note: "Thank you for subscribing!",
               },
               checkout_options: {
